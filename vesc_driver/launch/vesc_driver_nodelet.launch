@@ -21,13 +21,13 @@
 
   <!-- Nodelet manager -->
   <node if="$(arg start_manager)" pkg="nodelet" type="nodelet" name="$(arg manager)"
-        args="manager" output="screen" launch-prefix="$(arg launch_prefix)">
+        args="manager" output="screen" launch-prefix="$(arg launch_prefix)" respawn="true">
      <param name="num_worker_threads" value="$(arg num_worker_threads)" />
   </node>
 
   <!-- VESC driver nodelet -->
   <node pkg="nodelet" type="nodelet" name="$(arg node_name)"
-        args="load vesc_driver::VescDriverNodelet $(arg manager)" >
+        args="load vesc_driver::VescDriverNodelet $(arg manager)" respawn="true">
     <param name="port" value="$(arg port)" />
   </node>    
 

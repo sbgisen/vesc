@@ -1,0 +1,14 @@
+[0m[ INFO] [1599209970.855983894]: Initializing nodelet with 8 worker threads.[0m
+[0m[ INFO] [1599209971.329598986]: Reconfigure request : 0.500000 1.000000 0.100000 1.000000 6.000000[0m
+[33m[ WARN] [1599209986.245420436]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (-0.2, 0), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599209987.595343816]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.2, 0), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599209989.195372399]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (-0.2, 0), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599209990.945387172]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.2, 0), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599209992.145371830]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (-0.2, 0), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599209993.895370035]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.2, 0), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599209996.145356017]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (-0.2, 0), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599209997.345374317]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.2, 0), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599209998.495362723]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (-0.2, 0), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599209999.545401526]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (-0.2, 0), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599210003.495350909]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0, 0.3), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599210006.045380288]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0, -0.3), zeroing...[velocity_smoother][0m

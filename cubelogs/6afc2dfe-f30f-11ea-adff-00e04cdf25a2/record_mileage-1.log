@@ -1,0 +1,443 @@
+[rospy.client][INFO] 2020-09-10 11:59:12,630: init_node, name[/record_mileage], pid[26282]
+[xmlrpc][INFO] 2020-09-10 11:59:12,631: XML-RPC server binding to 0.0.0.0:0
+[rospy.init][INFO] 2020-09-10 11:59:12,632: ROS Slave URI: [http://cuboid0009:35365/]
+[xmlrpc][INFO] 2020-09-10 11:59:12,633: Started XML-RPC server [http://cuboid0009:35365/]
+[rospy.impl.masterslave][INFO] 2020-09-10 11:59:12,633: _ready: http://cuboid0009:35365/
+[rospy.registration][INFO] 2020-09-10 11:59:12,634: Registering with master node http://localhost:11311
+[xmlrpc][INFO] 2020-09-10 11:59:12,635: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2020-09-10 11:59:12,733: registered with master
+[rospy.rosout][INFO] 2020-09-10 11:59:12,733: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-10 11:59:12,735: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-10 11:59:12,737: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rosout][INFO] 2020-09-10 11:59:12,744: api:report/robot/uploadMileage/
+[rosout][INFO] 2020-09-10 11:59:12,745: robot_serial_no:Cuboid0009
+[rospy.internal][INFO] 2020-09-10 11:59:12,749: topic[/base/cube_base_driver/diff_drive_controller/odom] adding connection to [http://cuboid0009:45747/], count 0
+[rospy.internal][INFO] 2020-09-10 11:59:12,944: topic[/rosout] adding connection to [/rosout], count 0
+[rosout][INFO] 2020-09-10 11:59:22,774: 0.347945962653
+[rosout][INFO] 2020-09-10 11:59:22,774: [start] obtain token
+[rosout][INFO] 2020-09-10 11:59:22,775: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 11:59:22,775: password: 1Fc**********
+[rosout][INFO] 2020-09-10 11:59:23,290: [successed] obtain token
+[rosout][INFO] 2020-09-10 11:59:32,774: 0.0809882159286
+[rosout][INFO] 2020-09-10 11:59:42,774: 0.494652459864
+[rosout][INFO] 2020-09-10 11:59:52,742: 2.88071559579
+[rosout][INFO] 2020-09-10 12:00:02,770: 2.99773831572
+[rosout][INFO] 2020-09-10 12:00:12,762: 3.00540331053
+[rosout][INFO] 2020-09-10 12:00:22,741: 2.9859929313
+[rosout][INFO] 2020-09-10 12:00:32,782: 1.08152947438
+[rosout][INFO] 2020-09-10 12:00:42,778: 1.49342783825
+[rosout][INFO] 2020-09-10 12:00:52,742: 0.768409498232
+[rosout][INFO] 2020-09-10 12:01:02,742: 0.855808059184
+[rosout][INFO] 2020-09-10 12:01:12,762: 0.011052560467
+[rosout][INFO] 2020-09-10 12:01:22,778: 0.050053810606
+[rosout][INFO] 2020-09-10 12:01:32,782: 2.810096676
+[rosout][INFO] 2020-09-10 12:01:42,762: 2.96168259811
+[rosout][INFO] 2020-09-10 12:01:52,762: 2.97989600943
+[rosout][INFO] 2020-09-10 12:02:02,786: 0.151861517256
+[rosout][INFO] 2020-09-10 12:02:12,798: 1.99044596939
+[rosout][INFO] 2020-09-10 12:02:22,802: 2.98806297919
+[rosout][INFO] 2020-09-10 12:02:32,790: 2.8473873639
+[rosout][INFO] 2020-09-10 12:02:42,818: 0.19439798662
+[rosout][INFO] 2020-09-10 12:02:52,782: 0.255070341707
+[rosout][INFO] 2020-09-10 12:03:02,806: 2.94033388665
+[rosout][INFO] 2020-09-10 12:03:12,810: 0.475142554307
+[rosout][INFO] 2020-09-10 12:03:22,826: 2.69924292434
+[rosout][INFO] 2020-09-10 12:03:32,826: 2.98966953764
+[rosout][INFO] 2020-09-10 12:03:42,822: 3.004085097
+[rosout][INFO] 2020-09-10 12:03:52,846: 2.89444967615
+[rosout][INFO] 2020-09-10 12:04:02,842: 2.32886257349
+[rosout][INFO] 2020-09-10 12:04:12,822: 0.149797818368
+[rosout][INFO] 2020-09-10 12:04:22,866: -0.000292479819722
+[rosout][INFO] 2020-09-10 12:04:32,882: 1.66835965518
+[rosout][INFO] 2020-09-10 12:04:32,882: [start] obtain token
+[rosout][INFO] 2020-09-10 12:04:32,882: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 12:04:32,883: password: 1Fc**********
+[rosout][INFO] 2020-09-10 12:04:33,297: [successed] obtain token
+[rosout][INFO] 2020-09-10 12:04:42,902: 2.82920469064
+[rosout][INFO] 2020-09-10 12:04:52,870: 2.98703500582
+[rosout][INFO] 2020-09-10 12:05:02,866: 2.79503943801
+[rosout][INFO] 2020-09-10 12:05:12,890: 2.62092329179
+[rosout][INFO] 2020-09-10 12:05:22,882: 2.91877796105
+[rosout][INFO] 2020-09-10 12:05:32,878: 0.944304406206
+[rosout][INFO] 2020-09-10 12:05:42,922: -0.000138154035062
+[rosout][INFO] 2020-09-10 12:05:52,894: 2.01941298751
+[rosout][INFO] 2020-09-10 12:06:02,881: 2.98997110547
+[rosout][INFO] 2020-09-10 12:06:12,922: 2.99512103107
+[rosout][INFO] 2020-09-10 12:06:22,901: 2.98920716206
+[rosout][INFO] 2020-09-10 12:06:32,902: 2.42728491864
+[rosout][INFO] 2020-09-10 12:06:42,914: 1.50754527719
+[rosout][INFO] 2020-09-10 12:06:52,902: -0.100075096251
+[rosout][INFO] 2020-09-10 12:07:02,930: 0.123233302907
+[rosout][INFO] 2020-09-10 12:07:12,986: 0.0287244642486
+[rosout][INFO] 2020-09-10 12:07:22,942: -0.0776814586301
+[rosout][INFO] 2020-09-10 12:07:32,970: 0.0859682874659
+[rosout][INFO] 2020-09-10 12:07:42,970: 0.635739409436
+[rosout][INFO] 2020-09-10 12:07:53,002: 2.99954688177
+[rosout][INFO] 2020-09-10 12:08:02,990: 2.86406745645
+[rosout][INFO] 2020-09-10 12:08:13,002: 2.92046690942
+[rosout][INFO] 2020-09-10 12:08:22,998: 2.98349380167
+[rosout][INFO] 2020-09-10 12:08:33,022: 2.78123023687
+[rosout][INFO] 2020-09-10 12:08:42,990: 0.185153376734
+[rosout][INFO] 2020-09-10 12:08:53,014: 0.155783664275
+[rosout][INFO] 2020-09-10 12:09:02,990: 0.747108322674
+[rosout][INFO] 2020-09-10 12:09:13,014: 2.99787726812
+[rosout][INFO] 2020-09-10 12:09:23,010: 2.99463164806
+[rosout][INFO] 2020-09-10 12:09:32,981: 2.98940710258
+[rosout][ERROR] 2020-09-10 12:09:33,207: Failed to postrequest because of HTTPError:401 Unauthorized
+[rosout][ERROR] 2020-09-10 12:09:33,208: https://api.cuboid.cloud/report/robot/uploadMileage/
+[rosout][ERROR] 2020-09-10 12:09:33,208: {'distance': 2.9894071025773883, 'robot': 'Cuboid0009'}
+[rosout][INFO] 2020-09-10 12:09:43,022: 2.99041885044
+[rosout][INFO] 2020-09-10 12:09:43,023: [start] obtain token
+[rosout][INFO] 2020-09-10 12:09:43,023: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 12:09:43,024: password: 1Fc**********
+[rosout][INFO] 2020-09-10 12:09:43,389: [successed] obtain token
+[rosout][INFO] 2020-09-10 12:09:52,982: 2.97651568754
+[rosout][INFO] 2020-09-10 12:10:03,002: 0.348750736164
+[rosout][INFO] 2020-09-10 12:10:13,018: 0.00244276494962
+[rosout][INFO] 2020-09-10 12:10:23,026: 1.72531995318
+[rosout][INFO] 2020-09-10 12:10:33,038: 2.81959676626
+[rosout][INFO] 2020-09-10 12:10:43,022: 2.98903419357
+[rosout][INFO] 2020-09-10 12:10:53,054: 2.88928381586
+[rosout][INFO] 2020-09-10 12:11:03,046: 2.98814191436
+[rosout][INFO] 2020-09-10 12:11:13,026: 2.81399757345
+[rosout][INFO] 2020-09-10 12:11:23,026: 0.20858899865
+[rosout][INFO] 2020-09-10 12:11:33,082: 0.12096034587
+[rosout][INFO] 2020-09-10 12:11:43,066: -0.106505860289
+[rosout][INFO] 2020-09-10 12:11:53,041: 0.156941266247
+[rosout][INFO] 2020-09-10 12:12:03,062: 0.000473913276948
+[rosout][INFO] 2020-09-10 12:12:13,082: 0.312222795268
+[rosout][INFO] 2020-09-10 12:12:23,082: 2.52151852692
+[rosout][INFO] 2020-09-10 12:12:33,066: 1.37666421093
+[rosout][INFO] 2020-09-10 12:12:43,086: 1.92786685337
+[rosout][INFO] 2020-09-10 12:12:53,098: 2.80805156822
+[rosout][INFO] 2020-09-10 12:13:03,061: 2.98756458098
+[rosout][INFO] 2020-09-10 12:13:13,070: 2.98964514723
+[rosout][INFO] 2020-09-10 12:13:23,086: 1.76660937682
+[rosout][INFO] 2020-09-10 12:13:33,066: 0.516165144266
+[rosout][INFO] 2020-09-10 12:13:43,086: 0.00157157454144
+[rosout][INFO] 2020-09-10 12:13:53,081: 0.314388175606
+[rosout][INFO] 2020-09-10 12:14:03,098: 1.86472690981
+[rosout][INFO] 2020-09-10 12:14:13,102: 1.00716097732
+[rosout][INFO] 2020-09-10 12:14:23,134: 0.160791685537
+[rosout][INFO] 2020-09-10 12:14:33,110: 2.63860543873
+[rosout][INFO] 2020-09-10 12:14:43,102: 2.91776718106
+[rosout][INFO] 2020-09-10 12:14:43,102: [start] obtain token
+[rosout][INFO] 2020-09-10 12:14:43,102: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 12:14:43,103: password: 1Fc**********
+[rosout][INFO] 2020-09-10 12:14:43,499: [successed] obtain token
+[rosout][INFO] 2020-09-10 12:14:53,130: 2.90072230296
+[rosout][INFO] 2020-09-10 12:15:03,122: 2.99249787629
+[rosout][INFO] 2020-09-10 12:15:13,121: 2.99438200193
+[rosout][INFO] 2020-09-10 12:15:23,134: 1.90948741943
+[rosout][INFO] 2020-09-10 12:15:33,121: -0.00396660849128
+[rosout][INFO] 2020-09-10 12:15:43,154: 1.32704358893
+[rosout][INFO] 2020-09-10 12:15:53,146: 2.98927467642
+[rosout][INFO] 2020-09-10 12:16:03,122: 2.99224756705
+[rosout][INFO] 2020-09-10 12:16:13,142: 2.98315852601
+[rosout][INFO] 2020-09-10 12:16:23,122: 2.92385414941
+[rosout][INFO] 2020-09-10 12:16:33,162: 1.63528071174
+[rosout][INFO] 2020-09-10 12:16:43,122: 0.204444294731
+[rosout][INFO] 2020-09-10 12:16:53,154: 0.420587677151
+[rosout][INFO] 2020-09-10 12:17:03,126: 1.49813665567
+[rosout][INFO] 2020-09-10 12:17:13,131: -0.000154521537007
+[rosout][INFO] 2020-09-10 12:17:23,142: 2.13619050887
+[rosout][INFO] 2020-09-10 12:17:33,126: 2.98742982885
+[rosout][INFO] 2020-09-10 12:17:43,154: 2.42043939097
+[rosout][INFO] 2020-09-10 12:17:53,158: 1.29559883728
+[rosout][INFO] 2020-09-10 12:18:03,150: -0.220252242505
+[rosout][INFO] 2020-09-10 12:18:13,126: 1.45695507822
+[rosout][INFO] 2020-09-10 12:18:23,146: 2.75579465949
+[rosout][INFO] 2020-09-10 12:18:33,146: 2.9885454094
+[rosout][INFO] 2020-09-10 12:18:43,162: 1.12396570355
+[rosout][INFO] 2020-09-10 12:18:53,138: 0.00164630582413
+[rosout][INFO] 2020-09-10 12:19:03,130: 1.86477853771
+[rosout][INFO] 2020-09-10 12:19:13,150: 2.98242956167
+[rosout][INFO] 2020-09-10 12:19:23,134: 2.99486182071
+[rosout][INFO] 2020-09-10 12:19:33,122: 2.89647233975
+[rosout][INFO] 2020-09-10 12:19:43,130: 2.98193168361
+[rosout][INFO] 2020-09-10 12:19:43,130: [start] obtain token
+[rosout][INFO] 2020-09-10 12:19:43,131: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 12:19:43,131: password: 1Fc**********
+[rosout][INFO] 2020-09-10 12:19:43,689: [successed] obtain token
+[rosout][INFO] 2020-09-10 12:19:53,130: 1.53582592759
+[rosout][INFO] 2020-09-10 12:20:03,158: -0.192420790861
+[rosout][INFO] 2020-09-10 12:20:13,162: 2.42363393449
+[rosout][INFO] 2020-09-10 12:20:23,162: 2.80347158923
+[rosout][INFO] 2020-09-10 12:20:33,166: 2.99043200957
+[rosout][INFO] 2020-09-10 12:20:43,142: 2.86432769254
+[rosout][INFO] 2020-09-10 12:20:53,146: 2.98434425611
+[rosout][INFO] 2020-09-10 12:21:03,146: 1.64427401543
+[rosout][INFO] 2020-09-10 12:21:13,141: -0.0040571979187
+[rosout][INFO] 2020-09-10 12:21:23,166: 1.50727515342
+[rosout][INFO] 2020-09-10 12:21:33,182: 2.91273595428
+[rosout][INFO] 2020-09-10 12:21:43,178: 0.223539042666
+[rosout][INFO] 2020-09-10 12:21:53,186: 2.0375569887
+[rosout][INFO] 2020-09-10 12:22:03,166: 2.7445546051
+[rosout][INFO] 2020-09-10 12:22:13,171: 2.35544229838
+[rosout][INFO] 2020-09-10 12:22:23,161: 2.790329154
+[rosout][INFO] 2020-09-10 12:22:33,161: 1.71987750049
+[rosout][INFO] 2020-09-10 12:22:43,190: 1.42704006842
+[rosout][INFO] 2020-09-10 12:22:53,182: 0.00938571424671
+[rosout][INFO] 2020-09-10 12:23:03,186: 0.0315107168144
+[rosout][INFO] 2020-09-10 12:23:13,214: 2.69127989584
+[rosout][INFO] 2020-09-10 12:23:23,194: 2.98317714455
+[rosout][INFO] 2020-09-10 12:23:33,210: 2.9915154539
+[rosout][INFO] 2020-09-10 12:23:43,190: 2.68849977455
+[rosout][INFO] 2020-09-10 12:23:53,206: 2.99239382986
+[rosout][INFO] 2020-09-10 12:24:03,199: 2.35265669588
+[rosout][INFO] 2020-09-10 12:24:13,214: 0.0371205467616
+[rosout][INFO] 2020-09-10 12:24:23,254: 0.575821898194
+[rosout][INFO] 2020-09-10 12:24:33,258: 2.98668287089
+[rosout][INFO] 2020-09-10 12:24:43,282: 2.99093202315
+[rosout][INFO] 2020-09-10 12:24:43,282: [start] obtain token
+[rosout][INFO] 2020-09-10 12:24:43,283: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 12:24:43,283: password: 1Fc**********
+[rosout][INFO] 2020-09-10 12:24:43,666: [successed] obtain token
+[rosout][INFO] 2020-09-10 12:24:53,290: 2.32783964172
+[rosout][INFO] 2020-09-10 12:25:03,322: -0.208151575869
+[rosout][INFO] 2020-09-10 12:25:13,334: 1.56137299198
+[rosout][INFO] 2020-09-10 12:25:23,318: 0.227431980078
+[rosout][INFO] 2020-09-10 12:25:33,318: 0.796164068772
+[rosout][INFO] 2020-09-10 12:25:43,301: 0.267792492735
+[rosout][INFO] 2020-09-10 12:25:53,362: 0.553500889175
+[rosout][INFO] 2020-09-10 12:26:03,330: 1.37724311985
+[rosout][INFO] 2020-09-10 12:26:13,326: 2.5541144236
+[rosout][INFO] 2020-09-10 12:26:23,334: 2.36605625556
+[rosout][INFO] 2020-09-10 12:26:33,326: 1.62004805781
+[rosout][INFO] 2020-09-10 12:26:43,342: 0.63654995668
+[rosout][INFO] 2020-09-10 12:26:53,346: 0.00634526353186
+[rosout][INFO] 2020-09-10 12:27:03,322: 2.54686988669
+[rosout][INFO] 2020-09-10 12:27:13,358: 2.98385575507
+[rosout][INFO] 2020-09-10 12:27:23,350: 2.98859490547
+[rosout][INFO] 2020-09-10 12:27:33,374: 2.72936204355
+[rosout][INFO] 2020-09-10 12:27:43,346: 2.97170764161
+[rosout][INFO] 2020-09-10 12:27:53,354: 2.72619307751
+[rosout][INFO] 2020-09-10 12:28:03,362: 0.0894793448757
+[rosout][INFO] 2020-09-10 12:28:13,351: 0.512450820053
+[rosout][INFO] 2020-09-10 12:28:23,351: 0.0057777718467
+[rosout][INFO] 2020-09-10 12:28:33,354: 2.58509939375
+[rosout][INFO] 2020-09-10 12:28:43,382: 0.822359158862
+[rosout][INFO] 2020-09-10 12:28:53,341: 1.5810734416
+[rosout][INFO] 2020-09-10 12:29:03,366: 2.98268679297
+[rosout][INFO] 2020-09-10 12:29:13,366: 2.53073671693
+[rosout][INFO] 2020-09-10 12:29:23,342: 2.98347281571
+[rosout][INFO] 2020-09-10 12:29:33,341: 2.37751964782
+[rosout][INFO] 2020-09-10 12:29:43,350: 1.48156376963
+[rosout][INFO] 2020-09-10 12:29:43,351: [start] obtain token
+[rosout][INFO] 2020-09-10 12:29:43,351: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 12:29:43,351: password: 1Fc**********
+[rosout][INFO] 2020-09-10 12:29:43,720: [successed] obtain token
+[rosout][INFO] 2020-09-10 12:29:53,382: -0.000902961717961
+[rosout][INFO] 2020-09-10 12:30:03,358: 2.31118078048
+[rosout][INFO] 2020-09-10 12:30:13,374: 2.88424899918
+[rosout][INFO] 2020-09-10 12:30:23,341: 2.29571833726
+[rosout][INFO] 2020-09-10 12:30:33,354: 2.51685440552
+[rosout][INFO] 2020-09-10 12:30:43,346: 0.0258617274413
+[rosout][INFO] 2020-09-10 12:30:53,354: 2.33253495374
+[rosout][INFO] 2020-09-10 12:31:03,366: 2.98625359498
+[rosout][INFO] 2020-09-10 12:31:13,351: 2.80587866204
+[rosout][INFO] 2020-09-10 12:31:23,366: 0.892825030824
+[rosout][INFO] 2020-09-10 12:31:33,402: 0.000996272579612
+[rosout][INFO] 2020-09-10 12:31:43,370: 1.68306907489
+[rosout][INFO] 2020-09-10 12:31:53,370: 0.339539972934
+[rosout][INFO] 2020-09-10 12:32:03,398: 0.920342333486
+[rosout][INFO] 2020-09-10 12:32:13,382: 2.15356601416
+[rosout][INFO] 2020-09-10 12:32:23,386: 2.98609906761
+[rosout][INFO] 2020-09-10 12:32:33,391: 2.98002502974
+[rosout][INFO] 2020-09-10 12:32:43,382: 2.97580326907
+[rosout][INFO] 2020-09-10 12:32:53,394: 2.97466828488
+[rosout][INFO] 2020-09-10 12:33:03,402: 2.77201533853
+[rosout][INFO] 2020-09-10 12:33:13,386: 1.45929789604
+[rosout][INFO] 2020-09-10 12:33:23,374: -0.00545003427585
+[rosout][ERROR] 2020-09-10 12:33:23,376: Failed to postrequest because of URLError:[Errno 101] Network is unreachable
+[rosout][INFO] 2020-09-10 12:33:33,382: 0.342453175692
+[rosout][INFO] 2020-09-10 12:33:43,386: 2.99140175479
+[rosout][INFO] 2020-09-10 12:33:53,386: 2.2518791144
+[rosout][INFO] 2020-09-10 12:34:03,370: 2.34646689661
+[rosout][INFO] 2020-09-10 12:34:13,382: 1.57142350562
+[rosout][INFO] 2020-09-10 12:34:23,414: 1.09240984244
+[rosout][INFO] 2020-09-10 12:34:33,406: 1.99739628725
+[rosout][INFO] 2020-09-10 12:34:43,410: 1.46515698773
+[rosout][INFO] 2020-09-10 12:34:43,410: [start] obtain token
+[rosout][INFO] 2020-09-10 12:34:43,410: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 12:34:43,411: password: 1Fc**********
+[rosout][INFO] 2020-09-10 12:34:43,780: [successed] obtain token
+[rosout][INFO] 2020-09-10 12:34:53,442: 2.98434283584
+[rosout][INFO] 2020-09-10 12:35:03,466: 1.6288193184
+[rosout][INFO] 2020-09-10 12:35:13,446: -4.60438966873e-05
+[rosout][INFO] 2020-09-10 12:35:23,438: 1.65796307022
+[rosout][INFO] 2020-09-10 12:35:33,438: 2.06122892664
+[rosout][INFO] 2020-09-10 12:35:43,470: 2.6039420102
+[rosout][INFO] 2020-09-10 12:35:53,442: 2.98588063521
+[rosout][INFO] 2020-09-10 12:36:03,474: 1.66420113115
+[rosout][INFO] 2020-09-10 12:36:13,458: 1.37952807529
+[rosout][INFO] 2020-09-10 12:36:23,470: 2.99826166546
+[rosout][INFO] 2020-09-10 12:36:33,466: 0.663471682295
+[rosout][INFO] 2020-09-10 12:36:43,482: 1.61880104074
+[rosout][INFO] 2020-09-10 12:36:53,462: 1.80099122216
+[rosout][INFO] 2020-09-10 12:37:03,498: 0.060966130222
+[rosout][INFO] 2020-09-10 12:37:13,482: 0.350465948748
+[rosout][INFO] 2020-09-10 12:37:23,474: 1.21201829826
+[rosout][INFO] 2020-09-10 12:37:33,482: 1.45012506751
+[rosout][INFO] 2020-09-10 12:37:43,482: 2.97653719084
+[rosout][INFO] 2020-09-10 12:37:53,462: 2.11299076231
+[rosout][INFO] 2020-09-10 12:38:03,502: 2.31715766119
+[rosout][INFO] 2020-09-10 12:38:13,466: -0.0113711042204
+[rosout][INFO] 2020-09-10 12:38:23,498: 2.96581753343
+[rosout][INFO] 2020-09-10 12:38:33,462: 2.98708043154
+[rosout][INFO] 2020-09-10 12:38:43,478: 1.52886620802
+[rosout][INFO] 2020-09-10 12:38:53,490: -0.00211576379907
+[rosout][INFO] 2020-09-10 12:39:03,498: 1.58187898004
+[rosout][INFO] 2020-09-10 12:39:13,466: 2.98424217338
+[rosout][INFO] 2020-09-10 12:39:23,471: 2.98522430845
+[rosout][INFO] 2020-09-10 12:39:33,494: 1.03232630892
+[rosout][INFO] 2020-09-10 12:39:43,470: 0.690578505897
+[rosout][INFO] 2020-09-10 12:39:43,470: [start] obtain token
+[rosout][INFO] 2020-09-10 12:39:43,471: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 12:39:43,471: password: 1Fc**********
+[rosout][INFO] 2020-09-10 12:39:43,852: [successed] obtain token
+[rosout][INFO] 2020-09-10 12:39:53,481: 1.77401596908
+[rosout][INFO] 2020-09-10 12:40:03,482: 2.98638757365
+[rospy.impl.masterslave][INFO] 2020-09-10 12:40:10,923: external shutdown request from [/rosnode]: user request
+[rospy.core][INFO] 2020-09-10 12:40:10,923: signal_shutdown [external shutdown request from [/rosnode]: [user request]]
+[rospy.internal][INFO] 2020-09-10 12:40:10,925: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2020-09-10 12:40:10,926: topic[/base/cube_base_driver/diff_drive_controller/odom] removing connection to http://cuboid0009:45747/
+[rospy.internal][ERROR] 2020-09-10 12:40:10,926: Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 729, in receive_once
+    self.stat_bytes += recv_buff(sock, b, p.buff_size)
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 103, in recv_buff
+    d = sock.recv(buff_size)
+error: [Errno 104] Connection reset by peer
+
+[rospy.core][INFO] 2020-09-10 12:40:11,280: signal_shutdown [atexit]
+[rospy.client][INFO] 2020-09-10 13:20:13,119: init_node, name[/record_mileage], pid[15747]
+[xmlrpc][INFO] 2020-09-10 13:20:13,119: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2020-09-10 13:20:13,119: Started XML-RPC server [http://cuboid0009:40507/]
+[rospy.init][INFO] 2020-09-10 13:20:13,120: ROS Slave URI: [http://cuboid0009:40507/]
+[rospy.impl.masterslave][INFO] 2020-09-10 13:20:13,120: _ready: http://cuboid0009:40507/
+[rospy.registration][INFO] 2020-09-10 13:20:13,121: Registering with master node http://localhost:11311
+[xmlrpc][INFO] 2020-09-10 13:20:13,121: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2020-09-10 13:20:13,220: registered with master
+[rospy.rosout][INFO] 2020-09-10 13:20:13,221: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-10 13:20:13,224: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-10 13:20:13,231: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rosout][INFO] 2020-09-10 13:20:13,242: api:report/robot/uploadMileage/
+[rosout][INFO] 2020-09-10 13:20:13,243: robot_serial_no:Cuboid0009
+[rospy.internal][INFO] 2020-09-10 13:20:13,285: topic[/base/cube_base_driver/diff_drive_controller/odom] adding connection to [http://cuboid0009:45747/], count 0
+[rospy.internal][INFO] 2020-09-10 13:20:13,431: topic[/rosout] adding connection to [/rosout], count 0
+[rosout][INFO] 2020-09-10 13:20:23,266: 1.01949699477e-13
+[rosout][INFO] 2020-09-10 13:20:23,266: [start] obtain token
+[rosout][INFO] 2020-09-10 13:20:23,267: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 13:20:23,267: password: 1Fc**********
+[rosout][INFO] 2020-09-10 13:20:23,959: [successed] obtain token
+[rosout][INFO] 2020-09-10 13:20:33,294: 1.01949699477e-13
+[rosout][INFO] 2020-09-10 13:20:43,262: 0.100751252353
+[rosout][INFO] 2020-09-10 13:20:53,266: 0.00194727170093
+[rosout][INFO] 2020-09-10 13:21:03,262: 0.000432152674198
+[rosout][INFO] 2020-09-10 13:21:13,302: -0.0708119178306
+[rosout][INFO] 2020-09-10 13:21:23,278: 0.0614753437887
+[rosout][INFO] 2020-09-10 13:21:33,266: -0.00137322236658
+[rosout][INFO] 2020-09-10 13:21:43,261: 0.903675460999
+[rosout][INFO] 2020-09-10 13:21:53,282: 2.99882587232
+[rosout][INFO] 2020-09-10 13:22:03,282: 2.97784337169
+[rosout][INFO] 2020-09-10 13:22:13,266: 2.97160306387
+[rosout][INFO] 2020-09-10 13:22:23,270: 2.98618021468
+[rosout][INFO] 2020-09-10 13:22:33,274: 2.57086223674
+[rosout][INFO] 2020-09-10 13:22:43,266: 1.56134864145
+[rosout][INFO] 2020-09-10 13:22:53,261: -0.00582177214425
+[rosout][INFO] 2020-09-10 13:23:03,261: -0.00152870992636
+[rosout][INFO] 2020-09-10 13:23:13,278: 2.54556389365
+[rosout][INFO] 2020-09-10 13:23:23,262: 2.99178732047
+[rosout][INFO] 2020-09-10 13:23:33,261: 2.99276481196
+[rosout][INFO] 2020-09-10 13:23:43,261: 2.27311655469
+[rosout][INFO] 2020-09-10 13:23:53,266: 2.73025843059
+[rosout][ERROR] 2020-09-10 13:24:15,371: Failed to postrequest because of URLError:[Errno 101] Network is unreachable
+[rosout][INFO] 2020-09-10 13:24:15,389: 1.792894126
+[rosout][ERROR] 2020-09-10 13:24:18,449: Failed to postrequest because of URLError:[Errno 101] Network is unreachable
+[rosout][INFO] 2020-09-10 13:24:18,461: 2.11959219924
+[rosout][ERROR] 2020-09-10 13:25:21,570: Failed to postrequest because of URLError:timed out
+[rosout][INFO] 2020-09-10 13:25:21,580: -0.00384326980275
+[rosout][ERROR] 2020-09-10 13:27:21,706: Failed to postrequest because of URLError:timed out
+[rosout][INFO] 2020-09-10 13:27:21,718: 0.0579503613096
+[rosout][INFO] 2020-09-10 13:27:21,718: [start] obtain token
+[rosout][INFO] 2020-09-10 13:27:21,718: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 13:27:21,719: password: 1Fc**********
+[rosout][ERROR] 2020-09-10 13:29:21,838: Failed to postrequest because of URLError:timed out
+[rosout][ERROR] 2020-09-10 13:29:21,838: [failed] obtain token
+[rosout][INFO] 2020-09-10 13:29:21,852: 1.6580477396
+[rosout][INFO] 2020-09-10 13:29:21,852: [start] obtain token
+[rosout][INFO] 2020-09-10 13:29:21,852: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 13:29:21,853: password: 1Fc**********
+[rosout][ERROR] 2020-09-10 13:31:21,974: Failed to postrequest because of URLError:timed out
+[rosout][ERROR] 2020-09-10 13:31:21,974: [failed] obtain token
+[rosout][INFO] 2020-09-10 13:31:21,986: 2.98534366861
+[rosout][INFO] 2020-09-10 13:31:21,986: [start] obtain token
+[rosout][INFO] 2020-09-10 13:31:21,986: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 13:31:21,987: password: 1Fc**********
+[rosout][ERROR] 2020-09-10 13:33:22,106: Failed to postrequest because of URLError:timed out
+[rosout][ERROR] 2020-09-10 13:33:22,107: [failed] obtain token
+[rosout][INFO] 2020-09-10 13:33:22,117: 2.98794314871
+[rosout][INFO] 2020-09-10 13:33:22,117: [start] obtain token
+[rosout][INFO] 2020-09-10 13:33:22,117: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 13:33:22,118: password: 1Fc**********
+[rosout][ERROR] 2020-09-10 13:35:22,238: Failed to postrequest because of URLError:timed out
+[rosout][ERROR] 2020-09-10 13:35:22,238: [failed] obtain token
+[rosout][INFO] 2020-09-10 13:35:22,256: 2.99291135278
+[rosout][INFO] 2020-09-10 13:35:22,256: [start] obtain token
+[rosout][INFO] 2020-09-10 13:35:22,256: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 13:35:22,257: password: 1Fc**********
+[rosout][ERROR] 2020-09-10 13:37:22,378: Failed to postrequest because of URLError:timed out
+[rosout][ERROR] 2020-09-10 13:37:22,379: [failed] obtain token
+[rosout][INFO] 2020-09-10 13:37:22,389: 2.61542099565
+[rosout][INFO] 2020-09-10 13:37:22,389: [start] obtain token
+[rosout][INFO] 2020-09-10 13:37:22,390: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 13:37:22,390: password: 1Fc**********
+[rosout][ERROR] 2020-09-10 13:39:22,511: Failed to postrequest because of URLError:timed out
+[rosout][ERROR] 2020-09-10 13:39:22,511: [failed] obtain token
+[rosout][INFO] 2020-09-10 13:39:22,523: 0.766908155466
+[rosout][INFO] 2020-09-10 13:39:22,523: [start] obtain token
+[rosout][INFO] 2020-09-10 13:39:22,523: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 13:39:22,523: password: 1Fc**********
+[rosout][ERROR] 2020-09-10 13:41:22,644: Failed to postrequest because of URLError:timed out
+[rosout][ERROR] 2020-09-10 13:41:22,645: [failed] obtain token
+[rosout][INFO] 2020-09-10 13:41:22,657: 0.642483234128
+[rosout][INFO] 2020-09-10 13:41:22,658: [start] obtain token
+[rosout][INFO] 2020-09-10 13:41:22,658: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 13:41:22,658: password: 1Fc**********
+[rosout][ERROR] 2020-09-10 13:43:22,779: Failed to postrequest because of URLError:timed out
+[rosout][ERROR] 2020-09-10 13:43:22,780: [failed] obtain token
+[rosout][INFO] 2020-09-10 13:43:22,792: 2.76607620079
+[rosout][INFO] 2020-09-10 13:43:22,792: [start] obtain token
+[rosout][INFO] 2020-09-10 13:43:22,792: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 13:43:22,793: password: 1Fc**********
+[rosout][ERROR] 2020-09-10 13:45:22,915: Failed to postrequest because of URLError:timed out
+[rosout][ERROR] 2020-09-10 13:45:22,915: [failed] obtain token
+[rosout][INFO] 2020-09-10 13:45:22,924: -0.360413259395
+[rosout][INFO] 2020-09-10 13:45:22,924: [start] obtain token
+[rosout][INFO] 2020-09-10 13:45:22,925: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 13:45:22,925: password: 1Fc**********
+[rosout][ERROR] 2020-09-10 13:47:23,046: Failed to postrequest because of URLError:timed out
+[rosout][ERROR] 2020-09-10 13:47:23,047: [failed] obtain token
+[rosout][INFO] 2020-09-10 13:47:23,062: 2.73598461261
+[rosout][INFO] 2020-09-10 13:47:23,063: [start] obtain token
+[rosout][INFO] 2020-09-10 13:47:23,063: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 13:47:23,063: password: 1Fc**********
+[rosout][ERROR] 2020-09-10 13:49:23,184: Failed to postrequest because of URLError:timed out
+[rosout][ERROR] 2020-09-10 13:49:23,185: [failed] obtain token
+[rosout][INFO] 2020-09-10 13:49:23,221: 2.7258845981
+[rosout][INFO] 2020-09-10 13:49:23,222: [start] obtain token
+[rosout][INFO] 2020-09-10 13:49:23,222: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 13:49:23,222: password: 1Fc**********
+[rosout][ERROR] 2020-09-10 13:51:23,344: Failed to postrequest because of URLError:timed out
+[rosout][ERROR] 2020-09-10 13:51:23,344: [failed] obtain token
+[rosout][INFO] 2020-09-10 13:51:23,358: 0.661034030451
+[rosout][INFO] 2020-09-10 13:51:23,358: [start] obtain token
+[rosout][INFO] 2020-09-10 13:51:23,358: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 13:51:23,359: password: 1Fc**********
+[rosout][ERROR] 2020-09-10 13:53:23,479: Failed to postrequest because of URLError:timed out
+[rosout][ERROR] 2020-09-10 13:53:23,479: [failed] obtain token
+[rosout][INFO] 2020-09-10 13:53:23,488: 0.107434910475
+[rosout][INFO] 2020-09-10 13:53:23,488: [start] obtain token
+[rosout][INFO] 2020-09-10 13:53:23,489: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 13:53:23,489: password: 1Fc**********
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    

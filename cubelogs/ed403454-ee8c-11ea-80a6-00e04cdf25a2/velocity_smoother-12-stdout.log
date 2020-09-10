@@ -1,0 +1,8 @@
+[0m[ INFO] [1599209971.315815606]: Loading nodelet /velocity_smoother of type yocs_velocity_smoother/VelocitySmootherNodelet to manager velocity_smoother_manager with the following remappings:[0m
+[0m[ INFO] [1599209971.315874289]: /velocity_smoother/odometry -> /base/cube_base_driver/diff_drive_controller/odom[0m
+[0m[ INFO] [1599209971.315883442]: /velocity_smoother/raw_cmd_vel -> /base/cube_base_driver/diff_drive_controller/cmd_vel_raw[0m
+[0m[ INFO] [1599209971.315889853]: /velocity_smoother/robot_cmd_vel -> /base/cube_base_driver/diff_drive_controller/cmd_vel[0m
+[0m[ INFO] [1599209971.315897628]: /velocity_smoother/smooth_cmd_vel -> /base/cube_base_driver/diff_drive_controller/cmd_vel[0m
+[0m[ INFO] [1599211552.525650399]: Unloading nodelet /velocity_smoother from manager velocity_smoother_manager[0m
+[0m[ INFO] [1599211552.525879482]: waitForService: Service [/velocity_smoother_manager/unload_nodelet] has not been advertised, waiting...[0m
+[33m[ WARN] [1599211552.525942592]: Couldn't find service velocity_smoother_manager/unload_nodelet, perhaps the manager is already shut down[0m

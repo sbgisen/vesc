@@ -1,0 +1,15 @@
+[0m[ INFO] [1599700525.985968459]: Loading nodelet /camera_points_xyzrgb_hd of type depth_image_proc/point_cloud_xyzrgb to manager kinect2_manager with the following remappings:[0m
+[0m[ INFO] [1599700525.986049507]: /depth_registered/image_rect -> /camera/hd/image_depth_rect[0m
+[0m[ INFO] [1599700525.986064319]: /depth_registered/points -> /camera/hd/points[0m
+[0m[ INFO] [1599700525.986075695]: /rgb/camera_info -> /camera/hd/camera_info[0m
+[0m[ INFO] [1599700525.986088842]: /rgb/image_rect_color -> /camera/hd/image_color_rect[0m
+[33m[ WARN] [1599700781.955943865]: Shutdown request received. Reason: [user request][0m
+[0m[ INFO] [1599700782.006631640]: Unloading nodelet /camera_points_xyzrgb_hd from manager kinect2_manager[0m
+[0m[ INFO] [1599700782.849801496]: Loading nodelet /camera_points_xyzrgb_hd of type depth_image_proc/point_cloud_xyzrgb to manager kinect2_manager with the following remappings:[0m
+[0m[ INFO] [1599700782.849853236]: /depth_registered/image_rect -> /camera/hd/image_depth_rect[0m
+[0m[ INFO] [1599700782.849863194]: /depth_registered/points -> /camera/hd/points[0m
+[0m[ INFO] [1599700782.849869492]: /rgb/camera_info -> /camera/hd/camera_info[0m
+[0m[ INFO] [1599700782.849887250]: /rgb/image_rect_color -> /camera/hd/image_color_rect[0m
+[0m[ INFO] [1599700786.254341632]: Unloading nodelet /camera_points_xyzrgb_hd from manager kinect2_manager[0m
+[0m[ INFO] [1599700786.255036648]: waitForService: Service [/kinect2_manager/unload_nodelet] has not been advertised, waiting...[0m
+[33m[ WARN] [1599700786.255079693]: Couldn't find service kinect2_manager/unload_nodelet, perhaps the manager is already shut down[0m

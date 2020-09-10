@@ -1,0 +1,8 @@
+[0m[ INFO] [1598923153.808189528]: Requesting the map...[0m
+[0m[ INFO] [1598923153.810347217]: Received a 500 X 700 map @ 0.050 m/pix
+[0m
+[0m[ INFO] [1598923153.821351636]: Initializing likelihood field model; this can take some time on large maps...[0m
+[0m[ INFO] [1598923153.886283490]: Done initializing likelihood field model.[0m
+[0m[ INFO] [1598923160.027880332]: Setting pose (1598923160.027831): -6.350 -9.100 0.000[0m
+[33m[ WARN] [1598923539.057420372]: Shutdown request received.[0m
+[33m[ WARN] [1598923539.057448944]: Reason given for shutdown: [user request][0m

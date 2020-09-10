@@ -1,0 +1,29 @@
+[rospy.client][INFO] 2020-09-10 10:21:34,255: init_node, name[/diagnostic_battery], pid[12430]
+[xmlrpc][INFO] 2020-09-10 10:21:34,255: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2020-09-10 10:21:34,255: Started XML-RPC server [http://cuboid0009:32837/]
+[rospy.init][INFO] 2020-09-10 10:21:34,255: ROS Slave URI: [http://cuboid0009:32837/]
+[rospy.impl.masterslave][INFO] 2020-09-10 10:21:34,256: _ready: http://cuboid0009:32837/
+[rospy.registration][INFO] 2020-09-10 10:21:34,256: Registering with master node http://localhost:11311
+[xmlrpc][INFO] 2020-09-10 10:21:34,256: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2020-09-10 10:21:34,356: registered with master
+[rospy.rosout][INFO] 2020-09-10 10:21:34,356: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-10 10:21:34,358: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-10 10:21:34,360: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2020-09-10 10:21:34,372: topic[/battery_remaining] adding connection to [http://cuboid0009:45447/], count 0
+[rospy.internal][INFO] 2020-09-10 10:21:34,588: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2020-09-10 10:21:34,589: topic[/diagnostics] adding connection to [/diag_agg], count 0
+[rospy.internal][ERROR] 2020-09-10 10:23:24,012: Unable to initiate TCP/IP socket to cuboid0009:39337 (http://cuboid0009:45447/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 650, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 593, in _validate_header
+    raise TransportInitError("remote error reported: %s"%header['error'])
+TransportInitError: remote error reported: node shutting down
+
+[rospy.impl.masterslave][INFO] 2020-09-10 10:23:24,149: external shutdown request from [/rosnode]: user request
+[rospy.core][INFO] 2020-09-10 10:23:24,149: signal_shutdown [external shutdown request from [/rosnode]: [user request]]
+[rospy.internal][INFO] 2020-09-10 10:23:24,153: topic[/diagnostics] removing connection to /diag_agg
+[rospy.internal][INFO] 2020-09-10 10:23:24,153: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2020-09-10 10:23:24,153: topic[/battery_remaining] removing connection to http://cuboid0009:45447/
+[rospy.core][INFO] 2020-09-10 10:23:24,318: signal_shutdown [atexit]

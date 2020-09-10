@@ -1,0 +1,10 @@
+[INFO] [1599700903.709232]: ROS Serial Python Node
+[INFO] [1599700903.712971]: Connecting to /dev/ttySonar at 57600 baud
+[INFO] [1599700906.523527]: Note: publish buffer size is 380 bytes
+[INFO] [1599700906.523861]: Setup publisher on /sonar/left_side [sensor_msgs/Range]
+[INFO] [1599700906.526551]: Setup publisher on /sonar/left_oblique [sensor_msgs/Range]
+[INFO] [1599700906.529870]: Setup publisher on /sonar/left_front [sensor_msgs/Range]
+[INFO] [1599700906.535076]: Setup publisher on /sonar/right_front [sensor_msgs/Range]
+[INFO] [1599700906.539672]: Setup publisher on /sonar/right_oblique [sensor_msgs/Range]
+[INFO] [1599700906.543880]: Setup publisher on /sonar/right_side [sensor_msgs/Range]
+shutdown request: user request

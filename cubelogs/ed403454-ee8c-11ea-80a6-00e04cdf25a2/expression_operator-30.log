@@ -1,0 +1,27 @@
+[rospy.client][INFO] 2020-09-04 17:59:41,342: init_node, name[/expression_operator], pid[29422]
+[xmlrpc][INFO] 2020-09-04 17:59:41,342: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2020-09-04 17:59:41,343: Started XML-RPC server [http://cuboid0009:40231/]
+[rospy.init][INFO] 2020-09-04 17:59:41,343: ROS Slave URI: [http://cuboid0009:40231/]
+[rospy.impl.masterslave][INFO] 2020-09-04 17:59:41,343: _ready: http://cuboid0009:40231/
+[rospy.registration][INFO] 2020-09-04 17:59:41,344: Registering with master node http://localhost:11311
+[xmlrpc][INFO] 2020-09-04 17:59:41,344: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2020-09-04 17:59:41,444: registered with master
+[rospy.rosout][INFO] 2020-09-04 17:59:41,444: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-04 17:59:41,447: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-04 17:59:41,449: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2020-09-04 17:59:41,461: topic[/set_expression] adding connection to [http://cuboid0009:40231/], count 0
+[rospy.internal][INFO] 2020-09-04 17:59:41,463: topic[/set_expression] adding connection to [/expression_operator], count 0
+[rospy.internal][INFO] 2020-09-04 17:59:41,716: topic[/set_expression] adding connection to [/face_node], count 1
+[rospy.internal][INFO] 2020-09-04 17:59:41,716: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2020-09-04 17:59:42,126: topic[/battery_remaining] adding connection to [http://cuboid0009:33819/], count 0
+[rosout][INFO] 2020-09-04 17:59:42,355: Battery level is high
+[rosout][INFO] 2020-09-04 17:59:42,355: Switching expression from normal to happy
+[rospy.core][INFO] 2020-09-04 18:25:52,526: signal_shutdown [signal-2]
+[rospy.registration][WARNING] 2020-09-04 18:25:52,527: cannot unregister with master due to network issues
+[rospy.internal][INFO] 2020-09-04 18:25:52,527: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2020-09-04 18:25:52,527: topic[/set_expression] removing connection to /expression_operator
+[rospy.internal][INFO] 2020-09-04 18:25:52,527: topic[/set_expression] removing connection to /face_node
+[rospy.internal][INFO] 2020-09-04 18:25:52,527: topic[/battery_remaining] removing connection to http://cuboid0009:33819/
+[rospy.internal][INFO] 2020-09-04 18:25:52,528: topic[/set_expression] removing connection to http://cuboid0009:40231/
+[rospy.impl.masterslave][INFO] 2020-09-04 18:25:52,528: signal-2
+[rospy.core][INFO] 2020-09-04 18:25:52,706: signal_shutdown [atexit]

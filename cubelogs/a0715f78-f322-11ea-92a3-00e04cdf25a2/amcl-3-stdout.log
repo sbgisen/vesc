@@ -1,0 +1,11 @@
+[0m[ INFO] [1599714084.200019054]: Requesting the map...[0m
+[0m[ INFO] [1599714084.209460879]: Received a 2260 X 1120 map @ 0.050 m/pix
+[0m
+[0m[ INFO] [1599714084.252279171]: Initializing likelihood field model; this can take some time on large maps...[0m
+[0m[ INFO] [1599714085.016879036]: Done initializing likelihood field model.[0m
+[0m[ INFO] [1599714093.196389890]: Setting pose (1599714093.196370): 38.800 1.000 -1.601[0m
+[33m[ WARN] [1599714100.086372563]: No laser scan received (and thus no pose updates have been published) for 1599714100.086289 seconds.  Verify that data is being published on the /map_scan topic.[0m
+[0m[ INFO] [1599714116.465713591]: Setting pose (1599714116.465679): 27.850 -2.300 -1.708[0m
+[0m[ INFO] [1599714120.534946576]: Setting pose (1599714120.534901): 38.900 1.500 -1.520[0m
+[33m[ WARN] [1599715208.431606841]: Shutdown request received.[0m
+[33m[ WARN] [1599715208.431626953]: Reason given for shutdown: [user request][0m

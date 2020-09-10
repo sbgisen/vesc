@@ -1,0 +1,2 @@
+[0m[ INFO] [1599705825.568587639]: Loading nodelet /base/wheel_right/vesc_wheel_r of type vesc_driver::VescDriverNodelet to manager vesc_nodelet_manager with the following remappings:[0m
+[0m[ INFO] [1599713507.699648399]: Bond broken, exiting[0m

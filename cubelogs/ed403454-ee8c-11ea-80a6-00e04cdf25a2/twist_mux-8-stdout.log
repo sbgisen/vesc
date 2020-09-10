@@ -1,0 +1,7 @@
+[0m[ INFO] [1599209969.296790049]: Topic handler 'rotate_in_place' subscribed to topic 'rotate_vel': timeout = 0.500000s, priority = 130[0m
+[0m[ INFO] [1599209969.299517662]: Topic handler 'navigation' subscribed to topic 'nav_vel': timeout = 0.500000s, priority = 120[0m
+[0m[ INFO] [1599209969.302198993]: Topic handler 'joystick' subscribed to topic 'joy_vel': timeout = 0.500000s, priority = 100[0m
+[0m[ INFO] [1599209969.305126448]: Topic handler 'keyboard' subscribed to topic 'input_key/cmd_vel': timeout = 0.500000s, priority = 110[0m
+[0m[ INFO] [1599209969.308795279]: Topic handler 'pause' subscribed to topic 'pause_navigation': timeout = None, priority = 100[0m
+[0m[ INFO] [1599209969.311340185]: Topic handler 'loop_closure' subscribed to topic 'stop_closing_loop': timeout = None, priority = 200[0m
+[0m[ INFO] [1599209969.313704613]: Topic handler 'joystick' subscribed to topic 'joy_priority': timeout = 5.000000s, priority = 50[0m

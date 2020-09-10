@@ -1,0 +1,35 @@
+[rospy.client][INFO] 2020-09-01 10:18:12,554: init_node, name[/base/cube_base_driver/base_controller_spawner], pid[14951]
+[xmlrpc][INFO] 2020-09-01 10:18:12,554: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2020-09-01 10:18:12,554: Started XML-RPC server [http://cuboid:38581/]
+[rospy.init][INFO] 2020-09-01 10:18:12,554: ROS Slave URI: [http://cuboid:38581/]
+[rospy.impl.masterslave][INFO] 2020-09-01 10:18:12,554: _ready: http://cuboid:38581/
+[rospy.registration][INFO] 2020-09-01 10:18:12,555: Registering with master node http://localhost:11311
+[xmlrpc][INFO] 2020-09-01 10:18:12,555: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2020-09-01 10:18:12,655: registered with master
+[rospy.rosout][INFO] 2020-09-01 10:18:12,655: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-01 10:18:12,657: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-01 10:18:12,658: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rosout][INFO] 2020-09-01 10:18:12,660: Controller Spawner: Waiting for service controller_manager/load_controller
+[rosout][INFO] 2020-09-01 10:18:12,661: Controller Spawner: Waiting for service controller_manager/switch_controller
+[rosout][INFO] 2020-09-01 10:18:12,662: Controller Spawner: Waiting for service controller_manager/unload_controller
+[rosout][INFO] 2020-09-01 10:18:12,663: Loading controller: diff_drive_controller
+[rosout][INFO] 2020-09-01 10:18:12,724: Loading controller: joint_state_controller
+[rosout][INFO] 2020-09-01 10:18:12,734: Controller Spawner: Loaded controllers: diff_drive_controller, joint_state_controller
+[rosout][INFO] 2020-09-01 10:18:12,744: Started controllers: diff_drive_controller, joint_state_controller
+[rospy.internal][INFO] 2020-09-01 10:18:12,942: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.impl.masterslave][INFO] 2020-09-01 10:25:41,080: external shutdown request from [/rosnode]: user request
+[rospy.core][INFO] 2020-09-01 10:25:41,080: signal_shutdown [external shutdown request from [/rosnode]: [user request]]
+[rosout][INFO] 2020-09-01 10:25:41,080: Shutting down spawner. Stopping and unloading controllers...
+[rosout][INFO] 2020-09-01 10:25:41,080: Stopping all controllers...
+[rospy.internal][WARNING] 2020-09-01 10:25:41,216: Unknown error initiating TCP/IP socket to cuboid:45343 (rosrpc://cuboid:45343): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 650, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rosgraph/network.py", line 362, in read_ros_handshake_header
+    d = sock.recv(buff_size)
+error: [Errno 104] Connection reset by peer
+
+[rosout][WARNING] 2020-09-01 10:25:41,217: Controller Spawner error while taking down controllers: unable to connect to service: [Errno 104] Connection reset by peer
+[rospy.internal][INFO] 2020-09-01 10:25:41,220: topic[/rosout] removing connection to /rosout
+[rospy.core][INFO] 2020-09-01 10:25:41,624: signal_shutdown [atexit]

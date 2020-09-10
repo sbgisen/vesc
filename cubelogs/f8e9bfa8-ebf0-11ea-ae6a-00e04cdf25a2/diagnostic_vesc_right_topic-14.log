@@ -1,0 +1,29 @@
+[rospy.client][INFO] 2020-09-01 10:18:08,317: init_node, name[/diagnostic_vesc_right_topic], pid[14589]
+[xmlrpc][INFO] 2020-09-01 10:18:08,317: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2020-09-01 10:18:08,317: Started XML-RPC server [http://cuboid:41349/]
+[rospy.init][INFO] 2020-09-01 10:18:08,317: ROS Slave URI: [http://cuboid:41349/]
+[rospy.impl.masterslave][INFO] 2020-09-01 10:18:08,317: _ready: http://cuboid:41349/
+[rospy.registration][INFO] 2020-09-01 10:18:08,318: Registering with master node http://localhost:11311
+[xmlrpc][INFO] 2020-09-01 10:18:08,318: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2020-09-01 10:18:08,418: registered with master
+[rospy.rosout][INFO] 2020-09-01 10:18:08,418: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-01 10:18:08,420: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-01 10:18:08,421: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2020-09-01 10:18:08,628: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2020-09-01 10:18:08,729: topic[/diagnostics] adding connection to [/diag_agg], count 0
+[rospy.internal][INFO] 2020-09-01 10:18:11,351: topic[/base/wheel_right/sensors/core] adding connection to [http://cuboid:43917/], count 0
+[rospy.internal][WARNING] 2020-09-01 10:25:41,448: Unknown error initiating TCP/IP socket to cuboid:55275 (http://cuboid:43917/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 650, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rosgraph/network.py", line 362, in read_ros_handshake_header
+    d = sock.recv(buff_size)
+error: [Errno 104] Connection reset by peer
+
+[rospy.internal][INFO] 2020-09-01 10:25:41,449: topic[/base/wheel_right/sensors/core] removing connection to http://cuboid:43917/
+[rospy.internal][INFO] 2020-09-01 10:25:42,081: topic[/diagnostics] removing connection to /diag_agg
+[rospy.impl.masterslave][INFO] 2020-09-01 10:25:43,766: external shutdown request from [/rosnode]: user request
+[rospy.core][INFO] 2020-09-01 10:25:43,766: signal_shutdown [external shutdown request from [/rosnode]: [user request]]
+[rospy.internal][INFO] 2020-09-01 10:25:43,777: topic[/rosout] removing connection to /rosout
+[rospy.core][INFO] 2020-09-01 10:25:44,088: signal_shutdown [atexit]

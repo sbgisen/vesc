@@ -1,0 +1,25 @@
+[rospy.client][INFO] 2020-09-10 10:24:30,494: init_node, name[/diagnostic_rplidar_body_topic], pid[13086]
+[xmlrpc][INFO] 2020-09-10 10:24:30,494: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2020-09-10 10:24:30,495: Started XML-RPC server [http://cuboid0009:39805/]
+[rospy.init][INFO] 2020-09-10 10:24:30,495: ROS Slave URI: [http://cuboid0009:39805/]
+[rospy.impl.masterslave][INFO] 2020-09-10 10:24:30,495: _ready: http://cuboid0009:39805/
+[rospy.registration][INFO] 2020-09-10 10:24:30,496: Registering with master node http://localhost:11311
+[xmlrpc][INFO] 2020-09-10 10:24:30,496: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2020-09-10 10:24:30,595: registered with master
+[rospy.rosout][INFO] 2020-09-10 10:24:30,595: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-10 10:24:30,597: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-10 10:24:30,598: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2020-09-10 10:24:30,611: topic[/body_scan] adding connection to [http://cuboid0009:38001/], count 0
+[rospy.internal][INFO] 2020-09-10 10:24:30,711: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2020-09-10 10:24:30,713: topic[/diagnostics] adding connection to [/diag_agg], count 0
+[rospy.internal][INFO] 2020-09-10 11:38:44,027: topic[/diagnostics] removing connection to /diag_agg
+[rospy.impl.masterslave][INFO] 2020-09-10 11:38:44,718: external shutdown request from [/rosnode]: user request
+[rospy.core][INFO] 2020-09-10 11:38:44,719: signal_shutdown [external shutdown request from [/rosnode]: [user request]]
+[rospy.internal][INFO] 2020-09-10 11:38:44,723: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2020-09-10 11:38:44,724: topic[/body_scan] removing connection to http://cuboid0009:38001/
+[rospy.internal][WARNING] 2020-09-10 11:38:44,724: Unknown error initiating TCP/IP socket to cuboid0009:55577 (http://cuboid0009:38001/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 558, in connect
+    self.local_endpoint = self.socket.getsockname()
+AttributeError: 'NoneType' object has no attribute 'getsockname'
+
+[rospy.core][INFO] 2020-09-10 11:38:45,067: signal_shutdown [atexit]

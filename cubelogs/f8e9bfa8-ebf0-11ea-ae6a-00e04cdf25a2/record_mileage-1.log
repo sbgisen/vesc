@@ -1,0 +1,78 @@
+[rospy.client][INFO] 2020-09-01 10:19:28,296: init_node, name[/record_mileage], pid[2252]
+[xmlrpc][INFO] 2020-09-01 10:19:28,296: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2020-09-01 10:19:28,297: Started XML-RPC server [http://cuboid:39597/]
+[rospy.init][INFO] 2020-09-01 10:19:28,297: ROS Slave URI: [http://cuboid:39597/]
+[rospy.impl.masterslave][INFO] 2020-09-01 10:19:28,297: _ready: http://cuboid:39597/
+[rospy.registration][INFO] 2020-09-01 10:19:28,298: Registering with master node http://localhost:11311
+[xmlrpc][INFO] 2020-09-01 10:19:28,298: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2020-09-01 10:19:28,397: registered with master
+[rospy.rosout][INFO] 2020-09-01 10:19:28,398: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-01 10:19:28,400: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-01 10:19:28,402: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rosout][INFO] 2020-09-01 10:19:28,410: api:report/robot/uploadMileage/
+[rosout][INFO] 2020-09-01 10:19:28,410: robot_serial_no:Cuboid0009
+[rospy.internal][INFO] 2020-09-01 10:19:28,463: topic[/base/cube_base_driver/diff_drive_controller/odom] adding connection to [http://cuboid:36413/], count 0
+[rospy.internal][INFO] 2020-09-01 10:19:28,551: topic[/rosout] adding connection to [/rosout], count 0
+[rosout][INFO] 2020-09-01 10:19:38,469: 2.88770081755
+[rosout][INFO] 2020-09-01 10:19:38,469: [start] obtain token
+[rosout][INFO] 2020-09-01 10:19:38,469: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-01 10:19:38,470: password: 1Fc**********
+[rosout][INFO] 2020-09-01 10:19:39,209: [successed] obtain token
+[rosout][INFO] 2020-09-01 10:19:48,476: 2.99435527949
+[rosout][INFO] 2020-09-01 10:19:58,468: 2.983366712
+[rosout][INFO] 2020-09-01 10:20:08,485: 2.99224513909
+[rosout][INFO] 2020-09-01 10:20:18,465: 1.84578782073
+[rosout][INFO] 2020-09-01 10:20:28,509: 0.000273492332784
+[rosout][INFO] 2020-09-01 10:20:38,492: 0.513526926798
+[rosout][INFO] 2020-09-01 10:20:48,464: 2.99537358806
+[rosout][INFO] 2020-09-01 10:20:58,489: 2.20634264621
+[rosout][INFO] 2020-09-01 10:21:08,488: -0.174310260075
+[rosout][INFO] 2020-09-01 10:21:18,468: 0.861266097541
+[rosout][INFO] 2020-09-01 10:21:28,517: 2.98599987943
+[rosout][INFO] 2020-09-01 10:21:38,497: 2.97872633999
+[rosout][INFO] 2020-09-01 10:21:48,525: 2.20895818024
+[rosout][INFO] 2020-09-01 10:21:58,501: 0.00233554421532
+[rosout][INFO] 2020-09-01 10:22:08,496: 0.223601099443
+[rosout][INFO] 2020-09-01 10:22:18,517: 2.91651823558
+[rosout][INFO] 2020-09-01 10:22:28,565: 2.19926072712
+[rosout][INFO] 2020-09-01 10:22:38,549: 2.99289302528
+[rosout][INFO] 2020-09-01 10:22:48,569: 1.4292265306
+[rosout][INFO] 2020-09-01 10:22:58,608: -0.000912630541477
+[rosout][INFO] 2020-09-01 10:23:08,569: 1.79421209354
+[rosout][INFO] 2020-09-01 10:23:18,593: 2.98672148865
+[rosout][INFO] 2020-09-01 10:23:28,585: 2.98732765205
+[rosout][INFO] 2020-09-01 10:23:38,596: 2.98841881379
+[rosout][INFO] 2020-09-01 10:23:48,565: 2.98591827787
+[rosout][INFO] 2020-09-01 10:23:58,601: 1.86465283167
+[rosout][INFO] 2020-09-01 10:24:08,585: -0.000538798094878
+[rosout][INFO] 2020-09-01 10:24:18,572: 1.10671742455
+[rosout][INFO] 2020-09-01 10:24:28,565: 2.98550112266
+[rosout][INFO] 2020-09-01 10:24:38,605: 0.639279370247
+[rosout][INFO] 2020-09-01 10:24:48,605: 0.00066815473961
+[rosout][INFO] 2020-09-01 10:24:48,605: [start] obtain token
+[rosout][INFO] 2020-09-01 10:24:48,605: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-01 10:24:48,606: password: 1Fc**********
+[rosout][INFO] 2020-09-01 10:24:48,882: [successed] obtain token
+[rosout][INFO] 2020-09-01 10:24:58,613: 2.63746781735
+[rosout][INFO] 2020-09-01 10:25:08,621: 2.94050377607
+[rosout][INFO] 2020-09-01 10:25:18,649: 2.98966091033
+[rosout][INFO] 2020-09-01 10:25:28,620: 1.23570807816
+[rospy.impl.masterslave][INFO] 2020-09-01 10:25:35,042: external shutdown request from [/rosnode]: user request
+[rospy.core][INFO] 2020-09-01 10:25:35,042: signal_shutdown [external shutdown request from [/rosnode]: [user request]]
+[rospy.internal][INFO] 2020-09-01 10:25:35,045: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2020-09-01 10:25:35,045: topic[/base/cube_base_driver/diff_drive_controller/odom] removing connection to http://cuboid:36413/
+[rospy.internal][WARNING] 2020-09-01 10:25:35,051: Unknown error initiating TCP/IP socket to cuboid:45343 (http://cuboid:36413/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 650, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+AttributeError: 'NoneType' object has no attribute 'buff_size'
+
+[rospy.topics][ERROR] 2020-09-01 10:25:35,051: Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/topics.py", line 326, in close
+    c.close()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 838, in close
+    self.socket.close()
+AttributeError: 'NoneType' object has no attribute 'close'
+
+[rospy.core][INFO] 2020-09-01 10:25:35,221: signal_shutdown [atexit]

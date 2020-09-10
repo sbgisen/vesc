@@ -1,0 +1,36 @@
+[rospy.client][INFO] 2020-09-04 17:59:42,816: init_node, name[/rotate_in_place], pid[29747]
+[xmlrpc][INFO] 2020-09-04 17:59:42,817: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2020-09-04 17:59:42,817: Started XML-RPC server [http://cuboid0009:46505/]
+[rospy.init][INFO] 2020-09-04 17:59:42,817: ROS Slave URI: [http://cuboid0009:46505/]
+[rospy.impl.masterslave][INFO] 2020-09-04 17:59:42,817: _ready: http://cuboid0009:46505/
+[rospy.registration][INFO] 2020-09-04 17:59:42,818: Registering with master node http://localhost:11311
+[xmlrpc][INFO] 2020-09-04 17:59:42,818: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2020-09-04 17:59:42,918: registered with master
+[rospy.rosout][INFO] 2020-09-04 17:59:42,918: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-04 17:59:42,919: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-04 17:59:42,920: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rosout][INFO] 2020-09-04 17:59:42,926: Init robot_pose subscriber
+[rosout][INFO] 2020-09-04 17:59:42,930: Init global path subscriber
+[rosout][INFO] 2020-09-04 17:59:42,932: Init local costmap subscriber
+[rosout][INFO] 2020-09-04 17:59:42,934: Init move_base result subscriber
+[rospy.internal][INFO] 2020-09-04 17:59:42,935: topic[/robot_pose] adding connection to [http://cuboid0009:44049/], count 0
+[rosout][INFO] 2020-09-04 17:59:42,937: Init move_base feedback subscriber
+[rosout][INFO] 2020-09-04 17:59:42,939: [RotateInPlace] Init publisher and subscriber
+[rospy.internal][INFO] 2020-09-04 17:59:43,127: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2020-09-04 17:59:43,225: topic[/rotate_vel] adding connection to [/twist_mux], count 0
+[rospy.internal][INFO] 2020-09-04 18:00:03,917: topic[/move_base/NavfnROS/plan] adding connection to [http://cuboid0009:43207/], count 0
+[rospy.internal][INFO] 2020-09-04 18:00:04,531: topic[/move_base/local_costmap/costmap_updates] adding connection to [http://cuboid0009:43207/], count 0
+[rospy.internal][INFO] 2020-09-04 18:00:04,847: topic[/move_base/result] adding connection to [http://cuboid0009:43207/], count 0
+[rospy.internal][INFO] 2020-09-04 18:00:04,849: topic[/move_base/feedback] adding connection to [http://cuboid0009:43207/], count 0
+[rospy.core][INFO] 2020-09-04 18:25:52,561: signal_shutdown [signal-2]
+[rospy.registration][WARNING] 2020-09-04 18:25:52,562: cannot unregister with master due to network issues
+[rospy.internal][INFO] 2020-09-04 18:25:52,562: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2020-09-04 18:25:52,563: topic[/rotate_vel] removing connection to /twist_mux
+[rospy.internal][INFO] 2020-09-04 18:25:52,563: topic[/move_base/NavfnROS/plan] removing connection to http://cuboid0009:43207/
+[rospy.internal][INFO] 2020-09-04 18:25:52,563: topic[/move_base/result] removing connection to http://cuboid0009:43207/
+[rospy.internal][INFO] 2020-09-04 18:25:52,563: topic[/move_base/feedback] removing connection to http://cuboid0009:43207/
+[rospy.internal][INFO] 2020-09-04 18:25:52,563: topic[/robot_pose] removing connection to http://cuboid0009:44049/
+[rospy.internal][INFO] 2020-09-04 18:25:52,563: topic[/move_base/local_costmap/costmap_updates] removing connection to http://cuboid0009:43207/
+[rospy.impl.masterslave][INFO] 2020-09-04 18:25:52,564: signal-2
+[rospy.core][INFO] 2020-09-04 18:25:52,611: signal_shutdown [signal-2]
+[rospy.core][INFO] 2020-09-04 18:25:52,611: signal_shutdown [atexit]

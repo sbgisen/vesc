@@ -1,0 +1,7 @@
+[0m[ INFO] [1599700525.343767680]: Loading nodelet /camera_points_xyzrgb_qhd of type depth_image_proc/point_cloud_xyzrgb to manager kinect2_manager with the following remappings:[0m
+[0m[ INFO] [1599700525.343807926]: /depth_registered/image_rect -> /camera/qhd/image_depth_rect[0m
+[0m[ INFO] [1599700525.343816582]: /depth_registered/points -> /camera/qhd/points[0m
+[0m[ INFO] [1599700525.343822892]: /rgb/camera_info -> /camera/qhd/camera_info[0m
+[0m[ INFO] [1599700525.343828300]: /rgb/image_rect_color -> /camera/qhd/image_color_rect[0m
+[33m[ WARN] [1599700781.965116600]: Shutdown request received. Reason: [user request][0m
+[0m[ INFO] [1599700781.972814101]: Unloading nodelet /camera_points_xyzrgb_qhd from manager kinect2_manager[0m

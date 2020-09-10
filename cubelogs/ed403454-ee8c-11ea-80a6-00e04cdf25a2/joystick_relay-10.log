@@ -1,0 +1,21 @@
+[rospy.client][INFO] 2020-09-04 17:59:30,533: init_node, name[/joystick_relay], pid[27607]
+[xmlrpc][INFO] 2020-09-04 17:59:30,533: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2020-09-04 17:59:30,533: Started XML-RPC server [http://cuboid0009:43531/]
+[rospy.init][INFO] 2020-09-04 17:59:30,534: ROS Slave URI: [http://cuboid0009:43531/]
+[rospy.impl.masterslave][INFO] 2020-09-04 17:59:30,534: _ready: http://cuboid0009:43531/
+[xmlrpc][INFO] 2020-09-04 17:59:30,534: xml rpc node: starting XML-RPC server
+[rospy.registration][INFO] 2020-09-04 17:59:30,535: Registering with master node http://localhost:11311
+[rospy.init][INFO] 2020-09-04 17:59:30,634: registered with master
+[rospy.rosout][INFO] 2020-09-04 17:59:30,634: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-04 17:59:30,638: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-04 17:59:30,639: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2020-09-04 17:59:30,767: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2020-09-04 17:59:30,867: topic[/joy_priority] adding connection to [/twist_mux], count 0
+[rospy.internal][INFO] 2020-09-04 17:59:30,868: topic[/joy_vel] adding connection to [/twist_mux], count 0
+[rospy.core][INFO] 2020-09-04 18:25:52,523: signal_shutdown [signal-2]
+[rospy.registration][WARNING] 2020-09-04 18:25:52,524: cannot unregister with master due to network issues
+[rospy.internal][INFO] 2020-09-04 18:25:52,524: topic[/joy_priority] removing connection to /twist_mux
+[rospy.internal][INFO] 2020-09-04 18:25:52,525: topic[/joy_vel] removing connection to /twist_mux
+[rospy.internal][INFO] 2020-09-04 18:25:52,525: topic[/rosout] removing connection to /rosout
+[rospy.impl.masterslave][INFO] 2020-09-04 18:25:52,525: signal-2
+[rospy.core][INFO] 2020-09-04 18:25:52,718: signal_shutdown [atexit]

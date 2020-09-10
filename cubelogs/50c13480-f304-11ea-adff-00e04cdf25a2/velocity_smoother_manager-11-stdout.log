@@ -1,0 +1,49 @@
+[0m[ INFO] [1599701052.484841765]: Initializing nodelet with 8 worker threads.[0m
+[0m[ INFO] [1599701052.994221058]: Reconfigure request : 0.500000 1.000000 0.100000 1.000000 6.000000[0m
+[33m[ WARN] [1599701181.708237684]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599701183.158135492]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (-0.1, 0), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599701188.358157506]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0, 0.6), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599701191.158154437]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, -0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599701191.358137265]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, -0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599701193.958132240]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0, 0.6), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599701201.108182795]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, -0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599701201.308193669]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, -0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599701384.708115809]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (-0.1, 0), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599701393.658111218]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, -0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599701393.858144513]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, -0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599701591.658154713]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, -0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599701591.858158412]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, -0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599701592.058209353]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, -0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599702000.863235811]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599702001.063208891]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599702542.663223223]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, -0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599702542.863328229]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, -0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599702545.413184052]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0, 0.6), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599702758.713214245]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0, 0.3), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599702760.963228653]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0, -0.3), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599703248.863216098]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599703249.063317178]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599703416.963212816]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599703417.163214480]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599703683.763215663]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599703683.963205422]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599703750.463232049]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599703921.213209721]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599703921.413231067]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599704092.813254859]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599704093.013224501]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599704104.263233729]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, -0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599704104.463193690]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, -0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599704114.313216789]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599704114.513205460]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599704442.463209906]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599704442.663236813]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599704812.663206220]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599704812.863228112]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599704941.663256023]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599704941.863224190]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599704942.163208449]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599705513.063224465]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (-0.2, 0), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599705515.313216862]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (-0.2, 0), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1599705526.730078590]: Shutdown request received.[0m
+[33m[ WARN] [1599705526.730101996]: Reason given for shutdown: [user request][0m

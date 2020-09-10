@@ -1,0 +1,8 @@
+[0m[ INFO] [1598923086.693793409]: Initializing nodelet with 8 worker threads.[0m
+[0m[ INFO] [1598923087.163778606]: Reconfigure request : 0.500000 1.000000 0.100000 1.000000 6.000000[0m
+[33m[ WARN] [1598923261.979014726]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1598923262.178981064]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1598923476.329007367]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1598923476.528982489]: Velocity Smoother : input got inactive leaving us a non-zero target velocity (0.1, 0.5), zeroing...[velocity_smoother][0m
+[33m[ WARN] [1598923544.706378971]: Shutdown request received.[0m
+[33m[ WARN] [1598923544.706401943]: Reason given for shutdown: [user request][0m

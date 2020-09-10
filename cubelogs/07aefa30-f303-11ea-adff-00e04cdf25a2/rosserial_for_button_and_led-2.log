@@ -1,0 +1,24 @@
+[rospy.client][INFO] 2020-09-10 10:15:57,281: init_node, name[/rosserial_for_button_and_led], pid[18866]
+[xmlrpc][INFO] 2020-09-10 10:15:57,281: XML-RPC server binding to 0.0.0.0:0
+[rospy.init][INFO] 2020-09-10 10:15:57,281: ROS Slave URI: [http://cuboid0009:41035/]
+[xmlrpc][INFO] 2020-09-10 10:15:57,282: Started XML-RPC server [http://cuboid0009:41035/]
+[rospy.impl.masterslave][INFO] 2020-09-10 10:15:57,282: _ready: http://cuboid0009:41035/
+[xmlrpc][INFO] 2020-09-10 10:15:57,282: xml rpc node: starting XML-RPC server
+[rospy.registration][INFO] 2020-09-10 10:15:57,283: Registering with master node http://localhost:11311
+[rospy.init][INFO] 2020-09-10 10:15:57,382: registered with master
+[rospy.rosout][INFO] 2020-09-10 10:15:57,382: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-10 10:15:57,387: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-10 10:15:57,388: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rosout][INFO] 2020-09-10 10:15:57,393: ROS Serial Python Node
+[rosout][INFO] 2020-09-10 10:15:57,401: Connecting to /dev/ttyButton at 57600 baud
+[rospy.internal][INFO] 2020-09-10 10:15:57,542: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2020-09-10 10:15:57,640: topic[/diagnostics] adding connection to [/diag_agg], count 0
+[rosout][INFO] 2020-09-10 10:15:59,527: Note: publish buffer size is 280 bytes
+[rosout][INFO] 2020-09-10 10:15:59,528: Setup publisher on pushed [std_msgs/Bool]
+[rosout][INFO] 2020-09-10 10:15:59,545: Note: subscribe buffer size is 280 bytes
+[rosout][INFO] 2020-09-10 10:15:59,546: Setup subscriber on led_color_state [std_msgs/ColorRGBA]
+[rosout][INFO] 2020-09-10 10:17:57,928: Send tx stop request
+[rospy.core][INFO] 2020-09-10 10:17:57,928: signal_shutdown [atexit]
+[rospy.internal][INFO] 2020-09-10 10:17:57,933: topic[/diagnostics] removing connection to /diag_agg
+[rospy.internal][INFO] 2020-09-10 10:17:57,933: topic[/rosout] removing connection to /rosout
+[rospy.impl.masterslave][INFO] 2020-09-10 10:17:57,933: atexit

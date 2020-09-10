@@ -1,0 +1,30 @@
+[rospy.client][INFO] 2020-09-10 10:16:00,664: init_node, name[/record_mileage], pid[19728]
+[xmlrpc][INFO] 2020-09-10 10:16:00,664: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2020-09-10 10:16:00,665: Started XML-RPC server [http://cuboid0009:46323/]
+[rospy.init][INFO] 2020-09-10 10:16:00,665: ROS Slave URI: [http://cuboid0009:46323/]
+[rospy.impl.masterslave][INFO] 2020-09-10 10:16:00,665: _ready: http://cuboid0009:46323/
+[xmlrpc][INFO] 2020-09-10 10:16:00,666: xml rpc node: starting XML-RPC server
+[rospy.registration][INFO] 2020-09-10 10:16:00,666: Registering with master node http://localhost:11311
+[rospy.init][INFO] 2020-09-10 10:16:00,765: registered with master
+[rospy.rosout][INFO] 2020-09-10 10:16:00,765: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-10 10:16:00,769: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-10 10:16:00,771: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rosout][INFO] 2020-09-10 10:16:00,785: api:report/robot/uploadMileage/
+[rosout][INFO] 2020-09-10 10:16:00,785: robot_serial_no:Cuboid0009
+[rospy.internal][INFO] 2020-09-10 10:16:00,831: topic[/base/cube_base_driver/diff_drive_controller/odom] adding connection to [http://cuboid0009:33525/], count 0
+[rospy.internal][INFO] 2020-09-10 10:16:00,949: topic[/rosout] adding connection to [/rosout], count 0
+[rosout][INFO] 2020-09-10 10:16:10,855: 0.0
+[rosout][INFO] 2020-09-10 10:16:10,855: [start] obtain token
+[rosout][INFO] 2020-09-10 10:16:10,855: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 10:16:10,856: password: 1Fc**********
+[rosout][ERROR] 2020-09-10 10:18:10,975: Failed to postrequest because of URLError:timed out
+[rosout][ERROR] 2020-09-10 10:18:10,976: [failed] obtain token
+[rosout][INFO] 2020-09-10 10:18:10,993: 0.0
+[rosout][INFO] 2020-09-10 10:18:10,993: [start] obtain token
+[rosout][INFO] 2020-09-10 10:18:10,994: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 10:18:10,994: password: 1Fc**********
+[rospy.impl.masterslave][INFO] 2020-09-10 10:19:37,473: external shutdown request from [/rosnode]: user request
+[rospy.core][INFO] 2020-09-10 10:19:37,473: signal_shutdown [external shutdown request from [/rosnode]: [user request]]
+[rospy.internal][INFO] 2020-09-10 10:19:37,476: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2020-09-10 10:19:37,476: topic[/base/cube_base_driver/diff_drive_controller/odom] removing connection to http://cuboid0009:33525/
+[rospy.core][INFO] 2020-09-10 10:19:37,971: signal_shutdown [atexit]

@@ -1,0 +1,51 @@
+[rospy.client][INFO] 2020-09-10 14:01:33,097: init_node, name[/sonars_node], pid[10551]
+[xmlrpc][INFO] 2020-09-10 14:01:33,097: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2020-09-10 14:01:33,098: Started XML-RPC server [http://cuboid0009:42567/]
+[rospy.init][INFO] 2020-09-10 14:01:33,098: ROS Slave URI: [http://cuboid0009:42567/]
+[rospy.impl.masterslave][INFO] 2020-09-10 14:01:33,098: _ready: http://cuboid0009:42567/
+[xmlrpc][INFO] 2020-09-10 14:01:33,098: xml rpc node: starting XML-RPC server
+[rospy.registration][INFO] 2020-09-10 14:01:33,098: Registering with master node http://localhost:11311
+[rospy.init][INFO] 2020-09-10 14:01:33,198: registered with master
+[rospy.rosout][INFO] 2020-09-10 14:01:33,198: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-10 14:01:33,200: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-10 14:01:33,201: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rosout][INFO] 2020-09-10 14:01:33,203: ROS Serial Python Node
+[rosout][INFO] 2020-09-10 14:01:33,207: Connecting to /dev/ttySonar at 57600 baud
+[rospy.internal][INFO] 2020-09-10 14:01:33,367: topic[/diagnostics] adding connection to [/diag_agg], count 0
+[rospy.internal][INFO] 2020-09-10 14:01:33,467: topic[/rosout] adding connection to [/rosout], count 0
+[rosout][INFO] 2020-09-10 14:01:36,020: Note: publish buffer size is 380 bytes
+[rosout][INFO] 2020-09-10 14:01:36,020: Setup publisher on /sonar/left_side [sensor_msgs/Range]
+[rosout][INFO] 2020-09-10 14:01:36,023: Setup publisher on /sonar/left_oblique [sensor_msgs/Range]
+[rosout][INFO] 2020-09-10 14:01:36,026: Setup publisher on /sonar/left_front [sensor_msgs/Range]
+[rosout][INFO] 2020-09-10 14:01:36,028: Setup publisher on /sonar/right_front [sensor_msgs/Range]
+[rosout][INFO] 2020-09-10 14:01:36,030: Setup publisher on /sonar/right_oblique [sensor_msgs/Range]
+[rosout][INFO] 2020-09-10 14:01:36,037: Setup publisher on /sonar/right_side [sensor_msgs/Range]
+[rospy.internal][INFO] 2020-09-10 14:01:45,228: topic[/sonar/left_side] adding connection to [/move_base], count 0
+[rospy.internal][INFO] 2020-09-10 14:01:45,229: topic[/sonar/left_oblique] adding connection to [/move_base], count 0
+[rospy.internal][INFO] 2020-09-10 14:01:45,229: topic[/sonar/left_front] adding connection to [/move_base], count 0
+[rospy.internal][INFO] 2020-09-10 14:01:45,230: topic[/sonar/right_side] adding connection to [/move_base], count 0
+[rospy.internal][INFO] 2020-09-10 14:01:45,230: topic[/sonar/right_oblique] adding connection to [/move_base], count 0
+[rospy.internal][INFO] 2020-09-10 14:01:45,230: topic[/sonar/right_front] adding connection to [/move_base], count 0
+[rospy.internal][INFO] 2020-09-10 14:05:14,672: topic[/sonar/left_front] removing connection to /move_base
+[rospy.internal][INFO] 2020-09-10 14:05:14,672: topic[/sonar/left_oblique] removing connection to /move_base
+[rospy.internal][INFO] 2020-09-10 14:05:14,672: topic[/sonar/right_side] removing connection to /move_base
+[rospy.internal][INFO] 2020-09-10 14:05:14,673: topic[/sonar/right_oblique] removing connection to /move_base
+[rospy.internal][INFO] 2020-09-10 14:05:14,673: topic[/sonar/right_front] removing connection to /move_base
+[rospy.internal][INFO] 2020-09-10 14:05:14,673: topic[/sonar/left_side] removing connection to /move_base
+[rospy.internal][INFO] 2020-09-10 14:05:17,058: topic[/sonar/left_side] adding connection to [/move_base], count 0
+[rospy.internal][INFO] 2020-09-10 14:05:17,058: topic[/sonar/left_oblique] adding connection to [/move_base], count 0
+[rospy.internal][INFO] 2020-09-10 14:05:17,059: topic[/sonar/left_front] adding connection to [/move_base], count 0
+[rospy.internal][INFO] 2020-09-10 14:05:17,059: topic[/sonar/right_side] adding connection to [/move_base], count 0
+[rospy.internal][INFO] 2020-09-10 14:05:17,060: topic[/sonar/right_oblique] adding connection to [/move_base], count 0
+[rospy.internal][INFO] 2020-09-10 14:05:17,060: topic[/sonar/right_front] adding connection to [/move_base], count 0
+[rospy.internal][INFO] 2020-09-10 14:20:09,059: topic[/sonar/left_side] removing connection to /move_base
+[rospy.internal][INFO] 2020-09-10 14:20:09,091: topic[/sonar/left_oblique] removing connection to /move_base
+[rospy.internal][INFO] 2020-09-10 14:20:09,123: topic[/sonar/left_front] removing connection to /move_base
+[rospy.internal][INFO] 2020-09-10 14:20:09,165: topic[/sonar/right_front] removing connection to /move_base
+[rospy.internal][INFO] 2020-09-10 14:20:09,166: topic[/sonar/right_oblique] removing connection to /move_base
+[rospy.internal][INFO] 2020-09-10 14:20:09,197: topic[/sonar/right_side] removing connection to /move_base
+[rospy.internal][INFO] 2020-09-10 14:20:10,987: topic[/diagnostics] removing connection to /diag_agg
+[rospy.impl.masterslave][INFO] 2020-09-10 14:20:13,614: external shutdown request from [/rosnode]: user request
+[rospy.core][INFO] 2020-09-10 14:20:13,614: signal_shutdown [external shutdown request from [/rosnode]: [user request]]
+[rospy.internal][INFO] 2020-09-10 14:20:13,667: topic[/rosout] removing connection to /rosout
+[rospy.core][INFO] 2020-09-10 14:20:13,768: signal_shutdown [atexit]

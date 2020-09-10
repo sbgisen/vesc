@@ -1,0 +1,22 @@
+[rospy.client][INFO] 2020-09-04 17:59:57,107: init_node, name[/diagnostic_kinect], pid[1325]
+[xmlrpc][INFO] 2020-09-04 17:59:57,107: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2020-09-04 17:59:57,108: Started XML-RPC server [http://cuboid0009:40301/]
+[rospy.init][INFO] 2020-09-04 17:59:57,108: ROS Slave URI: [http://cuboid0009:40301/]
+[rospy.impl.masterslave][INFO] 2020-09-04 17:59:57,108: _ready: http://cuboid0009:40301/
+[rospy.registration][INFO] 2020-09-04 17:59:57,109: Registering with master node http://localhost:11311
+[xmlrpc][INFO] 2020-09-04 17:59:57,109: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2020-09-04 17:59:57,208: registered with master
+[rospy.rosout][INFO] 2020-09-04 17:59:57,208: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-04 17:59:57,210: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-04 17:59:57,211: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2020-09-04 17:59:57,223: topic[/camera/sd/image_color] adding connection to [http://cuboid0009:35961/], count 0
+[rospy.internal][INFO] 2020-09-04 17:59:57,376: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2020-09-04 17:59:57,478: topic[/diagnostics] adding connection to [/diag_agg], count 0
+[rospy.core][INFO] 2020-09-04 18:25:52,519: signal_shutdown [signal-2]
+[rospy.registration][WARNING] 2020-09-04 18:25:52,524: cannot unregister with master due to network issues
+[rospy.internal][INFO] 2020-09-04 18:25:52,524: topic[/diagnostics] removing connection to /diag_agg
+[rospy.internal][INFO] 2020-09-04 18:25:52,524: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2020-09-04 18:25:52,524: topic[/camera/sd/image_color] removing connection to http://cuboid0009:35961/
+[rospy.impl.masterslave][INFO] 2020-09-04 18:25:52,525: signal-2
+[rospy.core][INFO] 2020-09-04 18:25:52,556: signal_shutdown [signal-2]
+[rospy.core][INFO] 2020-09-04 18:25:52,556: signal_shutdown [atexit]

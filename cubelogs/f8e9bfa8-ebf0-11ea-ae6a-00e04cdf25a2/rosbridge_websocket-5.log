@@ -1,0 +1,114 @@
+[rospy.client][INFO] 2020-09-01 10:18:03,962: init_node, name[/rosbridge_websocket], pid[13971]
+[xmlrpc][INFO] 2020-09-01 10:18:03,962: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2020-09-01 10:18:03,963: Started XML-RPC server [http://cuboid:43015/]
+[rospy.init][INFO] 2020-09-01 10:18:03,963: ROS Slave URI: [http://cuboid:43015/]
+[rospy.impl.masterslave][INFO] 2020-09-01 10:18:03,963: _ready: http://cuboid:43015/
+[xmlrpc][INFO] 2020-09-01 10:18:03,964: xml rpc node: starting XML-RPC server
+[rospy.registration][INFO] 2020-09-01 10:18:03,964: Registering with master node http://localhost:11311
+[rospy.init][INFO] 2020-09-01 10:18:04,063: registered with master
+[rospy.rosout][INFO] 2020-09-01 10:18:04,063: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-01 10:18:04,066: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-01 10:18:04,067: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rosout][INFO] 2020-09-01 10:18:04,087: Rosbridge WebSocket server started at ws://0.0.0.0:9090
+[rospy.internal][INFO] 2020-09-01 10:18:04,215: topic[/rosout] adding connection to [/rosout], count 0
+[rosout][INFO] 2020-09-01 10:18:06,113: Client connected.  1 clients total.
+[rosout][INFO] 2020-09-01 10:18:06,322: [Client 0] Subscribed to /charge_current
+[rosout][INFO] 2020-09-01 10:18:06,326: [Client 0] Subscribed to /battery_remaining
+[rosout][INFO] 2020-09-01 10:18:07,120: Client connected.  2 clients total.
+[rosout][INFO] 2020-09-01 10:18:07,139: [Client 1] Subscribed to /diagnostics_agg
+[rospy.internal][INFO] 2020-09-01 10:18:07,180: topic[/diagnostics_agg] adding connection to [http://cuboid:44271/], count 0
+[rospy.internal][INFO] 2020-09-01 10:18:17,899: topic[/battery_remaining] adding connection to [http://cuboid:41997/], count 0
+[rospy.internal][INFO] 2020-09-01 10:18:17,899: topic[/charge_current] adding connection to [http://cuboid:41997/], count 0
+[rosout][INFO] 2020-09-01 10:18:56,261: Client disconnected. 1 clients total.
+[rospy.internal][INFO] 2020-09-01 10:18:56,261: topic impl's ref count is zero, deleting topic /diagnostics_agg...
+[rospy.internal][INFO] 2020-09-01 10:18:56,261: topic[/diagnostics_agg] removing connection to http://cuboid:44271/
+[rosout][INFO] 2020-09-01 10:18:59,313: Client connected.  2 clients total.
+[rosout][INFO] 2020-09-01 10:18:59,331: [Client 2] Subscribed to /diagnostics_agg
+[rospy.internal][INFO] 2020-09-01 10:18:59,376: topic[/diagnostics_agg] adding connection to [http://cuboid:44271/], count 0
+[rosout][INFO] 2020-09-01 10:19:04,996: Client disconnected. 1 clients total.
+[rospy.internal][INFO] 2020-09-01 10:19:04,997: topic impl's ref count is zero, deleting topic /diagnostics_agg...
+[rospy.internal][INFO] 2020-09-01 10:19:04,997: topic[/diagnostics_agg] removing connection to http://cuboid:44271/
+[rosout][INFO] 2020-09-01 10:19:15,294: Client connected.  2 clients total.
+[rosout][INFO] 2020-09-01 10:19:15,325: [Client 3] Subscribed to /robot_pose
+[rosout][INFO] 2020-09-01 10:19:15,339: [Client 3] Subscribed to /camera/qhd/image_color/compressed
+[rospy.internal][INFO] 2020-09-01 10:19:15,348: topic[/camera/qhd/image_color/compressed] adding connection to [http://cuboid:33467/], count 0
+[rospy.internal][INFO] 2020-09-01 10:19:15,349: topic[/robot_pose] adding connection to [http://cuboid:34005/], count 0
+[rosout][INFO] 2020-09-01 10:19:15,351: [Client 3] Subscribed to /move_base/NavfnROS/plan/cut
+[rospy.internal][INFO] 2020-09-01 10:19:15,354: topic[/move_base/NavfnROS/plan/cut] adding connection to [http://cuboid:45861/], count 0
+[rosout][INFO] 2020-09-01 10:19:15,370: [Client 3] Subscribed to /round_goals/sleeptime
+[rosout][INFO] 2020-09-01 10:19:15,383: [Client 3] Subscribed to /move_base/status
+[rosout][INFO] 2020-09-01 10:19:15,393: [Client 3] Subscribed to /costmap_image/full/compressed
+[rospy.internal][INFO] 2020-09-01 10:19:15,394: topic[/costmap_image/full/compressed] adding connection to [http://cuboid:44863/], count 0
+[rosout][INFO] 2020-09-01 10:19:15,407: [Client 3] Subscribed to /tf
+[rospy.internal][INFO] 2020-09-01 10:19:15,419: topic[/tf] adding connection to [http://cuboid:36413/], count 0
+[rospy.internal][INFO] 2020-09-01 10:19:15,419: topic[/tf] adding connection to [http://cuboid:38737/], count 0
+[rospy.internal][INFO] 2020-09-01 10:19:15,420: topic[/tf] adding connection to [http://cuboid:45245/], count 1
+[rospy.internal][INFO] 2020-09-01 10:19:15,421: topic[/tf] adding connection to [http://cuboid:35979/], count 1
+[rospy.internal][INFO] 2020-09-01 10:19:15,422: topic[/tf] adding connection to [http://cuboid:35707/], count 3
+[rospy.internal][INFO] 2020-09-01 10:19:16,737: topic[/move_base/status] adding connection to [http://cuboid:41905/], count 0
+[rospy.internal][INFO] 2020-09-01 10:19:20,021: topic[/initialpose] adding connection to [/amcl], count 0
+[rospy.internal][INFO] 2020-09-01 10:19:25,743: topic[/round_goals/sleeptime] adding connection to [http://cuboid:39763/], count 0
+[rosout][INFO] 2020-09-01 10:19:39,003: Client disconnected. 1 clients total.
+[rospy.internal][INFO] 2020-09-01 10:19:39,004: topic impl's ref count is zero, deleting topic /camera/qhd/image_color/compressed...
+[rospy.internal][INFO] 2020-09-01 10:19:39,004: topic[/camera/qhd/image_color/compressed] removing connection to http://cuboid:33467/
+[rospy.internal][INFO] 2020-09-01 10:19:39,007: topic impl's ref count is zero, deleting topic /move_base/NavfnROS/plan/cut...
+[rospy.internal][INFO] 2020-09-01 10:19:39,007: topic[/move_base/NavfnROS/plan/cut] removing connection to http://cuboid:45861/
+[rospy.internal][INFO] 2020-09-01 10:19:39,009: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2020-09-01 10:19:39,009: topic[/tf] removing connection to http://cuboid:36413/
+[rospy.internal][INFO] 2020-09-01 10:19:39,009: topic[/tf] removing connection to http://cuboid:38737/
+[rospy.internal][INFO] 2020-09-01 10:19:39,010: topic[/tf] removing connection to http://cuboid:45245/
+[rospy.internal][INFO] 2020-09-01 10:19:39,010: topic[/tf] removing connection to http://cuboid:35979/
+[rospy.internal][INFO] 2020-09-01 10:19:39,010: topic[/tf] removing connection to http://cuboid:35707/
+[rospy.internal][INFO] 2020-09-01 10:19:39,012: topic impl's ref count is zero, deleting topic /move_base/status...
+[rospy.internal][INFO] 2020-09-01 10:19:39,013: topic[/move_base/status] removing connection to http://cuboid:41905/
+[rospy.internal][INFO] 2020-09-01 10:19:39,014: topic impl's ref count is zero, deleting topic /round_goals/sleeptime...
+[rospy.internal][INFO] 2020-09-01 10:19:39,014: topic[/round_goals/sleeptime] removing connection to http://cuboid:39763/
+[rospy.internal][INFO] 2020-09-01 10:19:39,015: topic impl's ref count is zero, deleting topic /costmap_image/full/compressed...
+[rospy.internal][INFO] 2020-09-01 10:19:39,015: topic[/costmap_image/full/compressed] removing connection to http://cuboid:44863/
+[rospy.internal][INFO] 2020-09-01 10:19:39,016: topic impl's ref count is zero, deleting topic /robot_pose...
+[rospy.internal][INFO] 2020-09-01 10:19:39,016: topic[/robot_pose] removing connection to http://cuboid:34005/
+[rosout][INFO] 2020-09-01 10:19:44,266: Client disconnected. 0 clients total.
+[rospy.internal][INFO] 2020-09-01 10:19:44,266: topic impl's ref count is zero, deleting topic /battery_remaining...
+[rospy.internal][INFO] 2020-09-01 10:19:44,266: topic[/battery_remaining] removing connection to http://cuboid:41997/
+[rospy.internal][INFO] 2020-09-01 10:19:44,268: topic impl's ref count is zero, deleting topic /charge_current...
+[rospy.internal][INFO] 2020-09-01 10:19:44,268: topic[/charge_current] removing connection to http://cuboid:41997/
+[rospy.internal][INFO] 2020-09-01 10:19:49,004: topic impl's ref count is zero, deleting topic /initialpose...
+[rospy.internal][INFO] 2020-09-01 10:19:49,004: topic[/initialpose] removing connection to /amcl
+[rosout][INFO] 2020-09-01 10:25:33,099: Client connected.  1 clients total.
+[rosout][INFO] 2020-09-01 10:25:33,119: [Client 4] Subscribed to /charge_current
+[rospy.internal][INFO] 2020-09-01 10:25:33,133: topic[/charge_current] adding connection to [http://cuboid:41997/], count 0
+[rosout][INFO] 2020-09-01 10:25:33,145: [Client 4] Subscribed to /battery_remaining
+[rospy.internal][INFO] 2020-09-01 10:25:33,149: topic[/battery_remaining] adding connection to [http://cuboid:41997/], count 0
+[rospy.internal][ERROR] 2020-09-01 10:25:41,333: Unable to initiate TCP/IP socket to cuboid:44311 (http://cuboid:41997/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 650, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 593, in _validate_header
+    raise TransportInitError("remote error reported: %s"%header['error'])
+TransportInitError: remote error reported: node shutting down
+
+[rospy.internal][WARNING] 2020-09-01 10:25:41,333: Unknown error initiating TCP/IP socket to cuboid:44311 (http://cuboid:41997/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 650, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rosgraph/network.py", line 362, in read_ros_handshake_header
+    d = sock.recv(buff_size)
+error: [Errno 104] Connection reset by peer
+
+[rospy.internal][INFO] 2020-09-01 10:25:41,333: topic[/charge_current] removing connection to http://cuboid:41997/
+[rospy.internal][WARNING] 2020-09-01 10:25:42,334: Unknown error initiating TCP/IP socket to cuboid:44311 (http://cuboid:41997/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 555, in connect
+    self.socket.connect((dest_addr, dest_port))
+  File "/usr/lib/python2.7/socket.py", line 228, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 111] Connection refused
+
+[rospy.internal][INFO] 2020-09-01 10:25:42,334: topic[/battery_remaining] removing connection to http://cuboid:41997/
+[rospy.impl.masterslave][INFO] 2020-09-01 10:25:44,389: external shutdown request from [/rosnode]: user request
+[rospy.core][INFO] 2020-09-01 10:25:44,389: signal_shutdown [external shutdown request from [/rosnode]: [user request]]
+[rospy.internal][INFO] 2020-09-01 10:25:44,465: topic[/rosout] removing connection to /rosout
+[rospy.core][INFO] 2020-09-01 10:25:45,654: signal_shutdown [signal-2]
+[rosout][INFO] 2020-09-01 10:25:45,655: Client disconnected. 0 clients total.
+[rospy.core][INFO] 2020-09-01 10:25:45,655: signal_shutdown [atexit]

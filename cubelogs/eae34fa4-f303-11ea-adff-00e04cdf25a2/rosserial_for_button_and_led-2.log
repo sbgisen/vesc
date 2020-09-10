@@ -1,0 +1,23 @@
+[rospy.client][INFO] 2020-09-10 10:22:10,161: init_node, name[/rosserial_for_button_and_led], pid[22758]
+[xmlrpc][INFO] 2020-09-10 10:22:10,161: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2020-09-10 10:22:10,162: Started XML-RPC server [http://cuboid0009:45761/]
+[rospy.init][INFO] 2020-09-10 10:22:10,162: ROS Slave URI: [http://cuboid0009:45761/]
+[rospy.impl.masterslave][INFO] 2020-09-10 10:22:10,162: _ready: http://cuboid0009:45761/
+[rospy.registration][INFO] 2020-09-10 10:22:10,162: Registering with master node http://localhost:11311
+[xmlrpc][INFO] 2020-09-10 10:22:10,163: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2020-09-10 10:22:10,262: registered with master
+[rospy.rosout][INFO] 2020-09-10 10:22:10,262: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-10 10:22:10,270: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-10 10:22:10,271: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rosout][INFO] 2020-09-10 10:22:10,273: ROS Serial Python Node
+[rosout][INFO] 2020-09-10 10:22:10,278: Connecting to /dev/ttyButton at 57600 baud
+[rospy.internal][INFO] 2020-09-10 10:22:10,407: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2020-09-10 10:22:10,504: topic[/diagnostics] adding connection to [/diag_agg], count 0
+[rosout][INFO] 2020-09-10 10:22:12,403: Note: publish buffer size is 280 bytes
+[rosout][INFO] 2020-09-10 10:22:12,403: Setup publisher on pushed [std_msgs/Bool]
+[rosout][INFO] 2020-09-10 10:22:12,421: Note: subscribe buffer size is 280 bytes
+[rosout][INFO] 2020-09-10 10:22:12,421: Setup subscriber on led_color_state [std_msgs/ColorRGBA]
+[rospy.core][INFO] 2020-09-10 10:22:40,240: signal_shutdown [atexit]
+[rospy.internal][INFO] 2020-09-10 10:22:40,245: topic[/diagnostics] removing connection to /diag_agg
+[rospy.internal][INFO] 2020-09-10 10:22:40,245: topic[/rosout] removing connection to /rosout
+[rospy.impl.masterslave][INFO] 2020-09-10 10:22:40,245: atexit

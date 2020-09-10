@@ -1,0 +1,55 @@
+[rospy.client][INFO] 2020-09-10 10:22:09,939: init_node, name[/round_goals], pid[22623]
+[xmlrpc][INFO] 2020-09-10 10:22:09,940: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2020-09-10 10:22:09,940: Started XML-RPC server [http://cuboid0009:33257/]
+[rospy.init][INFO] 2020-09-10 10:22:09,940: ROS Slave URI: [http://cuboid0009:33257/]
+[rospy.impl.masterslave][INFO] 2020-09-10 10:22:09,941: _ready: http://cuboid0009:33257/
+[rospy.registration][INFO] 2020-09-10 10:22:09,942: Registering with master node http://localhost:11311
+[xmlrpc][INFO] 2020-09-10 10:22:09,943: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2020-09-10 10:22:10,041: registered with master
+[rospy.rosout][INFO] 2020-09-10 10:22:10,041: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-10 10:22:10,043: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-10 10:22:10,044: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2020-09-10 10:22:10,060: topic[/move_base/feedback] adding connection to [http://cuboid0009:35325/], count 0
+[rospy.internal][INFO] 2020-09-10 10:22:10,061: topic[/robot_pose] adding connection to [http://cuboid0009:33397/], count 0
+[rospy.internal][INFO] 2020-09-10 10:22:10,061: topic[/move_base/status] adding connection to [http://cuboid0009:35325/], count 0
+[rospy.internal][INFO] 2020-09-10 10:22:10,068: topic[/move_base/result] adding connection to [http://cuboid0009:35325/], count 0
+[rospy.internal][INFO] 2020-09-10 10:22:10,201: topic[/move_base/goal] adding connection to [/move_base], count 0
+[rospy.internal][INFO] 2020-09-10 10:22:10,302: topic[/move_base/cancel] adding connection to [/move_base], count 0
+[rospy.internal][INFO] 2020-09-10 10:22:10,306: topic[/rosout] adding connection to [/rosout], count 0
+[rosout][INFO] 2020-09-10 10:22:10,313: [start] obtain token
+[rosout][INFO] 2020-09-10 10:22:10,314: username: 3ETmYh7UGzHDPhJP
+[rosout][INFO] 2020-09-10 10:22:10,314: password: 1Fc**********
+[rospy.core][INFO] 2020-09-10 10:22:40,497: signal_shutdown [signal-2]
+[rospy.internal][INFO] 2020-09-10 10:22:40,503: topic[/move_base/goal] removing connection to /move_base
+[rospy.internal][INFO] 2020-09-10 10:22:40,503: topic[/move_base/cancel] removing connection to /move_base
+[rospy.internal][INFO] 2020-09-10 10:22:40,504: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2020-09-10 10:22:40,504: topic[/move_base/status] removing connection to http://cuboid0009:35325/
+[rospy.internal][INFO] 2020-09-10 10:22:40,504: topic[/move_base/feedback] removing connection to http://cuboid0009:35325/
+[rospy.internal][INFO] 2020-09-10 10:22:40,504: topic[/robot_pose] removing connection to http://cuboid0009:33397/
+[rospy.internal][INFO] 2020-09-10 10:22:40,505: topic[/move_base/result] removing connection to http://cuboid0009:35325/
+[rospy.internal][WARNING] 2020-09-10 10:22:40,506: Unknown error initiating TCP/IP socket to cuboid0009:42689 (http://cuboid0009:33397/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 650, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+AttributeError: 'NoneType' object has no attribute 'buff_size'
+
+[rospy.topics][ERROR] 2020-09-10 10:22:40,506: Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/topics.py", line 326, in close
+    c.close()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 838, in close
+    self.socket.close()
+AttributeError: 'NoneType' object has no attribute 'close'
+
+[rospy.impl.masterslave][INFO] 2020-09-10 10:22:40,506: signal-2
+[rospy.internal][WARNING] 2020-09-10 10:22:40,507: Unknown error initiating TCP/IP socket to cuboid0009:42091 (http://cuboid0009:35325/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 650, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+AttributeError: 'NoneType' object has no attribute 'buff_size'
+
+[rospy.core][INFO] 2020-09-10 10:22:55,518: signal_shutdown [signal-15]
+[rosout][ERROR] 2020-09-10 10:22:55,519: Failed to postrequest because of URLError:[Errno 4] Interrupted system call
+[rosout][ERROR] 2020-09-10 10:22:55,520: [failed] obtain token
+[rospy.core][INFO] 2020-09-10 10:22:55,521: signal_shutdown [atexit]

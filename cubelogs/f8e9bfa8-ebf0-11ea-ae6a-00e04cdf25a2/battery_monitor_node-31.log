@@ -1,0 +1,32 @@
+[rospy.client][INFO] 2020-09-01 10:18:17,733: init_node, name[/battery_monitor_node], pid[15988]
+[xmlrpc][INFO] 2020-09-01 10:18:17,734: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2020-09-01 10:18:17,734: Started XML-RPC server [http://cuboid:41997/]
+[rospy.init][INFO] 2020-09-01 10:18:17,734: ROS Slave URI: [http://cuboid:41997/]
+[rospy.impl.masterslave][INFO] 2020-09-01 10:18:17,734: _ready: http://cuboid:41997/
+[rospy.registration][INFO] 2020-09-01 10:18:17,735: Registering with master node http://localhost:11311
+[xmlrpc][INFO] 2020-09-01 10:18:17,735: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2020-09-01 10:18:17,835: registered with master
+[rospy.rosout][INFO] 2020-09-01 10:18:17,835: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-01 10:18:17,837: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-01 10:18:17,837: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rosout][INFO] 2020-09-01 10:18:17,859: minimal-modbus : Port Found
+[rosout][INFO] 2020-09-01 10:18:17,863: minimal-modbus : Port open
+[rospy.internal][INFO] 2020-09-01 10:18:17,873: topic[/battery_remaining] adding connection to [/expression_operator], count 0
+[rosout][INFO] 2020-09-01 10:18:17,874: minimal-modbus : start communication
+[rospy.internal][INFO] 2020-09-01 10:18:17,900: topic[/battery_remaining] adding connection to [/rosbridge_websocket], count 1
+[rospy.internal][INFO] 2020-09-01 10:18:17,900: topic[/charge_current] adding connection to [/rosbridge_websocket], count 0
+[rosout][WARNING] 2020-09-01 10:18:17,926: minimal-modbus : serial connected, but no data was received
+[rospy.internal][INFO] 2020-09-01 10:18:17,962: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2020-09-01 10:18:19,013: topic[/battery_remaining] adding connection to [/diagnostic_battery], count 2
+[rospy.internal][INFO] 2020-09-01 10:19:44,345: topic[/charge_current] removing connection to /rosbridge_websocket
+[rospy.internal][INFO] 2020-09-01 10:19:44,345: topic[/battery_remaining] removing connection to /rosbridge_websocket
+[rospy.internal][INFO] 2020-09-01 10:25:33,140: topic[/charge_current] adding connection to [/rosbridge_websocket], count 0
+[rospy.internal][INFO] 2020-09-01 10:25:33,150: topic[/battery_remaining] adding connection to [/rosbridge_websocket], count 2
+[rospy.impl.masterslave][INFO] 2020-09-01 10:25:41,324: external shutdown request from [/rosnode]: user request
+[rospy.core][INFO] 2020-09-01 10:25:41,324: signal_shutdown [external shutdown request from [/rosnode]: [user request]]
+[rospy.internal][INFO] 2020-09-01 10:25:41,331: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2020-09-01 10:25:41,332: topic[/battery_remaining] removing connection to /expression_operator
+[rospy.internal][INFO] 2020-09-01 10:25:41,332: topic[/battery_remaining] removing connection to /diagnostic_battery
+[rospy.internal][INFO] 2020-09-01 10:25:41,332: topic[/battery_remaining] removing connection to /rosbridge_websocket
+[rospy.internal][INFO] 2020-09-01 10:25:41,332: topic[/charge_current] removing connection to /rosbridge_websocket
+[rospy.core][INFO] 2020-09-01 10:25:41,464: signal_shutdown [atexit]

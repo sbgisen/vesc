@@ -1,0 +1,49 @@
+[rospy.client][INFO] 2020-09-10 10:24:22,908: init_node, name[/expression_operator], pid[11364]
+[xmlrpc][INFO] 2020-09-10 10:24:22,908: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2020-09-10 10:24:22,909: Started XML-RPC server [http://cuboid0009:38245/]
+[rospy.init][INFO] 2020-09-10 10:24:22,909: ROS Slave URI: [http://cuboid0009:38245/]
+[rospy.impl.masterslave][INFO] 2020-09-10 10:24:22,909: _ready: http://cuboid0009:38245/
+[rospy.registration][INFO] 2020-09-10 10:24:22,909: Registering with master node http://localhost:11311
+[xmlrpc][INFO] 2020-09-10 10:24:22,910: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2020-09-10 10:24:23,009: registered with master
+[rospy.rosout][INFO] 2020-09-10 10:24:23,010: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-10 10:24:23,012: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-10 10:24:23,013: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2020-09-10 10:24:23,025: topic[/set_expression] adding connection to [http://cuboid0009:38245/], count 0
+[rospy.internal][INFO] 2020-09-10 10:24:23,026: topic[/set_expression] adding connection to [/expression_operator], count 0
+[rospy.internal][INFO] 2020-09-10 10:24:23,187: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2020-09-10 10:24:23,287: topic[/set_expression] adding connection to [/face_node], count 1
+[rospy.internal][INFO] 2020-09-10 10:24:23,690: topic[/battery_remaining] adding connection to [http://cuboid0009:39637/], count 0
+[rosout][INFO] 2020-09-10 10:24:23,720: Battery level is high
+[rosout][INFO] 2020-09-10 10:24:23,720: Switching expression from normal to happy
+[rospy.internal][ERROR] 2020-09-10 11:38:43,430: Unable to initiate TCP/IP socket to cuboid0009:46513 (http://cuboid0009:39637/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 650, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 593, in _validate_header
+    raise TransportInitError("remote error reported: %s"%header['error'])
+TransportInitError: remote error reported: node shutting down
+
+[rospy.internal][WARNING] 2020-09-10 11:38:44,435: Unknown error initiating TCP/IP socket to cuboid0009:46513 (http://cuboid0009:39637/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 555, in connect
+    self.socket.connect((dest_addr, dest_port))
+  File "/usr/lib/python2.7/socket.py", line 228, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 111] Connection refused
+
+[rospy.internal][INFO] 2020-09-10 11:38:44,435: topic[/battery_remaining] removing connection to http://cuboid0009:39637/
+[rospy.impl.masterslave][INFO] 2020-09-10 11:38:45,981: external shutdown request from [/rosnode]: user request
+[rospy.core][INFO] 2020-09-10 11:38:45,981: signal_shutdown [external shutdown request from [/rosnode]: [user request]]
+[rospy.internal][INFO] 2020-09-10 11:38:45,984: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2020-09-10 11:38:45,985: topic[/set_expression] removing connection to /expression_operator
+[rospy.internal][INFO] 2020-09-10 11:38:45,985: topic[/set_expression] removing connection to /face_node
+[rospy.internal][INFO] 2020-09-10 11:38:45,985: topic[/set_expression] removing connection to http://cuboid0009:38245/
+[rospy.internal][WARNING] 2020-09-10 11:38:45,986: Unknown error initiating TCP/IP socket to cuboid0009:35177 (http://cuboid0009:38245/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 650, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+AttributeError: 'NoneType' object has no attribute 'buff_size'
+
+[rospy.core][INFO] 2020-09-10 11:38:46,102: signal_shutdown [atexit]

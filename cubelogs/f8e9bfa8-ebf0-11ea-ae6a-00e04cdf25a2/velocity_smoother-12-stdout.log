@@ -1,0 +1,7 @@
+[0m[ INFO] [1598923087.149663285]: Loading nodelet /velocity_smoother of type yocs_velocity_smoother/VelocitySmootherNodelet to manager velocity_smoother_manager with the following remappings:[0m
+[0m[ INFO] [1598923087.149701350]: /velocity_smoother/odometry -> /base/cube_base_driver/diff_drive_controller/odom[0m
+[0m[ INFO] [1598923087.149710281]: /velocity_smoother/raw_cmd_vel -> /base/cube_base_driver/diff_drive_controller/cmd_vel_raw[0m
+[0m[ INFO] [1598923087.149717223]: /velocity_smoother/robot_cmd_vel -> /base/cube_base_driver/diff_drive_controller/cmd_vel[0m
+[0m[ INFO] [1598923087.149745227]: /velocity_smoother/smooth_cmd_vel -> /base/cube_base_driver/diff_drive_controller/cmd_vel[0m
+[33m[ WARN] [1598923544.705770683]: Shutdown request received. Reason: [user request][0m
+[0m[ INFO] [1598923544.744418401]: Unloading nodelet /velocity_smoother from manager velocity_smoother_manager[0m

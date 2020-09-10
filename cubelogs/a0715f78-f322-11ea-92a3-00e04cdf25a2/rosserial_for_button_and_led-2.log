@@ -1,0 +1,37 @@
+[rospy.client][INFO] 2020-09-10 14:02:38,948: init_node, name[/rosserial_for_button_and_led], pid[27589]
+[xmlrpc][INFO] 2020-09-10 14:02:38,948: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2020-09-10 14:02:38,949: Started XML-RPC server [http://cuboid0009:34283/]
+[rospy.init][INFO] 2020-09-10 14:02:38,949: ROS Slave URI: [http://cuboid0009:34283/]
+[rospy.impl.masterslave][INFO] 2020-09-10 14:02:38,949: _ready: http://cuboid0009:34283/
+[rospy.registration][INFO] 2020-09-10 14:02:38,950: Registering with master node http://localhost:11311
+[xmlrpc][INFO] 2020-09-10 14:02:38,950: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2020-09-10 14:02:39,049: registered with master
+[rospy.rosout][INFO] 2020-09-10 14:02:39,050: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-10 14:02:39,053: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-10 14:02:39,054: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rosout][INFO] 2020-09-10 14:02:39,057: ROS Serial Python Node
+[rosout][INFO] 2020-09-10 14:02:39,062: Connecting to /dev/ttyButton at 57600 baud
+[rospy.internal][INFO] 2020-09-10 14:02:39,321: topic[/diagnostics] adding connection to [/diag_agg], count 0
+[rospy.internal][INFO] 2020-09-10 14:02:39,322: topic[/rosout] adding connection to [/rosout], count 0
+[rosout][INFO] 2020-09-10 14:02:41,185: Note: publish buffer size is 280 bytes
+[rosout][INFO] 2020-09-10 14:02:41,185: Setup publisher on pushed [std_msgs/Bool]
+[rosout][INFO] 2020-09-10 14:02:41,203: Note: subscribe buffer size is 280 bytes
+[rosout][INFO] 2020-09-10 14:02:41,203: Setup subscriber on led_color_state [std_msgs/ColorRGBA]
+[rospy.internal][INFO] 2020-09-10 14:02:41,216: topic[/led_color_state] adding connection to [http://cuboid0009:44929/], count 0
+[rospy.internal][INFO] 2020-09-10 14:02:41,271: topic[/pushed] adding connection to [/round_goals], count 0
+[rospy.internal][ERROR] 2020-09-10 14:15:48,841: Unable to initiate TCP/IP socket to cuboid0009:33097 (http://cuboid0009:44929/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 650, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 593, in _validate_header
+    raise TransportInitError("remote error reported: %s"%header['error'])
+TransportInitError: remote error reported: node shutting down
+
+[rospy.internal][INFO] 2020-09-10 14:15:48,972: topic[/pushed] removing connection to /round_goals
+[rosout][INFO] 2020-09-10 14:15:49,637: Send tx stop request
+[rospy.core][INFO] 2020-09-10 14:15:49,638: signal_shutdown [atexit]
+[rospy.internal][INFO] 2020-09-10 14:15:49,641: topic[/diagnostics] removing connection to /diag_agg
+[rospy.internal][INFO] 2020-09-10 14:15:49,641: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2020-09-10 14:15:49,641: topic[/led_color_state] removing connection to http://cuboid0009:44929/
+[rospy.impl.masterslave][INFO] 2020-09-10 14:15:49,641: atexit

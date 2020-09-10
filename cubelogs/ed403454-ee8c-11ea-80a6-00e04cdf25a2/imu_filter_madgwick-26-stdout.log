@@ -1,0 +1,9 @@
+[0m[ INFO] [1599209978.837917414]: Starting ImuFilter[0m
+[33m[ WARN] [1599209978.842434249]: Deprecation Warning: The parameter world_frame was not set, default is 'nwu'.[0m
+[33m[ WARN] [1599209978.842468244]: Starting with ROS Lunar, world_frame will default to 'enu'![0m
+[0m[ INFO] [1599209978.842479747]: Using dt computed from message headers[0m
+[0m[ INFO] [1599209978.842487088]: The gravity vector is kept in the IMU message.[0m
+[0m[ INFO] [1599209978.852140034]: Imu filter gain set to 0.100000[0m
+[0m[ INFO] [1599209978.852164215]: Gyro drift bias set to 0.000000[0m
+[0m[ INFO] [1599209978.852187833]: Magnetometer bias values: 0.000000 0.000000 0.000000[0m
+[0m[ INFO] [1599209979.130487171]: First IMU message received.[0m

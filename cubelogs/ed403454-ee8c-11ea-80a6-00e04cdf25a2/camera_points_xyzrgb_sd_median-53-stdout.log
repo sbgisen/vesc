@@ -1,0 +1,6 @@
+[0m[ INFO] [1599209994.606169630]: Loading nodelet /camera_points_xyzrgb_sd_median of type depth_image_proc/point_cloud_xyzrgb to manager kinect2_manager with the following remappings:[0m
+[0m[ INFO] [1599209994.606216721]: /depth_registered/image_rect -> /camera/sd/image_depth_rect[0m
+[0m[ INFO] [1599209994.606227042]: /depth_registered/points -> /camera/sd/points_median[0m
+[0m[ INFO] [1599209994.606234165]: /rgb/camera_info -> /camera/sd/camera_info[0m
+[0m[ INFO] [1599209994.606240419]: /rgb/image_rect_color -> /camera/sd/image_color_rect[0m
+[0m[ INFO] [1599211552.518363252]: Unloading nodelet /camera_points_xyzrgb_sd_median from manager kinect2_manager[0m

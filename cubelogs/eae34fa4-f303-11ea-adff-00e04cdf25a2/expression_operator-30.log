@@ -1,0 +1,51 @@
+[rospy.client][INFO] 2020-09-10 10:21:32,500: init_node, name[/expression_operator], pid[12076]
+[xmlrpc][INFO] 2020-09-10 10:21:32,501: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2020-09-10 10:21:32,501: Started XML-RPC server [http://cuboid0009:41895/]
+[rospy.init][INFO] 2020-09-10 10:21:32,501: ROS Slave URI: [http://cuboid0009:41895/]
+[rospy.impl.masterslave][INFO] 2020-09-10 10:21:32,501: _ready: http://cuboid0009:41895/
+[xmlrpc][INFO] 2020-09-10 10:21:32,502: xml rpc node: starting XML-RPC server
+[rospy.registration][INFO] 2020-09-10 10:21:32,502: Registering with master node http://localhost:11311
+[rospy.init][INFO] 2020-09-10 10:21:32,602: registered with master
+[rospy.rosout][INFO] 2020-09-10 10:21:32,602: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-10 10:21:32,604: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-10 10:21:32,606: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2020-09-10 10:21:32,619: topic[/set_expression] adding connection to [http://cuboid0009:41895/], count 0
+[rospy.internal][INFO] 2020-09-10 10:21:32,621: topic[/set_expression] adding connection to [/expression_operator], count 0
+[rospy.internal][INFO] 2020-09-10 10:21:32,778: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2020-09-10 10:21:32,878: topic[/set_expression] adding connection to [/face_node], count 1
+[rospy.internal][INFO] 2020-09-10 10:21:33,284: topic[/battery_remaining] adding connection to [http://cuboid0009:45447/], count 0
+[rosout][INFO] 2020-09-10 10:21:33,307: Battery level is high
+[rosout][INFO] 2020-09-10 10:21:33,308: Switching expression from normal to happy
+[rospy.internal][ERROR] 2020-09-10 10:23:24,012: Unable to initiate TCP/IP socket to cuboid0009:39337 (http://cuboid0009:45447/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 650, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 593, in _validate_header
+    raise TransportInitError("remote error reported: %s"%header['error'])
+TransportInitError: remote error reported: node shutting down
+
+[rospy.internal][WARNING] 2020-09-10 10:23:25,015: Unknown error initiating TCP/IP socket to cuboid0009:39337 (http://cuboid0009:45447/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 555, in connect
+    self.socket.connect((dest_addr, dest_port))
+  File "/usr/lib/python2.7/socket.py", line 228, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 111] Connection refused
+
+[rospy.internal][INFO] 2020-09-10 10:23:25,015: topic[/battery_remaining] removing connection to http://cuboid0009:45447/
+[rospy.impl.masterslave][INFO] 2020-09-10 10:23:26,383: external shutdown request from [/rosnode]: user request
+[rospy.core][INFO] 2020-09-10 10:23:26,383: signal_shutdown [external shutdown request from [/rosnode]: [user request]]
+[rospy.internal][INFO] 2020-09-10 10:23:26,386: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2020-09-10 10:23:26,386: topic[/set_expression] removing connection to /expression_operator
+[rospy.internal][INFO] 2020-09-10 10:23:26,386: topic[/set_expression] removing connection to /face_node
+[rospy.internal][ERROR] 2020-09-10 10:23:26,387: Unable to initiate TCP/IP socket to cuboid0009:34477 (http://cuboid0009:41895/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 650, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 593, in _validate_header
+    raise TransportInitError("remote error reported: %s"%header['error'])
+TransportInitError: remote error reported: node shutting down
+
+[rospy.internal][INFO] 2020-09-10 10:23:26,387: topic[/set_expression] removing connection to http://cuboid0009:41895/
+[rospy.core][INFO] 2020-09-10 10:23:26,541: signal_shutdown [atexit]

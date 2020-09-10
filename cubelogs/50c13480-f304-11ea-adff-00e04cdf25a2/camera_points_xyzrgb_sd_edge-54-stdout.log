@@ -1,0 +1,7 @@
+[0m[ INFO] [1599701076.807501176]: Loading nodelet /camera_points_xyzrgb_sd_edge of type depth_image_proc/point_cloud_xyzrgb to manager kinect2_manager with the following remappings:[0m
+[0m[ INFO] [1599701076.807630300]: /depth_registered/image_rect -> /camera/sd/image_depth_edge[0m
+[0m[ INFO] [1599701076.807659961]: /depth_registered/points -> /camera/sd/points_edge[0m
+[0m[ INFO] [1599701076.807684034]: /rgb/camera_info -> /camera/sd/camera_info[0m
+[0m[ INFO] [1599701076.807707256]: /rgb/image_rect_color -> /camera/sd/image_color_rect[0m
+[33m[ WARN] [1599705523.607790476]: Shutdown request received. Reason: [user request][0m
+[0m[ INFO] [1599705523.659124924]: Unloading nodelet /camera_points_xyzrgb_sd_edge from manager kinect2_manager[0m

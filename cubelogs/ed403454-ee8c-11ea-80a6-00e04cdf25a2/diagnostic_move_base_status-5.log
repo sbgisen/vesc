@@ -1,0 +1,22 @@
+[rospy.client][INFO] 2020-09-04 17:59:41,877: init_node, name[/diagnostic_move_base_status], pid[29575]
+[xmlrpc][INFO] 2020-09-04 17:59:41,877: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2020-09-04 17:59:41,877: Started XML-RPC server [http://cuboid0009:33525/]
+[rospy.init][INFO] 2020-09-04 17:59:41,877: ROS Slave URI: [http://cuboid0009:33525/]
+[rospy.impl.masterslave][INFO] 2020-09-04 17:59:41,877: _ready: http://cuboid0009:33525/
+[xmlrpc][INFO] 2020-09-04 17:59:41,878: xml rpc node: starting XML-RPC server
+[rospy.registration][INFO] 2020-09-04 17:59:41,879: Registering with master node http://localhost:11311
+[rospy.init][INFO] 2020-09-04 17:59:41,978: registered with master
+[rospy.rosout][INFO] 2020-09-04 17:59:41,978: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-04 17:59:41,980: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-04 17:59:41,981: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2020-09-04 17:59:42,218: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2020-09-04 17:59:42,219: topic[/diagnostics] adding connection to [/diag_agg], count 0
+[rospy.internal][INFO] 2020-09-04 18:00:04,820: topic[/move_base/result] adding connection to [http://cuboid0009:43207/], count 0
+[rospy.core][INFO] 2020-09-04 18:25:52,558: signal_shutdown [signal-2]
+[rospy.registration][WARNING] 2020-09-04 18:25:52,558: cannot unregister with master due to network issues
+[rospy.internal][INFO] 2020-09-04 18:25:52,559: topic[/diagnostics] removing connection to /diag_agg
+[rospy.internal][INFO] 2020-09-04 18:25:52,559: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2020-09-04 18:25:52,559: topic[/move_base/result] removing connection to http://cuboid0009:43207/
+[rospy.impl.masterslave][INFO] 2020-09-04 18:25:52,559: signal-2
+[rospy.core][INFO] 2020-09-04 18:25:52,714: signal_shutdown [signal-2]
+[rospy.core][INFO] 2020-09-04 18:25:52,715: signal_shutdown [atexit]

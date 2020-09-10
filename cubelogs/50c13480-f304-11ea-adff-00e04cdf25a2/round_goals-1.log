@@ -1,0 +1,296 @@
+[rospy.client][INFO] 2020-09-10 10:26:14,636: init_node, name[/round_goals], pid[8940]
+[xmlrpc][INFO] 2020-09-10 10:26:14,636: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2020-09-10 10:26:14,637: Started XML-RPC server [http://cuboid0009:35479/]
+[rospy.init][INFO] 2020-09-10 10:26:14,637: ROS Slave URI: [http://cuboid0009:35479/]
+[rospy.impl.masterslave][INFO] 2020-09-10 10:26:14,638: _ready: http://cuboid0009:35479/
+[rospy.registration][INFO] 2020-09-10 10:26:14,639: Registering with master node http://localhost:11311
+[xmlrpc][INFO] 2020-09-10 10:26:14,639: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2020-09-10 10:26:14,738: registered with master
+[rospy.rosout][INFO] 2020-09-10 10:26:14,738: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-10 10:26:14,740: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-10 10:26:14,741: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2020-09-10 10:26:14,758: topic[/move_base/feedback] adding connection to [http://cuboid0009:45979/], count 0
+[rospy.internal][INFO] 2020-09-10 10:26:14,759: topic[/move_base/status] adding connection to [http://cuboid0009:45979/], count 0
+[rospy.internal][INFO] 2020-09-10 10:26:14,776: topic[/move_base/result] adding connection to [http://cuboid0009:45979/], count 0
+[rospy.internal][INFO] 2020-09-10 10:26:14,983: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2020-09-10 10:26:14,984: topic[/move_base/goal] adding connection to [/move_base], count 0
+[rospy.internal][INFO] 2020-09-10 10:26:14,985: topic[/move_base/cancel] adding connection to [/move_base], count 0
+[rospy.internal][INFO] 2020-09-10 10:26:15,090: topic[/round_goals/sleeptime] adding connection to [/rosbridge_websocket], count 0
+[rosout][INFO] 2020-09-10 10:26:15,996: send goal:0
+[rospy.internal][INFO] 2020-09-10 10:26:17,689: topic[/led_color_state] adding connection to [/rosserial_for_button_and_led], count 0
+[rospy.internal][INFO] 2020-09-10 10:26:17,692: topic[/pushed] adding connection to [http://cuboid0009:43275/], count 0
+[rospy.internal][WARNING] 2020-09-10 10:26:22,985: Unknown error initiating TCP/IP socket to cuboid0009:38387 (http://cuboid0009:45979/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 650, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rosgraph/network.py", line 362, in read_ros_handshake_header
+    d = sock.recv(buff_size)
+error: [Errno 104] Connection reset by peer
+
+[rospy.internal][WARNING] 2020-09-10 10:26:22,985: Unknown error initiating TCP/IP socket to cuboid0009:38387 (http://cuboid0009:45979/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 556, in connect
+    self.write_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 635, in write_header
+    self.stat_bytes += write_ros_handshake_header(sock, protocol.get_header_fields())
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rosgraph/network.py", line 422, in write_ros_handshake_header
+    sock.sendall(s)
+  File "/usr/lib/python2.7/socket.py", line 228, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 104] Connection reset by peer
+
+[rospy.internal][INFO] 2020-09-10 10:26:22,985: topic[/move_base/status] removing connection to http://cuboid0009:45979/
+[rospy.internal][INFO] 2020-09-10 10:26:22,985: topic[/move_base/result] removing connection to http://cuboid0009:45979/
+[rospy.internal][WARNING] 2020-09-10 10:26:22,986: Unknown error initiating TCP/IP socket to cuboid0009:38387 (http://cuboid0009:45979/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 555, in connect
+    self.socket.connect((dest_addr, dest_port))
+  File "/usr/lib/python2.7/socket.py", line 228, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 111] Connection refused
+
+[rospy.internal][INFO] 2020-09-10 10:26:22,986: topic[/move_base/feedback] removing connection to http://cuboid0009:45979/
+[rospy.internal][INFO] 2020-09-10 10:26:23,192: topic[/move_base/goal] removing connection to /move_base
+[rospy.internal][INFO] 2020-09-10 10:26:23,193: topic[/move_base/cancel] removing connection to /move_base
+[rospy.internal][INFO] 2020-09-10 10:26:25,859: topic[/move_base/status] adding connection to [http://cuboid0009:42545/], count 0
+[rospy.internal][INFO] 2020-09-10 10:26:25,860: topic[/move_base/feedback] adding connection to [http://cuboid0009:42545/], count 0
+[rospy.internal][INFO] 2020-09-10 10:26:25,863: topic[/move_base/result] adding connection to [http://cuboid0009:42545/], count 0
+[rospy.internal][INFO] 2020-09-10 10:26:25,964: topic[/move_base/goal] adding connection to [/move_base], count 0
+[rospy.internal][INFO] 2020-09-10 10:26:25,964: topic[/move_base/cancel] adding connection to [/move_base], count 0
+[rosout][INFO] 2020-09-10 10:26:26,009: send goal:0
+[rosout][INFO] 2020-09-10 10:26:45,032: send goal:0
+[rosout][INFO] 2020-09-10 10:26:57,049: succeeded at goal:0
+[rosout][INFO] 2020-09-10 10:27:02,055: send goal:1
+[rosout][INFO] 2020-09-10 10:28:24,133: succeeded at goal:1
+[rosout][INFO] 2020-09-10 10:28:34,145: send goal:0
+[rospy.internal][WARNING] 2020-09-10 10:29:44,505: Unknown error initiating TCP/IP socket to cuboid0009:60303 (http://cuboid0009:42545/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 650, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rosgraph/network.py", line 362, in read_ros_handshake_header
+    d = sock.recv(buff_size)
+error: [Errno 104] Connection reset by peer
+
+[rospy.internal][INFO] 2020-09-10 10:29:44,505: topic[/move_base/result] removing connection to http://cuboid0009:42545/
+[rospy.internal][WARNING] 2020-09-10 10:29:44,505: Unknown error initiating TCP/IP socket to cuboid0009:60303 (http://cuboid0009:42545/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 555, in connect
+    self.socket.connect((dest_addr, dest_port))
+  File "/usr/lib/python2.7/socket.py", line 228, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 111] Connection refused
+
+[rospy.internal][INFO] 2020-09-10 10:29:44,506: topic[/move_base/feedback] removing connection to http://cuboid0009:42545/
+[rospy.internal][WARNING] 2020-09-10 10:29:44,506: Unknown error initiating TCP/IP socket to cuboid0009:60303 (http://cuboid0009:42545/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 555, in connect
+    self.socket.connect((dest_addr, dest_port))
+  File "/usr/lib/python2.7/socket.py", line 228, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 111] Connection refused
+
+[rospy.internal][INFO] 2020-09-10 10:29:44,506: topic[/move_base/status] removing connection to http://cuboid0009:42545/
+[rospy.internal][INFO] 2020-09-10 10:29:44,935: topic[/move_base/goal] removing connection to /move_base
+[rospy.internal][INFO] 2020-09-10 10:29:44,936: topic[/move_base/cancel] removing connection to /move_base
+[rospy.internal][INFO] 2020-09-10 10:29:47,453: topic[/move_base/status] adding connection to [http://cuboid0009:41439/], count 0
+[rospy.internal][INFO] 2020-09-10 10:29:47,456: topic[/move_base/result] adding connection to [http://cuboid0009:41439/], count 0
+[rospy.internal][INFO] 2020-09-10 10:29:47,456: topic[/move_base/feedback] adding connection to [http://cuboid0009:41439/], count 0
+[rospy.internal][INFO] 2020-09-10 10:29:47,559: topic[/move_base/goal] adding connection to [/move_base], count 0
+[rospy.internal][INFO] 2020-09-10 10:29:47,559: topic[/move_base/cancel] adding connection to [/move_base], count 0
+[rosout][INFO] 2020-09-10 10:29:48,217: send goal:0
+[rosout][INFO] 2020-09-10 10:30:11,240: succeeded at goal:0
+[rosout][INFO] 2020-09-10 10:30:21,251: send goal:1
+[rosout][INFO] 2020-09-10 10:31:26,316: succeeded at goal:1
+[rosout][INFO] 2020-09-10 10:31:36,326: send goal:0
+[rospy.internal][INFO] 2020-09-10 10:31:42,994: topic[/round_goals/sleeptime] removing connection to /rosbridge_websocket
+[rosout][INFO] 2020-09-10 10:32:41,386: succeeded at goal:0
+[rosout][INFO] 2020-09-10 10:32:51,395: send goal:1
+[rosout][INFO] 2020-09-10 10:34:20,487: succeeded at goal:1
+[rosout][INFO] 2020-09-10 10:34:30,497: send goal:0
+[rosout][INFO] 2020-09-10 10:36:09,584: succeeded at goal:0
+[rosout][INFO] 2020-09-10 10:36:19,591: send goal:1
+[rospy.internal][INFO] 2020-09-10 10:36:51,413: topic[/round_goals/sleeptime] adding connection to [/rosbridge_websocket], count 0
+[rosout][INFO] 2020-09-10 10:37:21,653: succeeded at goal:1
+[rosout][INFO] 2020-09-10 10:37:31,923: send goal:0
+[rosout][INFO] 2020-09-10 10:38:41,989: succeeded at goal:0
+[rosout][INFO] 2020-09-10 10:38:52,000: send goal:1
+[rosout][INFO] 2020-09-10 10:40:17,087: succeeded at goal:1
+[rosout][INFO] 2020-09-10 10:40:27,097: send goal:0
+[rosout][INFO] 2020-09-10 10:41:51,175: succeeded at goal:0
+[rosout][INFO] 2020-09-10 10:42:01,184: send goal:1
+[rosout][INFO] 2020-09-10 10:43:04,248: succeeded at goal:1
+[rosout][INFO] 2020-09-10 10:43:14,261: send goal:0
+[rosout][INFO] 2020-09-10 10:44:22,325: succeeded at goal:0
+[rosout][INFO] 2020-09-10 10:44:32,336: send goal:1
+[rosout][INFO] 2020-09-10 10:46:16,436: succeeded at goal:1
+[rosout][INFO] 2020-09-10 10:46:20,441: send goal:0
+[rosout][INFO] 2020-09-10 10:47:32,507: succeeded at goal:0
+[rosout][INFO] 2020-09-10 10:47:42,518: send goal:1
+[rosout][INFO] 2020-09-10 10:48:47,575: succeeded at goal:1
+[rosout][INFO] 2020-09-10 10:48:57,584: send goal:0
+[rosout][INFO] 2020-09-10 10:50:28,676: succeeded at goal:0
+[rosout][INFO] 2020-09-10 10:50:38,686: send goal:1
+[rosout][INFO] 2020-09-10 10:50:53,702: send goal:1
+[rosout][INFO] 2020-09-10 10:51:54,760: succeeded at goal:1
+[rosout][INFO] 2020-09-10 10:52:04,772: send goal:0
+[rosout][INFO] 2020-09-10 10:52:42,817: send goal:0
+[rosout][INFO] 2020-09-10 10:53:29,874: succeeded at goal:0
+[rosout][INFO] 2020-09-10 10:53:39,884: send goal:1
+[rosout][INFO] 2020-09-10 10:54:43,950: succeeded at goal:1
+[rosout][INFO] 2020-09-10 10:54:53,960: send goal:0
+[rosout][INFO] 2020-09-10 10:56:01,031: succeeded at goal:0
+[rosout][INFO] 2020-09-10 10:56:11,045: send goal:1
+[rosout][INFO] 2020-09-10 10:57:13,107: succeeded at goal:1
+[rosout][INFO] 2020-09-10 10:57:23,118: send goal:0
+[rosout][INFO] 2020-09-10 10:58:34,185: succeeded at goal:0
+[rosout][INFO] 2020-09-10 10:58:44,194: send goal:1
+[rosout][INFO] 2020-09-10 10:59:59,278: succeeded at goal:1
+[rosout][INFO] 2020-09-10 11:00:09,288: send goal:0
+[rosout][INFO] 2020-09-10 11:01:30,364: succeeded at goal:0
+[rosout][INFO] 2020-09-10 11:01:40,374: send goal:1
+[rosout][INFO] 2020-09-10 11:02:47,440: succeeded at goal:1
+[rosout][INFO] 2020-09-10 11:02:57,453: send goal:0
+[rosout][INFO] 2020-09-10 11:04:12,524: succeeded at goal:0
+[rosout][INFO] 2020-09-10 11:04:22,534: send goal:1
+[rosout][INFO] 2020-09-10 11:05:34,600: succeeded at goal:1
+[rosout][INFO] 2020-09-10 11:05:44,613: send goal:0
+[rosout][INFO] 2020-09-10 11:06:56,683: succeeded at goal:0
+[rosout][INFO] 2020-09-10 11:07:06,693: send goal:1
+[rosout][INFO] 2020-09-10 11:08:17,759: succeeded at goal:1
+[rosout][INFO] 2020-09-10 11:08:27,768: send goal:0
+[rospy.internal][WARNING] 2020-09-10 11:09:10,639: Unknown error initiating TCP/IP socket to cuboid0009:59243 (http://cuboid0009:41439/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 650, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rosgraph/network.py", line 362, in read_ros_handshake_header
+    d = sock.recv(buff_size)
+error: [Errno 104] Connection reset by peer
+
+[rospy.internal][WARNING] 2020-09-10 11:09:10,639: Unknown error initiating TCP/IP socket to cuboid0009:59243 (http://cuboid0009:41439/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 555, in connect
+    self.socket.connect((dest_addr, dest_port))
+  File "/usr/lib/python2.7/socket.py", line 228, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 111] Connection refused
+
+[rospy.internal][INFO] 2020-09-10 11:09:10,639: topic[/move_base/feedback] removing connection to http://cuboid0009:41439/
+[rospy.internal][WARNING] 2020-09-10 11:09:10,639: Unknown error initiating TCP/IP socket to cuboid0009:59243 (http://cuboid0009:41439/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 650, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rosgraph/network.py", line 362, in read_ros_handshake_header
+    d = sock.recv(buff_size)
+error: [Errno 104] Connection reset by peer
+
+[rospy.internal][INFO] 2020-09-10 11:09:10,639: topic[/move_base/result] removing connection to http://cuboid0009:41439/
+[rospy.internal][INFO] 2020-09-10 11:09:10,640: topic[/move_base/status] removing connection to http://cuboid0009:41439/
+[rospy.internal][INFO] 2020-09-10 11:09:10,845: topic[/move_base/goal] removing connection to /move_base
+[rospy.internal][INFO] 2020-09-10 11:09:10,845: topic[/move_base/cancel] removing connection to /move_base
+[rospy.internal][INFO] 2020-09-10 11:09:13,463: topic[/move_base/result] adding connection to [http://cuboid0009:44305/], count 0
+[rospy.internal][INFO] 2020-09-10 11:09:13,463: topic[/move_base/feedback] adding connection to [http://cuboid0009:44305/], count 0
+[rospy.internal][INFO] 2020-09-10 11:09:13,467: topic[/move_base/status] adding connection to [http://cuboid0009:44305/], count 0
+[rospy.internal][INFO] 2020-09-10 11:09:13,613: topic[/move_base/goal] adding connection to [/move_base], count 0
+[rospy.internal][INFO] 2020-09-10 11:09:13,614: topic[/move_base/cancel] adding connection to [/move_base], count 0
+[rosout][INFO] 2020-09-10 11:09:13,812: send goal:0
+[rosout][INFO] 2020-09-10 11:09:48,849: succeeded at goal:0
+[rosout][INFO] 2020-09-10 11:09:58,860: send goal:1
+[rosout][INFO] 2020-09-10 11:11:10,927: succeeded at goal:1
+[rosout][INFO] 2020-09-10 11:11:20,937: send goal:0
+[rosout][INFO] 2020-09-10 11:12:41,016: succeeded at goal:0
+[rosout][INFO] 2020-09-10 11:12:51,029: send goal:1
+[rosout][INFO] 2020-09-10 11:13:57,093: succeeded at goal:1
+[rosout][INFO] 2020-09-10 11:14:07,103: send goal:0
+[rosout][INFO] 2020-09-10 11:15:46,207: succeeded at goal:0
+[rosout][INFO] 2020-09-10 11:15:56,220: send goal:1
+[rosout][INFO] 2020-09-10 11:17:00,286: succeeded at goal:1
+[rosout][INFO] 2020-09-10 11:17:10,296: send goal:0
+[rosout][INFO] 2020-09-10 11:18:21,359: succeeded at goal:0
+[rosout][INFO] 2020-09-10 11:18:31,368: send goal:1
+[rosout][INFO] 2020-09-10 11:19:49,446: succeeded at goal:1
+[rosout][INFO] 2020-09-10 11:19:59,458: send goal:0
+[rosout][INFO] 2020-09-10 11:21:22,540: succeeded at goal:0
+[rosout][INFO] 2020-09-10 11:21:32,553: send goal:1
+[rosout][INFO] 2020-09-10 11:22:40,626: succeeded at goal:1
+[rosout][INFO] 2020-09-10 11:22:50,638: send goal:0
+[rosout][INFO] 2020-09-10 11:23:58,703: succeeded at goal:0
+[rosout][INFO] 2020-09-10 11:24:08,715: send goal:1
+[rosout][INFO] 2020-09-10 11:25:17,781: succeeded at goal:1
+[rosout][INFO] 2020-09-10 11:25:27,793: send goal:0
+[rosout][INFO] 2020-09-10 11:26:37,872: succeeded at goal:0
+[rosout][INFO] 2020-09-10 11:26:47,883: send goal:1
+[rosout][INFO] 2020-09-10 11:28:14,967: succeeded at goal:1
+[rosout][INFO] 2020-09-10 11:28:24,977: send goal:0
+[rospy.internal][WARNING] 2020-09-10 11:29:02,243: Unknown error initiating TCP/IP socket to cuboid0009:43005 (http://cuboid0009:44305/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 556, in connect
+    self.write_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 635, in write_header
+    self.stat_bytes += write_ros_handshake_header(sock, protocol.get_header_fields())
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rosgraph/network.py", line 422, in write_ros_handshake_header
+    sock.sendall(s)
+  File "/usr/lib/python2.7/socket.py", line 228, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 104] Connection reset by peer
+
+[rospy.internal][INFO] 2020-09-10 11:29:02,243: topic[/move_base/result] removing connection to http://cuboid0009:44305/
+[rospy.internal][WARNING] 2020-09-10 11:29:02,243: Unknown error initiating TCP/IP socket to cuboid0009:43005 (http://cuboid0009:44305/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 555, in connect
+    self.socket.connect((dest_addr, dest_port))
+  File "/usr/lib/python2.7/socket.py", line 228, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 111] Connection refused
+
+[rospy.internal][INFO] 2020-09-10 11:29:02,243: topic[/move_base/feedback] removing connection to http://cuboid0009:44305/
+[rospy.internal][WARNING] 2020-09-10 11:29:02,243: Unknown error initiating TCP/IP socket to cuboid0009:43005 (http://cuboid0009:44305/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 555, in connect
+    self.socket.connect((dest_addr, dest_port))
+  File "/usr/lib/python2.7/socket.py", line 228, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 111] Connection refused
+
+[rospy.internal][INFO] 2020-09-10 11:29:02,244: topic[/move_base/status] removing connection to http://cuboid0009:44305/
+[rospy.internal][INFO] 2020-09-10 11:29:02,421: topic[/move_base/goal] removing connection to /move_base
+[rospy.internal][INFO] 2020-09-10 11:29:02,421: topic[/move_base/cancel] removing connection to /move_base
+[rospy.internal][INFO] 2020-09-10 11:29:05,087: topic[/move_base/feedback] adding connection to [http://cuboid0009:41869/], count 0
+[rospy.internal][INFO] 2020-09-10 11:29:05,088: topic[/move_base/result] adding connection to [http://cuboid0009:41869/], count 0
+[rospy.internal][INFO] 2020-09-10 11:29:05,089: topic[/move_base/status] adding connection to [http://cuboid0009:41869/], count 0
+[rospy.internal][INFO] 2020-09-10 11:29:05,223: topic[/move_base/goal] adding connection to [/move_base], count 0
+[rospy.internal][INFO] 2020-09-10 11:29:05,223: topic[/move_base/cancel] adding connection to [/move_base], count 0
+[rosout][INFO] 2020-09-10 11:29:06,026: send goal:0
+[rosout][INFO] 2020-09-10 11:29:45,066: succeeded at goal:0
+[rosout][INFO] 2020-09-10 11:29:55,077: send goal:1
+[rosout][INFO] 2020-09-10 11:31:02,136: succeeded at goal:1
+[rosout][INFO] 2020-09-10 11:31:12,147: send goal:0
+[rosout][INFO] 2020-09-10 11:32:29,225: succeeded at goal:0
+[rosout][INFO] 2020-09-10 11:32:39,243: send goal:1
+[rosout][INFO] 2020-09-10 11:33:50,313: succeeded at goal:1
+[rosout][INFO] 2020-09-10 11:34:00,324: send goal:0
+[rosout][INFO] 2020-09-10 11:35:11,387: succeeded at goal:0
+[rosout][INFO] 2020-09-10 11:35:21,397: send goal:1
+[rosout][INFO] 2020-09-10 11:36:38,477: succeeded at goal:1
+[rosout][INFO] 2020-09-10 11:36:48,487: send goal:0
+[rosout][INFO] 2020-09-10 11:38:02,552: succeeded at goal:0
+[rosout][INFO] 2020-09-10 11:38:12,562: send goal:1
+[rospy.impl.masterslave][INFO] 2020-09-10 11:38:25,141: external shutdown request from [/rosnode]: user request
+[rospy.core][INFO] 2020-09-10 11:38:25,141: signal_shutdown [external shutdown request from [/rosnode]: [user request]]
+[rospy.internal][INFO] 2020-09-10 11:38:25,146: topic[/move_base/goal] removing connection to /move_base
+[rospy.internal][INFO] 2020-09-10 11:38:25,146: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2020-09-10 11:38:25,147: topic[/round_goals/sleeptime] removing connection to /rosbridge_websocket
+[rospy.internal][INFO] 2020-09-10 11:38:25,147: topic[/led_color_state] removing connection to /rosserial_for_button_and_led
+[rospy.internal][INFO] 2020-09-10 11:38:25,147: topic[/move_base/cancel] removing connection to /move_base
+[rospy.internal][INFO] 2020-09-10 11:38:25,148: topic[/move_base/status] removing connection to http://cuboid0009:41869/
+[rospy.internal][INFO] 2020-09-10 11:38:25,148: topic[/move_base/feedback] removing connection to http://cuboid0009:41869/
+[rospy.internal][INFO] 2020-09-10 11:38:25,148: topic[/pushed] removing connection to http://cuboid0009:43275/
+[rospy.internal][WARNING] 2020-09-10 11:38:25,149: Unknown error initiating TCP/IP socket to cuboid0009:42217 (http://cuboid0009:41869/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 650, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+AttributeError: 'NoneType' object has no attribute 'buff_size'
+
+[rospy.internal][INFO] 2020-09-10 11:38:25,149: topic[/move_base/result] removing connection to http://cuboid0009:41869/
+[rospy.internal][WARNING] 2020-09-10 11:38:25,150: Unknown error initiating TCP/IP socket to cuboid0009:42217 (http://cuboid0009:41869/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 558, in connect
+    self.local_endpoint = self.socket.getsockname()
+AttributeError: 'NoneType' object has no attribute 'getsockname'
+
+[rospy.core][INFO] 2020-09-10 11:38:25,575: signal_shutdown [atexit]

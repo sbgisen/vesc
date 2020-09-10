@@ -1,0 +1,45 @@
+[rospy.client][INFO] 2020-09-10 14:01:26,152: init_node, name[/diagnostic_move_base_status], pid[8720]
+[xmlrpc][INFO] 2020-09-10 14:01:26,152: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2020-09-10 14:01:26,152: Started XML-RPC server [http://cuboid0009:45841/]
+[rospy.init][INFO] 2020-09-10 14:01:26,153: ROS Slave URI: [http://cuboid0009:45841/]
+[rospy.impl.masterslave][INFO] 2020-09-10 14:01:26,153: _ready: http://cuboid0009:45841/
+[rospy.registration][INFO] 2020-09-10 14:01:26,154: Registering with master node http://localhost:11311
+[xmlrpc][INFO] 2020-09-10 14:01:26,154: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2020-09-10 14:01:26,253: registered with master
+[rospy.rosout][INFO] 2020-09-10 14:01:26,254: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-10 14:01:26,255: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-10 14:01:26,256: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2020-09-10 14:01:26,442: topic[/diagnostics] adding connection to [/diag_agg], count 0
+[rospy.internal][INFO] 2020-09-10 14:01:26,541: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2020-09-10 14:01:45,442: topic[/move_base/result] adding connection to [http://cuboid0009:42881/], count 0
+[rospy.internal][WARNING] 2020-09-10 14:05:14,590: Unknown error initiating TCP/IP socket to cuboid0009:51033 (http://cuboid0009:42881/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 650, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rosgraph/network.py", line 362, in read_ros_handshake_header
+    d = sock.recv(buff_size)
+error: [Errno 104] Connection reset by peer
+
+[rospy.internal][INFO] 2020-09-10 14:05:14,590: topic[/move_base/result] removing connection to http://cuboid0009:42881/
+[rospy.internal][INFO] 2020-09-10 14:05:17,369: topic[/move_base/result] adding connection to [http://cuboid0009:41297/], count 0
+[rospy.core][INFO] 2020-09-10 14:20:08,769: signal_shutdown [signal-2]
+[rospy.internal][INFO] 2020-09-10 14:20:08,776: topic[/diagnostics] removing connection to /diag_agg
+[rospy.internal][INFO] 2020-09-10 14:20:08,776: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2020-09-10 14:20:08,777: topic[/move_base/result] removing connection to http://cuboid0009:41297/
+[rospy.internal][WARNING] 2020-09-10 14:20:08,777: Unknown error initiating TCP/IP socket to cuboid0009:48663 (http://cuboid0009:41297/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 650, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+AttributeError: 'NoneType' object has no attribute 'buff_size'
+
+[rospy.topics][ERROR] 2020-09-10 14:20:08,777: Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/topics.py", line 326, in close
+    c.close()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 838, in close
+    self.socket.close()
+AttributeError: 'NoneType' object has no attribute 'close'
+
+[rospy.impl.masterslave][INFO] 2020-09-10 14:20:08,778: signal-2
+[rospy.core][INFO] 2020-09-10 14:20:08,894: signal_shutdown [atexit]

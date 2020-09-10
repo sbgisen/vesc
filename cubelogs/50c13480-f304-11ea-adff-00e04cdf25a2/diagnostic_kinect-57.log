@@ -1,0 +1,27 @@
+[rospy.client][INFO] 2020-09-10 10:24:38,765: init_node, name[/diagnostic_kinect], pid[15265]
+[xmlrpc][INFO] 2020-09-10 10:24:38,766: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2020-09-10 10:24:38,766: Started XML-RPC server [http://cuboid0009:39159/]
+[rospy.init][INFO] 2020-09-10 10:24:38,766: ROS Slave URI: [http://cuboid0009:39159/]
+[rospy.impl.masterslave][INFO] 2020-09-10 10:24:38,766: _ready: http://cuboid0009:39159/
+[rospy.registration][INFO] 2020-09-10 10:24:38,767: Registering with master node http://localhost:11311
+[xmlrpc][INFO] 2020-09-10 10:24:38,767: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2020-09-10 10:24:38,867: registered with master
+[rospy.rosout][INFO] 2020-09-10 10:24:38,867: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-10 10:24:38,869: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-10 10:24:38,870: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2020-09-10 10:24:38,882: topic[/camera/sd/image_color] adding connection to [http://cuboid0009:33427/], count 0
+[rospy.internal][INFO] 2020-09-10 10:24:39,043: topic[/diagnostics] adding connection to [/diag_agg], count 0
+[rospy.internal][INFO] 2020-09-10 10:24:39,141: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.impl.masterslave][INFO] 2020-09-10 11:38:44,182: external shutdown request from [/rosnode]: user request
+[rospy.core][INFO] 2020-09-10 11:38:44,182: signal_shutdown [external shutdown request from [/rosnode]: [user request]]
+[rospy.internal][INFO] 2020-09-10 11:38:44,184: topic[/diagnostics] removing connection to /diag_agg
+[rospy.internal][INFO] 2020-09-10 11:38:44,184: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2020-09-10 11:38:44,185: topic[/camera/sd/image_color] removing connection to http://cuboid0009:33427/
+[rospy.internal][WARNING] 2020-09-10 11:38:44,185: Unknown error initiating TCP/IP socket to cuboid0009:60227 (http://cuboid0009:33427/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 650, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+AttributeError: 'NoneType' object has no attribute 'buff_size'
+
+[rospy.core][INFO] 2020-09-10 11:38:44,410: signal_shutdown [atexit]

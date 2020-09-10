@@ -1,0 +1,9 @@
+[0m[ INFO] [1599701159.730238609]: Requesting the map...[0m
+[0m[ INFO] [1599701159.738118414]: Received a 2260 X 1120 map @ 0.050 m/pix
+[0m
+[0m[ INFO] [1599701159.784735161]: Initializing likelihood field model; this can take some time on large maps...[0m
+[0m[ INFO] [1599701160.601799127]: Done initializing likelihood field model.[0m
+[0m[ INFO] [1599701166.588752852]: Setting pose (1599701166.588729): 39.200 -0.050 -1.773[0m
+[33m[ WARN] [1599701850.090219435]: Detected jump back in time of 0.705403s. Clearing TF buffer.[0m
+[33m[ WARN] [1599705521.186416518]: Shutdown request received.[0m
+[33m[ WARN] [1599705521.186446674]: Reason given for shutdown: [user request][0m

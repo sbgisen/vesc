@@ -1,0 +1,3 @@
+[0m[ INFO] [1598923091.275812202]: Loading nodelet /base/wheel_right/vesc_wheel_r of type vesc_driver::VescDriverNodelet to manager vesc_nodelet_manager with the following remappings:[0m
+[33m[ WARN] [1598923541.322853414]: Shutdown request received. Reason: [user request][0m
+[0m[ INFO] [1598923541.347979424]: Unloading nodelet /base/wheel_right/vesc_wheel_r from manager vesc_nodelet_manager[0m

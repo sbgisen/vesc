@@ -1,0 +1,5 @@
+logging to /home/cuboid/.ros/log/f8e9bfa8-ebf0-11ea-ae6a-00e04cdf25a2/rosout.log
+re-publishing aggregated messages to /rosout_agg
+subscribed to /rosout
+[33m[ WARN] [1598923544.566183215]: Shutdown request received.[0m
+[33m[ WARN] [1598923544.566203340]: Reason given for shutdown: [user request][0m

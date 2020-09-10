@@ -1,0 +1,2 @@
+[33m[ WARN] [1599209998.186237102]: Deprecation Warning: No '/' detected in FilterType, Please update to 1.2 plugin syntax. [0m
+[33m[ WARN] [1599209998.186306463]: Replaced ScanShadowsFilter with laser_filters/ScanShadowsFilter[0m

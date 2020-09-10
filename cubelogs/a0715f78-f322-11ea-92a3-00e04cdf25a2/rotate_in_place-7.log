@@ -1,0 +1,114 @@
+[rospy.client][INFO] 2020-09-10 14:01:27,116: init_node, name[/rotate_in_place], pid[8909]
+[xmlrpc][INFO] 2020-09-10 14:01:27,116: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2020-09-10 14:01:27,117: Started XML-RPC server [http://cuboid0009:40745/]
+[rospy.init][INFO] 2020-09-10 14:01:27,117: ROS Slave URI: [http://cuboid0009:40745/]
+[rospy.impl.masterslave][INFO] 2020-09-10 14:01:27,117: _ready: http://cuboid0009:40745/
+[xmlrpc][INFO] 2020-09-10 14:01:27,118: xml rpc node: starting XML-RPC server
+[rospy.registration][INFO] 2020-09-10 14:01:27,118: Registering with master node http://localhost:11311
+[rospy.init][INFO] 2020-09-10 14:01:27,218: registered with master
+[rospy.rosout][INFO] 2020-09-10 14:01:27,218: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-10 14:01:27,219: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-10 14:01:27,220: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rosout][INFO] 2020-09-10 14:01:27,225: Init robot_pose subscriber
+[rosout][INFO] 2020-09-10 14:01:27,227: Init global path subscriber
+[rosout][INFO] 2020-09-10 14:01:27,229: Init local costmap subscriber
+[rosout][INFO] 2020-09-10 14:01:27,230: Init move_base result subscriber
+[rosout][INFO] 2020-09-10 14:01:27,232: Init move_base feedback subscriber
+[rosout][INFO] 2020-09-10 14:01:27,234: [RotateInPlace] Init publisher and subscriber
+[rospy.internal][INFO] 2020-09-10 14:01:27,235: topic[/robot_pose] adding connection to [http://cuboid0009:43369/], count 0
+[rospy.internal][INFO] 2020-09-10 14:01:27,446: topic[/rotate_vel] adding connection to [/twist_mux], count 0
+[rospy.internal][INFO] 2020-09-10 14:01:27,446: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2020-09-10 14:01:44,858: topic[/move_base/NavfnROS/plan] adding connection to [http://cuboid0009:42881/], count 0
+[rospy.internal][INFO] 2020-09-10 14:01:45,174: topic[/move_base/local_costmap/costmap_updates] adding connection to [http://cuboid0009:42881/], count 0
+[rospy.internal][INFO] 2020-09-10 14:01:45,439: topic[/move_base/feedback] adding connection to [http://cuboid0009:42881/], count 0
+[rospy.internal][INFO] 2020-09-10 14:01:45,439: topic[/move_base/result] adding connection to [http://cuboid0009:42881/], count 0
+[rosout][INFO] 2020-09-10 14:02:45,861: [RotateInPlace] Rotate here.
+[rosout][INFO] 2020-09-10 14:02:51,123: [RotateInPlace] Rotated.
+[rosout][INFO] 2020-09-10 14:03:14,642: [RotateInPlace] Rotate here.
+[rosout][INFO] 2020-09-10 14:03:18,683: [RotateInPlace] Rotated.
+[rospy.internal][WARNING] 2020-09-10 14:05:14,590: Unknown error initiating TCP/IP socket to cuboid0009:51033 (http://cuboid0009:42881/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 650, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rosgraph/network.py", line 362, in read_ros_handshake_header
+    d = sock.recv(buff_size)
+error: [Errno 104] Connection reset by peer
+
+[rospy.internal][INFO] 2020-09-10 14:05:14,590: topic[/move_base/feedback] removing connection to http://cuboid0009:42881/
+[rospy.internal][WARNING] 2020-09-10 14:05:14,591: Unknown error initiating TCP/IP socket to cuboid0009:51033 (http://cuboid0009:42881/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 650, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rosgraph/network.py", line 362, in read_ros_handshake_header
+    d = sock.recv(buff_size)
+error: [Errno 104] Connection reset by peer
+
+[rospy.internal][INFO] 2020-09-10 14:05:14,591: topic[/move_base/local_costmap/costmap_updates] removing connection to http://cuboid0009:42881/
+[rospy.internal][WARNING] 2020-09-10 14:05:14,591: Unknown error initiating TCP/IP socket to cuboid0009:51033 (http://cuboid0009:42881/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 650, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rosgraph/network.py", line 362, in read_ros_handshake_header
+    d = sock.recv(buff_size)
+error: [Errno 104] Connection reset by peer
+
+[rospy.internal][INFO] 2020-09-10 14:05:14,591: topic[/move_base/NavfnROS/plan] removing connection to http://cuboid0009:42881/
+[rospy.internal][WARNING] 2020-09-10 14:05:14,592: Unknown error initiating TCP/IP socket to cuboid0009:51033 (http://cuboid0009:42881/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 555, in connect
+    self.socket.connect((dest_addr, dest_port))
+  File "/usr/lib/python2.7/socket.py", line 228, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 111] Connection refused
+
+[rospy.internal][INFO] 2020-09-10 14:05:14,592: topic[/move_base/result] removing connection to http://cuboid0009:42881/
+[rospy.internal][INFO] 2020-09-10 14:05:16,671: topic[/move_base/NavfnROS/plan] adding connection to [http://cuboid0009:41297/], count 0
+[rospy.internal][INFO] 2020-09-10 14:05:17,087: topic[/move_base/local_costmap/costmap_updates] adding connection to [http://cuboid0009:41297/], count 0
+[rospy.internal][INFO] 2020-09-10 14:05:17,403: topic[/move_base/feedback] adding connection to [http://cuboid0009:41297/], count 0
+[rospy.internal][INFO] 2020-09-10 14:05:17,403: topic[/move_base/result] adding connection to [http://cuboid0009:41297/], count 0
+[rosout][INFO] 2020-09-10 14:05:18,023: [RotateInPlace] Rotate here.
+[rosout][INFO] 2020-09-10 14:05:21,661: [RotateInPlace] Rotated.
+[rosout][INFO] 2020-09-10 14:08:02,300: [RotateInPlace] Rotate here.
+[rosout][INFO] 2020-09-10 14:08:04,942: [RotateInPlace] Rotated.
+[rosout][INFO] 2020-09-10 14:13:49,436: [RotateInPlace] Rotate here.
+[rosout][INFO] 2020-09-10 14:13:52,468: [RotateInPlace] Rotated.
+[rosout][INFO] 2020-09-10 14:14:03,035: [RotateInPlace] Rotate here.
+[rosout][INFO] 2020-09-10 14:14:06,269: [RotateInPlace] Rotated.
+[rosout][INFO] 2020-09-10 14:15:24,648: [RotateInPlace] Rotate here.
+[rosout][ERROR] 2020-09-10 14:15:24,649: [RotateInPlace] cannot rotate in place becase there is a potential collision. Cost:  76
+[rosout][INFO] 2020-09-10 14:15:28,566: [RotateInPlace] Rotate here.
+[rosout][ERROR] 2020-09-10 14:15:28,568: [RotateInPlace] cannot rotate in place becase there is a potential collision. Cost:  95
+[rosout][INFO] 2020-09-10 14:15:32,486: [RotateInPlace] Rotate here.
+[rosout][ERROR] 2020-09-10 14:15:32,487: [RotateInPlace] cannot rotate in place becase there is a potential collision. Cost:  95
+[rosout][INFO] 2020-09-10 14:15:36,401: [RotateInPlace] Rotate here.
+[rosout][ERROR] 2020-09-10 14:15:36,403: [RotateInPlace] cannot rotate in place becase there is a potential collision. Cost:  95
+[rosout][INFO] 2020-09-10 14:15:36,708: [RotateInPlace] Rotate here.
+[rosout][ERROR] 2020-09-10 14:15:36,710: [RotateInPlace] cannot rotate in place becase there is a potential collision. Cost:  95
+[rosout][INFO] 2020-09-10 14:15:40,628: [RotateInPlace] Rotate here.
+[rosout][WARNING] 2020-09-10 14:15:40,629: [RotateInPlace] Feedback is stopped.
+[rospy.core][INFO] 2020-09-10 14:20:08,769: signal_shutdown [signal-2]
+[rospy.internal][INFO] 2020-09-10 14:20:08,777: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2020-09-10 14:20:08,778: topic[/rotate_vel] removing connection to /twist_mux
+[rospy.internal][INFO] 2020-09-10 14:20:08,778: topic[/move_base/NavfnROS/plan] removing connection to http://cuboid0009:41297/
+[rospy.internal][WARNING] 2020-09-10 14:20:08,778: Unknown error initiating TCP/IP socket to cuboid0009:48663 (http://cuboid0009:41297/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 650, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+AttributeError: 'NoneType' object has no attribute 'buff_size'
+
+[rospy.topics][ERROR] 2020-09-10 14:20:08,778: Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/topics.py", line 326, in close
+    c.close()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 838, in close
+    self.socket.close()
+AttributeError: 'NoneType' object has no attribute 'close'
+
+[rospy.internal][INFO] 2020-09-10 14:20:08,779: topic[/move_base/result] removing connection to http://cuboid0009:41297/
+[rospy.internal][INFO] 2020-09-10 14:20:08,779: topic[/move_base/feedback] removing connection to http://cuboid0009:41297/
+[rospy.internal][INFO] 2020-09-10 14:20:08,779: topic[/robot_pose] removing connection to http://cuboid0009:43369/
+[rospy.internal][INFO] 2020-09-10 14:20:08,779: topic[/move_base/local_costmap/costmap_updates] removing connection to http://cuboid0009:41297/
+[rospy.impl.masterslave][INFO] 2020-09-10 14:20:08,780: signal-2
+[rospy.core][INFO] 2020-09-10 14:20:08,896: signal_shutdown [atexit]

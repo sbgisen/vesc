@@ -1,0 +1,4 @@
+[0m[ INFO] [1599700881.717146967]: Initializing nodelet with 8 worker threads.[0m
+[0m[ INFO] [1599700882.221479727]: Reconfigure request : 0.500000 1.000000 0.100000 1.000000 6.000000[0m
+[33m[ WARN] [1599701007.119642546]: Shutdown request received.[0m
+[33m[ WARN] [1599701007.119665488]: Reason given for shutdown: [user request][0m

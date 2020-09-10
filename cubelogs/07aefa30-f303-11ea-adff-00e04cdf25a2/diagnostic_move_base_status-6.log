@@ -1,0 +1,20 @@
+[rospy.client][INFO] 2020-09-10 10:15:27,505: init_node, name[/diagnostic_move_base_status], pid[10316]
+[xmlrpc][INFO] 2020-09-10 10:15:27,506: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2020-09-10 10:15:27,506: Started XML-RPC server [http://cuboid0009:38479/]
+[rospy.init][INFO] 2020-09-10 10:15:27,506: ROS Slave URI: [http://cuboid0009:38479/]
+[rospy.impl.masterslave][INFO] 2020-09-10 10:15:27,506: _ready: http://cuboid0009:38479/
+[rospy.registration][INFO] 2020-09-10 10:15:27,508: Registering with master node http://localhost:11311
+[xmlrpc][INFO] 2020-09-10 10:15:27,508: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2020-09-10 10:15:27,607: registered with master
+[rospy.rosout][INFO] 2020-09-10 10:15:27,607: initializing /rosout core topic
+[rospy.rosout][INFO] 2020-09-10 10:15:27,609: connected to core topic /rosout
+[rospy.simtime][INFO] 2020-09-10 10:15:27,610: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2020-09-10 10:15:27,836: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2020-09-10 10:15:27,843: topic[/diagnostics] adding connection to [/diag_agg], count 0
+[rospy.internal][INFO] 2020-09-10 10:15:34,544: topic[/move_base/result] adding connection to [http://cuboid0009:44827/], count 0
+[rospy.core][INFO] 2020-09-10 10:19:39,848: signal_shutdown [signal-2]
+[rospy.internal][INFO] 2020-09-10 10:19:39,854: topic[/diagnostics] removing connection to /diag_agg
+[rospy.internal][INFO] 2020-09-10 10:19:39,855: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2020-09-10 10:19:39,855: topic[/move_base/result] removing connection to http://cuboid0009:44827/
+[rospy.impl.masterslave][INFO] 2020-09-10 10:19:39,855: signal-2
+[rospy.core][INFO] 2020-09-10 10:19:40,020: signal_shutdown [atexit]

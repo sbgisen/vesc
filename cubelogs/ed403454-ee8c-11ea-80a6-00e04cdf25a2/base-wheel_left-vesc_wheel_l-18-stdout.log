@@ -1,0 +1,4 @@
+[0m[ INFO] [1599209974.401637148]: Loading nodelet /base/wheel_left/vesc_wheel_l of type vesc_driver::VescDriverNodelet to manager vesc_nodelet_manager with the following remappings:[0m
+[0m[ INFO] [1599211552.529934637]: Unloading nodelet /base/wheel_left/vesc_wheel_l from manager vesc_nodelet_manager[0m
+[0m[ INFO] [1599211552.534990365]: waitForService: Service [/base/wheel_left/vesc_nodelet_manager/unload_nodelet] has not been advertised, waiting...[0m
+[33m[ WARN] [1599211552.535107844]: Couldn't find service vesc_nodelet_manager/unload_nodelet, perhaps the manager is already shut down[0m

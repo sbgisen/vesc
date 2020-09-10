@@ -1,0 +1,3 @@
+[33m[ WARN] [1599700495.841894427]: The 'state_publisher' executable is deprecated. Please use 'robot_state_publisher' instead[0m
+[33m[ WARN] [1599700784.519036323]: Shutdown request received.[0m
+[33m[ WARN] [1599700784.519056937]: Reason given for shutdown: [user request][0m

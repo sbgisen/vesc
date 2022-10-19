@@ -40,6 +40,7 @@
 #include "vesc_driver/vesc_packet.h"
 #include "vesc_driver/vesc_packet_factory.h"
 #include "vesc_hw_interface/vesc_servo_controller.h"
+#include "vesc_hw_interface/vesc_wheel_controller.h"
 
 namespace vesc_hw_interface
 {
@@ -61,30 +62,34 @@ public:
   ros::Time getTime() const;
   ros::Duration getPeriod() const;
 
-private:
-  VescInterface vesc_interface_;
-  VescServoController servo_controller_;
-
-  std::string joint_name_, command_mode_;
-
-  double command_;
-  double position_, velocity_, effort_;  // joint states
-
-  int num_motor_pole_pairs_;          // the number of motor pole pairs
-  double gear_ratio_, torque_const_;  // physical params.
-
+protected:
   hardware_interface::JointStateInterface joint_state_interface_;
   hardware_interface::PositionJointInterface joint_position_interface_;
   hardware_interface::VelocityJointInterface joint_velocity_interface_;
   hardware_interface::EffortJointInterface joint_effort_interface_;
+  double command_;
+  double position_, velocity_, effort_;  // joint states
 
   joint_limits_interface::JointLimits joint_limits_;
   joint_limits_interface::PositionJointSaturationInterface limit_position_interface_;
   joint_limits_interface::VelocityJointSaturationInterface limit_velocity_interface_;
   joint_limits_interface::EffortJointSaturationInterface limit_effort_interface_;
 
+private:
+  VescInterface vesc_interface_;
+  VescServoController servo_controller_;
+  VescWheelController wheel_controller_;
   void packetCallback(const std::shared_ptr<VescPacket const>&);
   void errorCallback(const std::string&);
+  double position_pulse_;
+  double position_pulse_prev_;
+
+  std::string joint_name_, command_mode_, joint_type_;
+  int num_motor_pole_pairs_;          // the number of motor pole pairs
+  double gear_ratio_, torque_const_;  // physical params.
+  double rad_;
+
+  bool initialize_vesc_;
 };
 
 }  // namespace vesc_hw_interface

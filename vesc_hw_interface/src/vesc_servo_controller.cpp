@@ -63,7 +63,7 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
 
 void VescServoController::control(const double position_reference, const double position_current)
 {
-  // executes caribration
+  // executes calibration
   if (calibration_flag_)
   {
     calibrate(position_current);
@@ -172,14 +172,7 @@ bool VescServoController::calibrate(const double position_current)
 
 bool VescServoController::isSaturated(const double arg) const
 {
-  if (std::abs(arg) > 1.0)
-  {
-    return true;
-  }
-  else
-  {
-    return false;
-  }
+  return std::abs(arg) > 1.0;
 }
 
 double VescServoController::saturate(const double arg) const

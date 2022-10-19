@@ -15,6 +15,9 @@
  ********************************************************************/
 
 #include "vesc_hw_interface/vesc_hw_interface.h"
+#include <urdf_model/types.h>
+#include <cmath>
+#include "angles/angles.h"
 
 namespace vesc_hw_interface
 {
@@ -58,6 +61,7 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
   nh.param<std::string>("robot_description_name", robot_description_name, "/robot_description");
 
   // parses the urdf
+  joint_type_ = "";
   if (nh.getParam(robot_description_name, robot_description))
   {
     const urdf::ModelInterfaceSharedPtr urdf = urdf::parseURDF(robot_description);
@@ -67,6 +71,19 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
     {
       ROS_INFO("Joint limits are loaded");
     }
+
+    switch (urdf_joint->type)
+    {
+      case urdf::Joint::REVOLUTE:
+        joint_type_ = "revolute";
+        break;
+      case urdf::Joint::CONTINUOUS:
+        joint_type_ = "continuous";
+        break;
+      case urdf::Joint::PRISMATIC:
+        joint_type_ = "prismatic";
+        break;
+    }
   }
 
   // initializes commands and states
@@ -74,6 +91,7 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
   position_ = 0.0;
   velocity_ = 0.0;
   effort_ = 0.0;
+  rad_ = 0.0;
 
   // reads system parameters
   nh.param<double>("gear_ratio", gear_ratio_, 1.0);
@@ -86,7 +104,7 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
   // reads driving mode setting
   // - assigns an empty string if param. is not found
   nh.param<std::string>("command_mode", command_mode_, "");
-  ROS_INFO("mode: %s", command_mode_.data());
+  ROS_INFO("command mode: %s", command_mode_.data());
 
   // registers a state handle and its interface
   hardware_interface::JointStateHandle state_handle(joint_name_, &position_, &velocity_, &effort_);
@@ -106,7 +124,7 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
     // initializes the servo controller
     servo_controller_.init(nh, &vesc_interface_);
   }
-  else if (command_mode_ == "velocity")
+  else if (command_mode_ == "velocity" || command_mode_ == "velocity_duty")
   {
     hardware_interface::JointHandle velocity_handle(joint_state_interface_.getHandle(joint_name_), &command_);
     joint_velocity_interface_.registerHandle(velocity_handle);
@@ -114,6 +132,13 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
 
     joint_limits_interface::VelocityJointSaturationHandle limit_handle(velocity_handle, joint_limits_);
     limit_velocity_interface_.registerHandle(limit_handle);
+
+    if (command_mode_ == "velocity_duty")
+    {
+      initialize_vesc_ = true;
+      wheel_controller_.init(nh, &vesc_interface_);
+      wheel_controller_.setControlFrequency(1.0 / this->getPeriod().toSec());
+    }
   }
   else if (command_mode_ == "effort" || command_mode_ == "effort_duty")
   {
@@ -131,20 +156,50 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
     return false;
   }
 
+  // reads joint type setting
+  nh.getParam("joint_type", joint_type_);
+  ROS_INFO("joint type: %s", joint_type_.data());
+  if ((joint_type_ != "revolute") && (joint_type_ != "continuous") && (joint_type_ != "prismatic"))
+  {
+    ROS_ERROR("Verify your joint type");
+    return false;
+  }
   return true;
 }
 
 void VescHwInterface::read()
 {
   // requests joint states
-  // function `packetCallback` will be called after receiveing retrun packets
+  // function `packetCallback` will be called after receiving return packets
   vesc_interface_.requestState();
-
+  if (initialize_vesc_)
+  {
+    position_pulse_prev_ = position_pulse_;
+  }
+  double displacement_diff = position_pulse_ - position_pulse_prev_;
+  if (fabs(displacement_diff) > num_motor_pole_pairs_ / 4)
+  {
+    displacement_diff = 0;
+    initialize_vesc_ = true;
+  }
+  if ((joint_type_ == "revolute") || (joint_type_ == "continuous"))
+  {
+    rad_ += displacement_diff / num_motor_pole_pairs_ * 2.0 * M_PI;
+    if (joint_type_ == "revolute")
+    {
+      rad_ = angles::normalize_angle(rad_);
+    }
+    position_ = rad_;
+  }
   return;
 }
 
 void VescHwInterface::read(const ros::Time& time, const ros::Duration& period)
 {
+  if (command_mode_ == "velocity_duty")
+  {
+    wheel_controller_.setControlFrequency(1.0 / period.toSec());
+  }
   read();
   return;
 }
@@ -170,6 +225,11 @@ void VescHwInterface::write()
     // sends a reference velocity command
     vesc_interface_.setSpeed(command_erpm);
   }
+  else if (command_mode_ == "velocity_duty")
+  {
+    wheel_controller_.control(command_, position_pulse_, initialize_vesc_);
+    initialize_vesc_ = fabs(command_) < 0.0001;
+  }
   else if (command_mode_ == "effort")
   {
     limit_effort_interface_.enforceLimits(getPeriod());
@@ -193,6 +253,10 @@ void VescHwInterface::write()
 
 void VescHwInterface::write(const ros::Time& time, const ros::Duration& period)
 {
+  if (command_mode_ == "velocity_duty")
+  {
+    wheel_controller_.setControlFrequency(1.0 / period.toSec());
+  }
   write();
   return;
 }
@@ -215,12 +279,14 @@ void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& pa
 
     const double current = values->getMotorCurrent();
     const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_motor_pole_pairs_);
-    const double position_pulse = values->getPosition();
+    position_pulse_prev_ = position_pulse_;
+    position_pulse_ = values->getPosition();
 
-    // 3.0 represents the number of hall sensors
-    position_ = position_pulse / num_motor_pole_pairs_ / 3.0 * gear_ratio_ -
-                servo_controller_.getZeroPosition();  // unit: rad or m
-
+    if (joint_type_ == "prismatic")
+    {  // 3.0 represents the number of hall sensors
+      position_ = position_pulse_ / num_motor_pole_pairs_ / 3.0 * gear_ratio_ -
+                  servo_controller_.getZeroPosition();  // unit: rad or m
+    }
     velocity_ = velocity_rpm / 60.0 * 2.0 * M_PI * gear_ratio_;  // unit: rad/s or m/s
     effort_ = current * torque_const_ / gear_ratio_;             // unit: Nm or N
   }

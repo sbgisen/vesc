@@ -105,6 +105,9 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
 
     // initializes the servo controller
     servo_controller_.init(nh, &vesc_interface_);
+    servo_controller_.setGearRatio(gear_ratio_);
+    servo_controller_.setTorqueConst(torque_const_);
+    servo_controller_.setMotorPolePairs(num_motor_pole_pairs_);
   }
   else if (command_mode_ == "velocity")
   {
@@ -138,7 +141,18 @@ void VescHwInterface::read()
 {
   // requests joint states
   // function `packetCallback` will be called after receiveing retrun packets
-  vesc_interface_.requestState();
+  if (command_mode_ == "position")
+  {
+    // For PID control, request packets are automatically sent in the control cycle.
+    // The latest data is read in this function.
+    position_ = servo_controller_.getPositionSens();
+    velocity_ = servo_controller_.getVelocitySens();
+    effort_   = servo_controller_.getEffortSens();
+  }
+  else
+  {
+    vesc_interface_.requestState();
+  }
 
   return;
 }
@@ -157,7 +171,7 @@ void VescHwInterface::write()
     limit_position_interface_.enforceLimits(getPeriod());
 
     // executes PID control
-    servo_controller_.control(command_, position_);
+    servo_controller_.setTargetPosition(command_);
   }
   else if (command_mode_ == "velocity")
   {
@@ -209,7 +223,11 @@ ros::Duration VescHwInterface::getPeriod() const
 
 void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& packet)
 {
-  if (packet->getName() == "Values")
+  if (command_mode_ == "position")
+  {
+    servo_controller_.updateSensor(packet);
+  }
+  else if (packet->getName() == "Values")
   {
     std::shared_ptr<VescPacketValues const> values = std::dynamic_pointer_cast<VescPacketValues const>(packet);
 

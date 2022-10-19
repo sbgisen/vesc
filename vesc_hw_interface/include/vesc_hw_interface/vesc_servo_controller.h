@@ -25,15 +25,27 @@
 namespace vesc_hw_interface
 {
 using vesc_driver::VescInterface;
+using vesc_driver::VescPacket;
+using vesc_driver::VescPacketValues;
 
 class VescServoController
 {
 public:
+  VescServoController();
+  ~VescServoController();
+
   void init(ros::NodeHandle, VescInterface*);
   void control(const double, const double);
+  void setTargetPosition(const double position_reference);
+  void setGearRatio(const double gear_ratio);
+  void setTorqueConst(const double torque_const);
+  void setMotorPolePairs(const int motor_pole_pairs);
   double getZeroPosition() const;
+  double getPositionSens(void);
+  double getVelocitySens(void);
+  double getEffortSens(void);
   void executeCalibration();
-
+  void updateSensor(const std::shared_ptr<VescPacket const>&);
 private:
   VescInterface* interface_ptr_;
 
@@ -47,13 +59,25 @@ private:
   double calibration_position_;   // unit: rad or m
   double zero_position_;          // unit: rad or m
   double Kp_, Ki_, Kd_;
+  double control_rate_, control_period_;
+  double position_target_;
+  double position_reference_; // limited with speed (speed_limit_)
+  double position_reference_previous_;
+  double position_sens_, velocity_sens_, effort_sens_;
+  double position_sens_previous_;
   double error_previous_;
   double error_integ_;
   ros::Time time_previous_;
+  int num_motor_pole_pairs_;          // the number of motor pole pairs
+  double gear_ratio_, torque_const_;  // physical params.
+  double speed_limit_;
+  ros::Timer control_timer_;
 
   bool calibrate(const double);
   bool isSaturated(const double) const;
   double saturate(const double) const;
+  void updateSpeedLimitedPositionReference(void);
+  void controlTimerCallback(const ros::TimerEvent& e);
 };
 
 }  // namespace vesc_hw_interface

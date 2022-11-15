@@ -95,7 +95,6 @@ void VescServoController::control(const double position_reference, const double 
   const ros::Time time_current = ros::Time::now();
   // calculates PD control
   const double error_current = position_reference - position_current;
-  const double u_p = Kp_ * error_current + Kd_;
   const double u_pd = Kp_ * error_current + Kd_ * (error_current - error_previous_) / control_period_;
 
   double u = 0.0;

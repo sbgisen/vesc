@@ -2,12 +2,12 @@
 
 <robot name="vesc_test">
   <link name="base_link"/>
-  <joint name="arm_joint" type="revolute">
+  <joint name="vesc_joint" type="revolute">
     <parent link="base_link"/>
-    <child link="arm_link"/>
+    <child link="vesc_link"/>
     <origin xyz="0 0 0" rpy="0 0 0"/>
     <axis xyz="0 0 1"/>
     <limit effort="100" lower="-100" upper="100" velocity="100"/>
   </joint>
-  <link name="arm_link"/>
+  <link name="vesc_link"/>
 </robot>

@@ -40,6 +40,7 @@
 #include "vesc_driver/vesc_packet.h"
 #include "vesc_driver/vesc_packet_factory.h"
 #include "vesc_hw_interface/vesc_servo_controller.h"
+#include "vesc_hw_interface/vesc_wheel_controller.h"
 
 namespace vesc_hw_interface
 {
@@ -64,6 +65,7 @@ public:
 private:
   VescInterface vesc_interface_;
   VescServoController servo_controller_;
+  VescWheelController wheel_controller_;
 
   std::string joint_name_, command_mode_;
 

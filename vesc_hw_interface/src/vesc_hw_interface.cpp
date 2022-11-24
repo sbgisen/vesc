@@ -109,7 +109,7 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
     servo_controller_.setTorqueConst(torque_const_);
     servo_controller_.setMotorPolePairs(num_motor_pole_pairs_);
   }
-  else if (command_mode_ == "velocity")
+  else if (command_mode_ == "velocity" || command_mode_ == "velocity_duty")
   {
     hardware_interface::JointHandle velocity_handle(joint_state_interface_.getHandle(joint_name_), &command_);
     joint_velocity_interface_.registerHandle(velocity_handle);
@@ -117,6 +117,13 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
 
     joint_limits_interface::VelocityJointSaturationHandle limit_handle(velocity_handle, joint_limits_);
     limit_velocity_interface_.registerHandle(limit_handle);
+    if (command_mode_ == "velocity_duty")
+    {
+      wheel_controller_.init(nh, &vesc_interface_);
+      wheel_controller_.setGearRatio(gear_ratio_);
+      wheel_controller_.setTorqueConst(torque_const_);
+      wheel_controller_.setMotorPolePairs(num_motor_pole_pairs_);
+    }
   }
   else if (command_mode_ == "effort" || command_mode_ == "effort_duty")
   {
@@ -140,14 +147,20 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
 void VescHwInterface::read()
 {
   // requests joint states
-  // function `packetCallback` will be called after receiveing retrun packets
+  // function `packetCallback` will be called after receiving return packets
   if (command_mode_ == "position")
   {
     // For PID control, request packets are automatically sent in the control cycle.
     // The latest data is read in this function.
     position_ = servo_controller_.getPositionSens();
     velocity_ = servo_controller_.getVelocitySens();
-    effort_   = servo_controller_.getEffortSens();
+    effort_ = servo_controller_.getEffortSens();
+  }
+  else if (command_mode_ == "velocity_duty")
+  {
+    position_ = wheel_controller_.getPositionSens();
+    velocity_ = wheel_controller_.getVelocitySens();
+    effort_ = wheel_controller_.getEffortSens();
   }
   else
   {
@@ -183,6 +196,13 @@ void VescHwInterface::write()
 
     // sends a reference velocity command
     vesc_interface_.setSpeed(command_erpm);
+  }
+  else if (command_mode_ == "velocity_duty")
+  {
+    limit_velocity_interface_.enforceLimits(getPeriod());
+
+    // executes PID control
+    wheel_controller_.setTargetVelocity(command_);
   }
   else if (command_mode_ == "effort")
   {
@@ -227,6 +247,10 @@ void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& pa
   {
     servo_controller_.updateSensor(packet);
   }
+  else if (command_mode_ == "velocity_duty")
+  {
+    wheel_controller_.updateSensor(packet);
+  }
   else if (packet->getName() == "Values")
   {
     std::shared_ptr<VescPacketValues const> values = std::dynamic_pointer_cast<VescPacketValues const>(packet);
@@ -236,11 +260,9 @@ void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& pa
     const double position_pulse = values->getPosition();
 
     // 3.0 represents the number of hall sensors
-    position_ = position_pulse / num_motor_pole_pairs_ / 3.0 * gear_ratio_ -
-                servo_controller_.getZeroPosition();  // unit: rad or m
-
-    velocity_ = velocity_rpm / 60.0 * 2.0 * M_PI * gear_ratio_;  // unit: rad/s or m/s
-    effort_ = current * torque_const_ / gear_ratio_;             // unit: Nm or N
+    position_ = position_pulse / num_motor_pole_pairs_ / 3.0 * gear_ratio_;  // unit: rad or m
+    velocity_ = velocity_rpm / 60.0 * 2.0 * M_PI * gear_ratio_;              // unit: rad/s or m/s
+    effort_ = current * torque_const_ / gear_ratio_;                         // unit: Nm or N
   }
 
   return;

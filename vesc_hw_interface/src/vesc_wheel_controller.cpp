@@ -224,10 +224,6 @@ double VescWheelController::getEffortSens()
 
 void VescWheelController::controlTimerCallback(const ros::TimerEvent& e)
 {
-  if (reset_)
-  {
-    prev_position_pulse_ = position_pulse_;
-  }
   double diff = position_pulse_ - prev_position_pulse_;
   if (fabs(diff) > num_motor_pole_pairs_ / 4)
   {

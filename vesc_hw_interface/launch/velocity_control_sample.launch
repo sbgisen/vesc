@@ -10,6 +10,7 @@
     <rosparam>
       joint_name: vesc_joint
       command_mode: velocity
+      joint_type: continuous
       port: /dev/ttyUSB0
       num_motor_pole_pairs: 10
       gear_ratio: 1

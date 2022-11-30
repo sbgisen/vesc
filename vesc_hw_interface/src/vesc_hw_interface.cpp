@@ -58,6 +58,7 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
   nh.param<std::string>("robot_description_name", robot_description_name, "/robot_description");
 
   // parses the urdf
+  joint_type_ = "";
   if (nh.getParam(robot_description_name, robot_description))
   {
     const urdf::ModelInterfaceSharedPtr urdf = urdf::parseURDF(robot_description);
@@ -66,6 +67,19 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
     if (getJointLimits(urdf_joint, joint_limits_))
     {
       ROS_INFO("Joint limits are loaded");
+    }
+
+    switch (urdf_joint->type)
+    {
+      case urdf::Joint::REVOLUTE:
+        joint_type_ = "revolute";
+        break;
+      case urdf::Joint::CONTINUOUS:
+        joint_type_ = "continuous";
+        break;
+      case urdf::Joint::PRISMATIC:
+        joint_type_ = "prismatic";
+        break;
     }
   }
 
@@ -141,6 +155,14 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
     return false;
   }
 
+  nh.param<std::string>("joint_type", joint_type_);
+  ROS_INFO("joint type: %s", joint_type_.data());
+  if ((joint_type_ != "revolute") && (joint_type_ != "continuous") && (joint_type_ != "prismatic"))
+  {
+    ROS_ERROR("Verify your joint type");
+    return false;
+  }
+
   return true;
 }
 
@@ -165,6 +187,11 @@ void VescHwInterface::read()
   else
   {
     vesc_interface_.requestState();
+  }
+
+  if (joint_type_ == "revolute")
+  {
+    position_ = angles::normalize_angle(position_);
   }
 
   return;

@@ -22,6 +22,7 @@
 #include <memory>
 #include <string>
 
+#include <angles/angles.h>
 #include <controller_manager/controller_manager.h>
 #include <hardware_interface/hardware_interface.h>
 #include <hardware_interface/joint_command_interface.h>
@@ -33,6 +34,7 @@
 #include <joint_limits_interface/joint_limits_urdf.h>
 #include <ros/ros.h>
 #include <serial/serial.h>
+#include <urdf_model/types.h>
 #include <urdf_parser/urdf_parser.h>
 #include <pluginlib/class_list_macros.hpp>
 
@@ -67,7 +69,7 @@ private:
   VescServoController servo_controller_;
   VescWheelController wheel_controller_;
 
-  std::string joint_name_, command_mode_;
+  std::string joint_name_, command_mode_, joint_type_;
 
   double command_;
   double position_, velocity_, effort_;  // joint states

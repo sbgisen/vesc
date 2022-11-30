@@ -93,7 +93,8 @@ void VescWheelController::control(const double target_velocity, const double cur
   }
 
   // pid control
-  error_dt_ = target_velocity - (this->counterTD(current_pulse, false) * 2.0 * M_PI / motor_hall_ppr * control_rate_);
+  velocity_sens_ = this->counterTD(current_pulse, false) * 2.0 * M_PI / motor_hall_ppr * control_rate_;
+  error_dt_ = target_velocity - velocity_sens_;
   error_ = target_pulse_ - current_pulse;
   error_integ_prev_ = error_integ_;
   error_integ_ += (error_ / control_rate_);
@@ -246,8 +247,7 @@ void VescWheelController::updateSensor(const std::shared_ptr<const VescPacket>& 
     const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_motor_pole_pairs_);
     prev_position_pulse_ = position_pulse_;
     position_pulse_ = values->getPosition();
-    velocity_sens_ = velocity_rpm / 60.0 * 2.0 * M_PI * gear_ratio_;  // unit: rad/s or m/s
-    effort_sens_ = current * torque_const_ / gear_ratio_;             // unit: Nm or N
+    effort_sens_ = current * torque_const_ / gear_ratio_;  // unit: Nm or N
   }
 }
 }  // namespace vesc_hw_interface

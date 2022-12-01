@@ -155,7 +155,7 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
     return false;
   }
 
-  nh.param<std::string>("joint_type", joint_type_);
+  nh.getParam("joint_type", joint_type_);
   ROS_INFO("joint type: %s", joint_type_.data());
   if ((joint_type_ != "revolute") && (joint_type_ != "continuous") && (joint_type_ != "prismatic"))
   {

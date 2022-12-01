@@ -36,6 +36,7 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
   {
     ROS_FATAL("VESC communication port parameter required.");
     ros::shutdown();
+    return false;
   }
 
   // attempts to open the serial port
@@ -46,7 +47,7 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
   catch (serial::SerialException exception)
   {
     ROS_FATAL("Failed to connect to the VESC, %s.", exception.what());
-    // ros::shutdown();
+    ros::shutdown();
     return false;
   }
 
@@ -102,6 +103,16 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
   nh.param<std::string>("command_mode", command_mode_, "");
   ROS_INFO("mode: %s", command_mode_.data());
 
+  // check joint type
+  nh.getParam("joint_type", joint_type_);
+  ROS_INFO("joint type: %s", joint_type_.data());
+  if ((joint_type_ != "revolute") && (joint_type_ != "continuous") && (joint_type_ != "prismatic"))
+  {
+    ROS_ERROR("Verify your joint type");
+    ros::shutdown();
+    return false;
+  }
+
   // registers a state handle and its interface
   hardware_interface::JointStateHandle state_handle(joint_name_, &position_, &velocity_, &effort_);
   joint_state_interface_.registerHandle(state_handle);
@@ -151,15 +162,7 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
   else
   {
     ROS_ERROR("Verify your command mode setting");
-    // ros::shutdown();
-    return false;
-  }
-
-  nh.getParam("joint_type", joint_type_);
-  ROS_INFO("joint type: %s", joint_type_.data());
-  if ((joint_type_ != "revolute") && (joint_type_ != "continuous") && (joint_type_ != "prismatic"))
-  {
-    ROS_ERROR("Verify your joint type");
+    ros::shutdown();
     return false;
   }
 

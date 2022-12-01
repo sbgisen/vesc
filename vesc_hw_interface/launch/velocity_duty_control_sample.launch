@@ -9,12 +9,19 @@
   <node name="vesc_hw_interface_node" pkg="vesc_hw_interface" type="vesc_hw_interface_node" output="screen">
     <rosparam>
       joint_name: vesc_joint
-      command_mode: velocity
+      command_mode: velocity_duty
       joint_type: continuous
       port: /dev/ttyUSB0
-      num_motor_pole_pairs: 10
+      num_motor_pole_pairs: 258
       gear_ratio: 1
       torque_const: 1
+      motor:
+        Kp: 0.005
+        Ki: 0.005
+        Kd: 0.0025
+        i_clamp: 0.2
+        duty_limiter: 1.0
+        antiwindup: true
     </rosparam>
   </node>
 

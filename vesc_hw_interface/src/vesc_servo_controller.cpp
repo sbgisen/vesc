@@ -153,6 +153,12 @@ void VescServoController::setRotorPolePairs(const int rotor_pole_pairs)
   ROS_INFO("[VescServoController]The number of rotor pole pairs is set to %d", num_rotor_pole_pairs_);
 }
 
+void VescServoController::setHallSensors(const int hall_sensors)
+{
+  num_hall_sensors_ = hall_sensors;
+  ROS_INFO("[VescServoController]The number of hall sensors is set to %d", num_hall_sensors_);
+}
+
 double VescServoController::getZeroPosition() const
 {
   return zero_position_;

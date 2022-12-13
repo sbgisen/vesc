@@ -36,6 +36,7 @@ public:
   void setGearRatio(const double gear_ratio);
   void setTorqueConst(const double torque_const);
   void setRotorPolePairs(const int rotor_pole_pairs);
+  void setHallSensors(const int hall_sensors);
   double getPositionSens();
   double getVelocitySens();
   double getEffortSens();
@@ -49,6 +50,7 @@ private:
   bool antiwindup_;
   double duty_limiter_;
   double num_rotor_pole_pairs_;
+  double num_hall_sensors_;
   double gear_ratio_, torque_const_;
 
   double control_rate_;

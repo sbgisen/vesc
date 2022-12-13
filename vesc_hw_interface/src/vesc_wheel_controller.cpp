@@ -208,6 +208,12 @@ void VescWheelController::setRotorPolePairs(const int rotor_pole_pairs)
   ROS_INFO("[VescWheelController]The number of rotor pole pairs is set to %d", rotor_pole_pairs);
 }
 
+void VescWheelController::setHallSensors(const int hall_sensors)
+{
+  num_hall_sensors_ = static_cast<double>(hall_sensors);
+  ROS_INFO("[VescWheelController]The number of hall sensors is set to %d", hall_sensors);
+}
+
 double VescWheelController::getPositionSens()
 {
   return position_sens_;

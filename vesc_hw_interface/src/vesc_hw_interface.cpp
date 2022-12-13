@@ -94,9 +94,11 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
   nh.param<double>("gear_ratio", gear_ratio_, 1.0);
   nh.param<double>("torque_const", torque_const_, 1.0);
   nh.param<int>("num_rotor_pole_pairs", num_rotor_pole_pairs_, 1);
+  nh.param<int>("num_hall_sensors", num_hall_sensors_, 3);
   ROS_INFO("Gear ratio is set to %f", gear_ratio_);
   ROS_INFO("Torque constant is set to %f", torque_const_);
   ROS_INFO("The number of rotor pole pairs is set to %d", num_rotor_pole_pairs_);
+  ROS_INFO("The number of hall sensors is set to %d", num_hall_sensors_);
 
   // reads driving mode setting
   // - assigns an empty string if param. is not found
@@ -133,6 +135,7 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
     servo_controller_.setGearRatio(gear_ratio_);
     servo_controller_.setTorqueConst(torque_const_);
     servo_controller_.setRotorPolePairs(num_rotor_pole_pairs_);
+    servo_controller_.setHallSensors(num_hall_sensors_);
   }
   else if (command_mode_ == "velocity" || command_mode_ == "velocity_duty")
   {
@@ -148,6 +151,7 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
       wheel_controller_.setGearRatio(gear_ratio_);
       wheel_controller_.setTorqueConst(torque_const_);
       wheel_controller_.setRotorPolePairs(num_rotor_pole_pairs_);
+      wheel_controller_.setHallSensors(num_hall_sensors_);
     }
   }
   else if (command_mode_ == "effort" || command_mode_ == "effort_duty")

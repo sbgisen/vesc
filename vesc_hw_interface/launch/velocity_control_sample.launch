@@ -4,7 +4,6 @@
   <!-- Controller -->
   <arg name="model" default="$(find vesc_hw_interface)/launch/test.xacro"/>
   <param name="robot_description" command="$(find xacro)/xacro $(arg model)"/>
-
   <!-- Boot hardware interfaces -->
   <node name="vesc_hw_interface_node" pkg="vesc_hw_interface" type="vesc_hw_interface_node" output="screen">
     <rosparam>
@@ -12,7 +11,7 @@
       command_mode: velocity
       joint_type: continuous
       port: /dev/ttyUSB0
-      num_motor_pole_pairs: 10
+      num_rotor_pole_pairs: 10
       gear_ratio: 1
       torque_const: 1
     </rosparam>
@@ -30,6 +29,5 @@
       base_frame_id: base_link
       joint: vesc_joint
   </rosparam>
-
   <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="joint_state_controller joint_velocity_controller"/>
 </launch>

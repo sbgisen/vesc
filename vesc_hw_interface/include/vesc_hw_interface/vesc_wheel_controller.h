@@ -35,7 +35,7 @@ public:
   void setTargetVelocity(const double velocity_reference);
   void setGearRatio(const double gear_ratio);
   void setTorqueConst(const double torque_const);
-  void setMotorPolePairs(const int motor_pole_pairs);
+  void setRotorPolePairs(const int rotor_pole_pairs);
   double getPositionSens();
   double getVelocitySens();
   double getEffortSens();
@@ -48,7 +48,7 @@ private:
   double i_clamp_;
   bool antiwindup_;
   double duty_limiter_;
-  double num_motor_pole_pairs_;
+  double num_rotor_pole_pairs_;
   double gear_ratio_, torque_const_;
 
   double control_rate_;

@@ -74,7 +74,7 @@ private:
   double command_;
   double position_, velocity_, effort_;  // joint states
 
-  int num_motor_pole_pairs_;          // the number of motor pole pairs
+  int num_rotor_pole_pairs_;          // the number of rotor pole pairs
   double gear_ratio_, torque_const_;  // physical params.
 
   hardware_interface::JointStateInterface joint_state_interface_;

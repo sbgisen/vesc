@@ -55,8 +55,8 @@ void VescWheelController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
 
 void VescWheelController::control(const double target_velocity, const double current_pulse, bool reset)
 {
-  const double motor_hall_ppr = num_motor_pole_pairs_;
-  const double count_deviation_limit = num_motor_pole_pairs_;
+  const double motor_hall_ppr = num_rotor_pole_pairs_;
+  const double count_deviation_limit = num_rotor_pole_pairs_;
 
   if (reset)
   {
@@ -202,10 +202,10 @@ void VescWheelController::setTorqueConst(const double torque_const)
   ROS_INFO("[VescWheelController]Torque constant is set to %f", torque_const_);
 }
 
-void VescWheelController::setMotorPolePairs(const int motor_pole_pairs)
+void VescWheelController::setRotorPolePairs(const int rotor_pole_pairs)
 {
-  num_motor_pole_pairs_ = static_cast<double>(motor_pole_pairs);
-  ROS_INFO("[VescWheelController]The number of motor pole pairs is set to %d", motor_pole_pairs);
+  num_rotor_pole_pairs_ = static_cast<double>(rotor_pole_pairs);
+  ROS_INFO("[VescWheelController]The number of rotor pole pairs is set to %d", rotor_pole_pairs);
 }
 
 double VescWheelController::getPositionSens()
@@ -226,12 +226,12 @@ double VescWheelController::getEffortSens()
 void VescWheelController::controlTimerCallback(const ros::TimerEvent& e)
 {
   double diff = position_pulse_ - prev_position_pulse_;
-  if (fabs(diff) > num_motor_pole_pairs_ / 4)
+  if (fabs(diff) > num_rotor_pole_pairs_ / 4)
   {
     diff = 0;
     reset_ = true;
   }
-  position_sens_ += diff / num_motor_pole_pairs_ * 2.0 * M_PI;
+  position_sens_ += diff / num_rotor_pole_pairs_ * 2.0 * M_PI;
 
   control(velocity_reference_, position_pulse_, reset_);
   interface_ptr_->requestState();
@@ -244,7 +244,7 @@ void VescWheelController::updateSensor(const std::shared_ptr<const VescPacket>& 
   {
     std::shared_ptr<VescPacketValues const> values = std::dynamic_pointer_cast<VescPacketValues const>(packet);
     const double current = values->getMotorCurrent();
-    const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_motor_pole_pairs_);
+    const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_rotor_pole_pairs_);
     prev_position_pulse_ = position_pulse_;
     position_pulse_ = values->getPosition();
     effort_sens_ = current * torque_const_ / gear_ratio_;  // unit: Nm or N

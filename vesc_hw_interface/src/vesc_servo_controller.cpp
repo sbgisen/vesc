@@ -18,10 +18,7 @@
 
 namespace vesc_hw_interface
 {
-VescServoController::VescServoController()
-  : gear_ratio_(1.0),
-  torque_const_(1.0),
-  num_motor_pole_pairs_(1)
+VescServoController::VescServoController() : gear_ratio_(1.0), torque_const_(1.0), num_rotor_pole_pairs_(1)
 {
 }
 
@@ -150,10 +147,10 @@ void VescServoController::setTorqueConst(const double torque_const)
   ROS_INFO("[VescServoController]Torque constant is set to %f", torque_const_);
 }
 
-void VescServoController::setMotorPolePairs(const int motor_pole_pairs)
+void VescServoController::setRotorPolePairs(const int rotor_pole_pairs)
 {
-  num_motor_pole_pairs_ = motor_pole_pairs;
-  ROS_INFO("[VescServoController]The number of motor pole pairs is set to %d", num_motor_pole_pairs_);
+  num_rotor_pole_pairs_ = rotor_pole_pairs;
+  ROS_INFO("[VescServoController]The number of rotor pole pairs is set to %d", num_rotor_pole_pairs_);
 }
 
 double VescServoController::getZeroPosition() const
@@ -210,7 +207,7 @@ bool VescServoController::calibrate(const double position_current)
 
   if (step % 20 == 0)
   {
-    if(position_current == position_previous)
+    if (position_current == position_previous)
     {
       // finishes calibrating
       step = 0;
@@ -267,11 +264,11 @@ double VescServoController::saturate(const double arg) const
 
 void VescServoController::updateSpeedLimitedPositionReference(void)
 {
-  if( position_target_ > (position_reference_previous_ + speed_limit_ * control_period_) )
+  if (position_target_ > (position_reference_previous_ + speed_limit_ * control_period_))
   {
     position_reference_ = position_reference_previous_ + speed_limit_ * control_period_;
   }
-  else if(position_target_ < (position_reference_previous_ - speed_limit_ * control_period_) )
+  else if (position_target_ < (position_reference_previous_ - speed_limit_ * control_period_))
   {
     position_reference_ = position_reference_previous_ - speed_limit_ * control_period_;
   }
@@ -294,11 +291,10 @@ void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& 
   {
     std::shared_ptr<VescPacketValues const> values = std::dynamic_pointer_cast<VescPacketValues const>(packet);
     const double current = values->getMotorCurrent();
-    const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_motor_pole_pairs_);
+    const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_rotor_pole_pairs_);
     const double position_pulse = values->getPosition();
     // 3.0 represents the number of hall sensors
-    position_sens_ = position_pulse / num_motor_pole_pairs_ / 3.0 * gear_ratio_ -
-                getZeroPosition();  // unit: rad or m
+    position_sens_ = position_pulse / num_rotor_pole_pairs_ / 3.0 * gear_ratio_ - getZeroPosition();  // unit: rad or m
     velocity_sens_ = velocity_rpm / 60.0 * 2.0 * M_PI * gear_ratio_;  // unit: rad/s or m/s
     effort_sens_ = current * torque_const_ / gear_ratio_;             // unit: Nm or N
   }

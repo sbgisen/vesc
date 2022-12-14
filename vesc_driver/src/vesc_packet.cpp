@@ -279,7 +279,12 @@ double VescPacketValues::getInputPower() const
  **/
 double VescPacketValues::getPosition() const
 {
-  return readBuffer(TACHOMETER, 4);
+  int tachometer = (int)readBuffer(TACHOMETER, 4);
+  static int tachometer_last = tachometer;
+  static double current_step = 0;
+  current_step += (double)(tachometer - tachometer_last);
+  tachometer_last = tachometer;
+  return current_step;
 }
 
 /**
@@ -288,7 +293,12 @@ double VescPacketValues::getPosition() const
  **/
 double VescPacketValues::getDisplacement() const
 {
-  return readBuffer(TACHOMETER_ABS, 4);
+  int tachometer = (int)readBuffer(TACHOMETER_ABS, 4);
+  static int tachometer_last = tachometer;
+  static double current_step = 0;
+  current_step += (double)(tachometer - tachometer_last);
+  tachometer_last = tachometer;
+  return current_step;
 }
 
 /**

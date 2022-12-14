@@ -46,7 +46,6 @@ void VescWheelController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
   position_sens_ = 0.0;
   velocity_reference_ = 0.0;
   steps_ = 0.0;
-  prev_steps_ = 0.0;
   velocity_sens_ = 0.0;
   effort_sens_ = 0.0;
 
@@ -93,8 +92,8 @@ void VescWheelController::control(const double target_velocity, const double cur
   }
 
   // pid control
-  velocity_sens_ = this->counterTD(current_steps, false) * 2.0 * M_PI / motor_hall_ppr * control_rate_;
-  error_dt_ = target_velocity - velocity_sens_;
+  double current_vel = this->counterTD(current_steps, false) * 2.0 * M_PI / motor_hall_ppr * control_rate_;
+  error_dt_ = target_velocity - current_vel;
   error_ = target_steps_ - current_steps;
   error_integ_prev_ = error_integ_;
   error_integ_ += (error_ / control_rate_);
@@ -232,14 +231,6 @@ double VescWheelController::getEffortSens()
 
 void VescWheelController::controlTimerCallback(const ros::TimerEvent& e)
 {
-  double diff = steps_ - prev_steps_;
-  if (fabs(diff) > num_rotor_pole_pairs_ / 4)
-  {
-    diff = 0;
-    reset_ = true;
-  }
-  position_sens_ += diff / num_rotor_pole_pairs_ * 2.0 * M_PI;
-
   control(velocity_reference_, steps_, reset_);
   interface_ptr_->requestState();
   reset_ = fabs(velocity_reference_) < 0.0001;
@@ -251,10 +242,12 @@ void VescWheelController::updateSensor(const std::shared_ptr<const VescPacket>& 
   {
     std::shared_ptr<VescPacketValues const> values = std::dynamic_pointer_cast<VescPacketValues const>(packet);
     const double current = values->getMotorCurrent();
-    const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_rotor_pole_pairs_);
-    prev_steps_ = steps_;
+    const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_rotor_pole_pairs_) * gear_ratio_;
     steps_ = values->getPosition();
-    effort_sens_ = current * torque_const_ / gear_ratio_;  // unit: Nm or N
+    position_sens_ =
+        (steps_ * 2.0 * M_PI) / (num_rotor_poles_ * num_hall_sensors_) * gear_ratio_;  // convert steps to rad
+    velocity_sens_ = velocity_rpm * 2 * M_PI / 60;                                     // convert rpm to rad/s
+    effort_sens_ = current * torque_const_ / gear_ratio_;                              // unit: Nm or N
   }
 }
 }  // namespace vesc_hw_interface

@@ -298,11 +298,11 @@ void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& 
     std::shared_ptr<VescPacketValues const> values = std::dynamic_pointer_cast<VescPacketValues const>(packet);
     const double current = values->getMotorCurrent();
     const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_rotor_poles_) / 2;
-    const double position_pulse = values->getPosition();
+    const double steps = values->getPosition();
     position_sens_ =
-        position_pulse / (num_hall_sensors_ * num_rotor_poles_) * gear_ratio_ - getZeroPosition();  // unit: rad or m
-    velocity_sens_ = velocity_rpm / 60.0 * 2.0 * M_PI * gear_ratio_;  // unit: rad/s or m/s
-    effort_sens_ = current * torque_const_ / gear_ratio_;             // unit: Nm or N
+        steps / (num_hall_sensors_ * num_rotor_poles_) * gear_ratio_ - getZeroPosition();  // unit: rad or m
+    velocity_sens_ = velocity_rpm / 60.0 * 2.0 * M_PI * gear_ratio_;                       // unit: rad/s or m/s
+    effort_sens_ = current * torque_const_ / gear_ratio_;                                  // unit: Nm or N
   }
   return;
 }

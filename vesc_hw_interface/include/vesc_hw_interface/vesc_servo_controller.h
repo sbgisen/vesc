@@ -39,13 +39,15 @@ public:
   void setTargetPosition(const double position_reference);
   void setGearRatio(const double gear_ratio);
   void setTorqueConst(const double torque_const);
-  void setMotorPolePairs(const int motor_pole_pairs);
+  void setRotorPoles(const int rotor_poles);
+  void setHallSensors(const int hall_sensors);
   double getZeroPosition() const;
   double getPositionSens(void);
   double getVelocitySens(void);
   double getEffortSens(void);
   void executeCalibration();
   void updateSensor(const std::shared_ptr<VescPacket const>&);
+
 private:
   VescInterface* interface_ptr_;
 
@@ -61,14 +63,15 @@ private:
   double Kp_, Ki_, Kd_;
   double control_rate_, control_period_;
   double position_target_;
-  double position_reference_; // limited with speed (speed_limit_)
+  double position_reference_;  // limited with speed (speed_limit_)
   double position_reference_previous_;
   double position_sens_, velocity_sens_, effort_sens_;
   double position_sens_previous_;
   double error_previous_;
   double error_integ_;
   ros::Time time_previous_;
-  int num_motor_pole_pairs_;          // the number of motor pole pairs
+  int num_rotor_poles_;               // the number of rotor poles
+  int num_hall_sensors_;              // the number of hall sensors
   double gear_ratio_, torque_const_;  // physical params.
   double speed_limit_;
   ros::Timer control_timer_;

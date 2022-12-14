@@ -93,10 +93,20 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
   // reads system parameters
   nh.param<double>("gear_ratio", gear_ratio_, 1.0);
   nh.param<double>("torque_const", torque_const_, 1.0);
-  nh.param<int>("num_motor_pole_pairs", num_motor_pole_pairs_, 1);
+  nh.param<int>("num_hall_sensors", num_hall_sensors_, 3);
   ROS_INFO("Gear ratio is set to %f", gear_ratio_);
   ROS_INFO("Torque constant is set to %f", torque_const_);
-  ROS_INFO("The number of motor pole pairs is set to %d", num_motor_pole_pairs_);
+  ROS_INFO("The number of hall sensors is set to %d", num_hall_sensors_);
+
+  // check num of rotor poles
+  nh.param<int>("num_rotor_poles", num_rotor_poles_, 2);
+  ROS_INFO("The number of rotor poles is set to %d", num_rotor_poles_);
+  if (num_rotor_poles_ % 2 != 0)
+  {
+    ROS_ERROR("There should be even number of rotor poles");
+    ros::shutdown();
+    return false;
+  }
 
   // reads driving mode setting
   // - assigns an empty string if param. is not found
@@ -132,7 +142,8 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
     servo_controller_.init(nh, &vesc_interface_);
     servo_controller_.setGearRatio(gear_ratio_);
     servo_controller_.setTorqueConst(torque_const_);
-    servo_controller_.setMotorPolePairs(num_motor_pole_pairs_);
+    servo_controller_.setRotorPoles(num_rotor_poles_);
+    servo_controller_.setHallSensors(num_hall_sensors_);
   }
   else if (command_mode_ == "velocity" || command_mode_ == "velocity_duty")
   {
@@ -147,7 +158,8 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
       wheel_controller_.init(nh, &vesc_interface_);
       wheel_controller_.setGearRatio(gear_ratio_);
       wheel_controller_.setTorqueConst(torque_const_);
-      wheel_controller_.setMotorPolePairs(num_motor_pole_pairs_);
+      wheel_controller_.setRotorPoles(num_rotor_poles_);
+      wheel_controller_.setHallSensors(num_hall_sensors_);
     }
   }
   else if (command_mode_ == "effort" || command_mode_ == "effort_duty")
@@ -222,7 +234,7 @@ void VescHwInterface::write()
 
     // converts the velocity unit: rad/s or m/s -> rpm -> erpm
     const double command_rpm = command_ * 60.0 / 2.0 / M_PI / gear_ratio_;
-    const double command_erpm = command_rpm * static_cast<double>(num_motor_pole_pairs_);
+    const double command_erpm = command_rpm * static_cast<double>(num_rotor_poles_) / 2;
 
     // sends a reference velocity command
     vesc_interface_.setSpeed(command_erpm);
@@ -286,13 +298,13 @@ void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& pa
     std::shared_ptr<VescPacketValues const> values = std::dynamic_pointer_cast<VescPacketValues const>(packet);
 
     const double current = values->getMotorCurrent();
-    const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_motor_pole_pairs_);
+    const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_rotor_poles_) / 2;
     const double position_pulse = values->getPosition();
 
     // 3.0 represents the number of hall sensors
-    position_ = position_pulse / num_motor_pole_pairs_ / 3.0 * gear_ratio_;  // unit: rad or m
-    velocity_ = velocity_rpm / 60.0 * 2.0 * M_PI * gear_ratio_;              // unit: rad/s or m/s
-    effort_ = current * torque_const_ / gear_ratio_;                         // unit: Nm or N
+    position_ = position_pulse / (num_hall_sensors_ * num_rotor_poles_) * gear_ratio_;  // unit: rad or m
+    velocity_ = velocity_rpm / 60.0 * 2.0 * M_PI * gear_ratio_;                         // unit: rad/s or m/s
+    effort_ = current * torque_const_ / gear_ratio_;                                    // unit: Nm or N
   }
 
   return;

@@ -31,11 +31,12 @@ class VescWheelController
 {
 public:
   void init(ros::NodeHandle nh, VescInterface* vesc_interface);
-  void control(const double target_velocity, const double current_pulse, bool reset);
+  void control(const double target_velocity, const double current_steps, bool reset);
   void setTargetVelocity(const double velocity_reference);
   void setGearRatio(const double gear_ratio);
   void setTorqueConst(const double torque_const);
-  void setMotorPolePairs(const int motor_pole_pairs);
+  void setRotorPoles(const int rotor_poles);
+  void setHallSensors(const int hall_sensors);
   double getPositionSens();
   double getVelocitySens();
   double getEffortSens();
@@ -48,7 +49,8 @@ private:
   double i_clamp_;
   bool antiwindup_;
   double duty_limiter_;
-  double num_motor_pole_pairs_;
+  double num_rotor_pole_pairs_, num_rotor_poles_;
+  double num_hall_sensors_;
   double gear_ratio_, torque_const_;
 
   double control_rate_;
@@ -56,13 +58,13 @@ private:
   void controlTimerCallback(const ros::TimerEvent& e);
 
   double velocity_reference_;
-  double position_pulse_, prev_position_pulse_;
+  double steps_;
   double position_sens_;
   double velocity_sens_;
   double effort_sens_;
 
   double error_, error_dt_, error_integ_, error_integ_prev_;
-  double target_pulse_;
+  double target_steps_;
   bool reset_;
 
   double counterTD(const double count_in, bool reset);

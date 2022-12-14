@@ -74,7 +74,7 @@ private:
   double command_;
   double position_, velocity_, effort_;  // joint states
 
-  int num_rotor_pole_pairs_;          // the number of rotor pole pairs
+  int num_rotor_poles_;               // the number of rotor poles
   int num_hall_sensors_;              // the number of hall sensors
   double gear_ratio_, torque_const_;  // physical params.
 

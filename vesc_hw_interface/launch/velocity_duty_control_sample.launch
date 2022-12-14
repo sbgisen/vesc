@@ -10,8 +10,8 @@
       joint_name: vesc_joint
       command_mode: velocity_duty
       joint_type: continuous
-      port: /dev/ttyUSB0
-      num_rotor_pole_pairs: 10
+      port: /dev/ttyACM0
+      num_rotor_poles: 20
       gear_ratio: 0.230769
       torque_const: 1
       motor:

@@ -10,7 +10,7 @@
       joint_name: vesc_joint
       command_mode: position
       port: /dev/ttyUSB0
-      num_rotor_pole_pairs: 10
+      num_rotor_poles: 20
       gear_ratio: 1
       torque_const: 1
       servo/calibration_current: 1.0

@@ -190,11 +190,11 @@ void VescWheelController::setTorqueConst(const double torque_const)
   ROS_INFO("[VescWheelController]Torque constant is set to %f", torque_const_);
 }
 
-void VescWheelController::setRotorPolePairs(const int rotor_pole_pairs)
+void VescWheelController::setRotorPoles(const int rotor_poles)
 {
-  num_rotor_pole_pairs_ = static_cast<double>(rotor_pole_pairs);
-  num_rotor_poles_ = num_rotor_pole_pairs_ * 2;
-  ROS_INFO("[VescWheelController]The number of rotor pole pairs is set to %d", rotor_pole_pairs);
+  num_rotor_poles_ = static_cast<double>(rotor_poles);
+  num_rotor_pole_pairs_ = num_rotor_poles_ / 2;
+  ROS_INFO("[VescWheelController]The number of rotor poles is set to %d", rotor_poles);
 }
 
 void VescWheelController::setHallSensors(const int hall_sensors)

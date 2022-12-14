@@ -39,7 +39,7 @@ public:
   void setTargetPosition(const double position_reference);
   void setGearRatio(const double gear_ratio);
   void setTorqueConst(const double torque_const);
-  void setRotorPolePairs(const int rotor_pole_pairs);
+  void setRotorPoles(const int rotor_poles);
   void setHallSensors(const int hall_sensors);
   double getZeroPosition() const;
   double getPositionSens(void);
@@ -70,7 +70,7 @@ private:
   double error_previous_;
   double error_integ_;
   ros::Time time_previous_;
-  int num_rotor_pole_pairs_;          // the number of rotor pole pairs
+  int num_rotor_poles_;               // the number of rotor poles
   int num_hall_sensors_;              // the number of hall sensors
   double gear_ratio_, torque_const_;  // physical params.
   double speed_limit_;

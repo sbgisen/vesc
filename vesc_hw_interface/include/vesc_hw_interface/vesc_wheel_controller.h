@@ -35,7 +35,7 @@ public:
   void setTargetVelocity(const double velocity_reference);
   void setGearRatio(const double gear_ratio);
   void setTorqueConst(const double torque_const);
-  void setRotorPolePairs(const int rotor_pole_pairs);
+  void setRotorPoles(const int rotor_poles);
   void setHallSensors(const int hall_sensors);
   double getPositionSens();
   double getVelocitySens();

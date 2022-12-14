@@ -45,57 +45,57 @@ void VescWheelController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
   reset_ = true;
   position_sens_ = 0.0;
   velocity_reference_ = 0.0;
-  position_pulse_ = 0.0;
-  prev_position_pulse_ = 0.0;
+  steps_ = 0.0;
+  prev_steps_ = 0.0;
   velocity_sens_ = 0.0;
   effort_sens_ = 0.0;
 
   control_timer_ = nh.createTimer(ros::Duration(1.0 / control_rate_), &VescWheelController::controlTimerCallback, this);
 }
 
-void VescWheelController::control(const double target_velocity, const double current_pulse, bool reset)
+void VescWheelController::control(const double target_velocity, const double current_steps, bool reset)
 {
   const double motor_hall_ppr = num_rotor_pole_pairs_;
   const double count_deviation_limit = num_rotor_pole_pairs_;
 
   if (reset)
   {
-    target_pulse_ = current_pulse;
+    target_steps_ = current_steps;
     error_ = 0.0;
     error_dt_ = 0.0;
     error_integ_ = 0.0;
     error_integ_prev_ = 0.0;
-    this->counterTD(current_pulse, true);
+    this->counterTD(current_steps, true);
   }
   else
   {  // convert rad/s to pulse
-    target_pulse_ += target_velocity * motor_hall_ppr / (2 * M_PI) / control_rate_;
+    target_steps_ += target_velocity * motor_hall_ppr / (2 * M_PI) / control_rate_;
   }
 
   // overflow check
-  if (target_pulse_ > static_cast<double>(LONG_MAX))
+  if (target_steps_ > static_cast<double>(LONG_MAX))
   {
-    target_pulse_ += static_cast<double>(LONG_MIN);
+    target_steps_ += static_cast<double>(LONG_MIN);
   }
-  else if (target_pulse_ < static_cast<double>(LONG_MIN))
+  else if (target_steps_ < static_cast<double>(LONG_MIN))
   {
-    target_pulse_ += static_cast<double>(LONG_MAX);
+    target_steps_ += static_cast<double>(LONG_MAX);
   }
 
   // limit error
-  if (target_pulse_ - current_pulse > count_deviation_limit)
+  if (target_steps_ - current_steps > count_deviation_limit)
   {
-    target_pulse_ = current_pulse + count_deviation_limit;
+    target_steps_ = current_steps + count_deviation_limit;
   }
-  else if (target_pulse_ - current_pulse < -count_deviation_limit)
+  else if (target_steps_ - current_steps < -count_deviation_limit)
   {
-    target_pulse_ = current_pulse - count_deviation_limit;
+    target_steps_ = current_steps - count_deviation_limit;
   }
 
   // pid control
-  velocity_sens_ = this->counterTD(current_pulse, false) * 2.0 * M_PI / motor_hall_ppr * control_rate_;
+  velocity_sens_ = this->counterTD(current_steps, false) * 2.0 * M_PI / motor_hall_ppr * control_rate_;
   error_dt_ = target_velocity - velocity_sens_;
-  error_ = target_pulse_ - current_pulse;
+  error_ = target_steps_ - current_steps;
   error_integ_prev_ = error_integ_;
   error_integ_ += (error_ / control_rate_);
   double duty = (kp_ * error_ + ki_ * error_integ_ + kd_ * error_dt_);
@@ -231,7 +231,7 @@ double VescWheelController::getEffortSens()
 
 void VescWheelController::controlTimerCallback(const ros::TimerEvent& e)
 {
-  double diff = position_pulse_ - prev_position_pulse_;
+  double diff = steps_ - prev_steps_;
   if (fabs(diff) > num_rotor_pole_pairs_ / 4)
   {
     diff = 0;
@@ -239,7 +239,7 @@ void VescWheelController::controlTimerCallback(const ros::TimerEvent& e)
   }
   position_sens_ += diff / num_rotor_pole_pairs_ * 2.0 * M_PI;
 
-  control(velocity_reference_, position_pulse_, reset_);
+  control(velocity_reference_, steps_, reset_);
   interface_ptr_->requestState();
   reset_ = fabs(velocity_reference_) < 0.0001;
 }
@@ -251,8 +251,8 @@ void VescWheelController::updateSensor(const std::shared_ptr<const VescPacket>& 
     std::shared_ptr<VescPacketValues const> values = std::dynamic_pointer_cast<VescPacketValues const>(packet);
     const double current = values->getMotorCurrent();
     const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_rotor_pole_pairs_);
-    prev_position_pulse_ = position_pulse_;
-    position_pulse_ = values->getPosition();
+    prev_steps_ = steps_;
+    steps_ = values->getPosition();
     effort_sens_ = current * torque_const_ / gear_ratio_;  // unit: Nm or N
   }
 }

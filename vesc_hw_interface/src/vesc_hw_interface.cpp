@@ -299,12 +299,11 @@ void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& pa
 
     const double current = values->getMotorCurrent();
     const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_rotor_poles_) / 2;
-    const double position_pulse = values->getPosition();
+    const double steps = values->getPosition();
 
-    // 3.0 represents the number of hall sensors
-    position_ = position_pulse / (num_hall_sensors_ * num_rotor_poles_) * gear_ratio_;  // unit: rad or m
-    velocity_ = velocity_rpm / 60.0 * 2.0 * M_PI * gear_ratio_;                         // unit: rad/s or m/s
-    effort_ = current * torque_const_ / gear_ratio_;                                    // unit: Nm or N
+    position_ = steps / (num_hall_sensors_ * num_rotor_poles_) * gear_ratio_;  // unit: rad or m
+    velocity_ = velocity_rpm / 60.0 * 2.0 * M_PI * gear_ratio_;                // unit: rad/s or m/s
+    effort_ = current * torque_const_ / gear_ratio_;                           // unit: Nm or N
   }
 
   return;

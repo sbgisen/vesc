@@ -11,13 +11,13 @@
       command_mode: velocity_duty
       joint_type: continuous
       port: /dev/ttyUSB0
-      num_rotor_pole_pairs: 258
-      gear_ratio: 1
+      num_rotor_pole_pairs: 10
+      gear_ratio: 0.230769
       torque_const: 1
       motor:
-        Kp: 0.005
-        Ki: 0.005
-        Kd: 0.0025
+        Kp: 0.1
+        Ki: 1.0
+        Kd: 0.01
         i_clamp: 0.2
         duty_limiter: 1.0
         antiwindup: true

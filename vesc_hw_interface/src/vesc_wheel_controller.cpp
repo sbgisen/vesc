@@ -54,9 +54,6 @@ void VescWheelController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
 
 void VescWheelController::control(const double target_velocity, const double current_steps, bool reset)
 {
-  const double motor_hall_ppr = num_rotor_pole_pairs_;
-  const double count_deviation_limit = num_rotor_pole_pairs_;
-
   if (reset)
   {
     target_steps_ = current_steps;
@@ -67,8 +64,9 @@ void VescWheelController::control(const double target_velocity, const double cur
     this->counterTD(current_steps, true);
   }
   else
-  {  // convert rad/s to pulse
-    target_steps_ += target_velocity * motor_hall_ppr / (2 * M_PI) / control_rate_;
+  {  // convert rad/s to steps
+    target_steps_ +=
+        target_velocity * (num_rotor_poles_ * num_hall_sensors_) / (2 * M_PI) / control_rate_ / gear_ratio_;
   }
 
   // overflow check
@@ -81,20 +79,11 @@ void VescWheelController::control(const double target_velocity, const double cur
     target_steps_ += static_cast<double>(LONG_MAX);
   }
 
-  // limit error
-  if (target_steps_ - current_steps > count_deviation_limit)
-  {
-    target_steps_ = current_steps + count_deviation_limit;
-  }
-  else if (target_steps_ - current_steps < -count_deviation_limit)
-  {
-    target_steps_ = current_steps - count_deviation_limit;
-  }
-
   // pid control
-  double current_vel = this->counterTD(current_steps, false) * 2.0 * M_PI / motor_hall_ppr * control_rate_;
+  double current_vel = this->counterTD(current_steps, false) * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_) *
+                       control_rate_ * gear_ratio_;
   error_dt_ = target_velocity - current_vel;
-  error_ = target_steps_ - current_steps;
+  error_ = (target_steps_ - current_steps) * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_);
   error_integ_prev_ = error_integ_;
   error_integ_ += (error_ / control_rate_);
   double duty = (kp_ * error_ + ki_ * error_integ_ + kd_ * error_dt_);
@@ -233,7 +222,7 @@ void VescWheelController::controlTimerCallback(const ros::TimerEvent& e)
 {
   control(velocity_reference_, steps_, reset_);
   interface_ptr_->requestState();
-  reset_ = fabs(velocity_reference_) < 0.0001;
+  reset_ = fabs(velocity_reference_) < 0.0001;  // disable PID control when command is 0
 }
 
 void VescWheelController::updateSensor(const std::shared_ptr<const VescPacket>& packet)

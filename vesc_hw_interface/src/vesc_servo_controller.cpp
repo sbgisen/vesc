@@ -248,14 +248,7 @@ bool VescServoController::calibrate(const double position_current)
 
 bool VescServoController::isSaturated(const double arg) const
 {
-  if (std::abs(arg) > 1.0)
-  {
-    return true;
-  }
-  else
-  {
-    return false;
-  }
+  return std::abs(arg) > 1.0;
 }
 
 double VescServoController::saturate(const double arg) const

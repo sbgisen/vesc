@@ -123,7 +123,7 @@ void VescWheelController::control(const double target_velocity, const double cur
 
   // limit duty value
   duty = std::clamp(duty, -duty_limiter_, duty_limiter_);
-  interface_ptr_->setDutyCycle(fabs(target_velocity) < 0.0001 ? 0.0 : duty);
+  interface_ptr_->setDutyCycle(std::abs(target_velocity) < 0.0001 ? 0.0 : duty);
 }
 
 double VescWheelController::counterTD(const double count_in, bool reset)
@@ -169,7 +169,7 @@ double VescWheelController::counterTD(const double count_in, bool reset)
   counter_td_tmp_[0] = static_cast<double>(counter_changed_log_[0][0] - counter_changed_log_[1][0]) /
                        static_cast<double>(counter_changed_log_[0][1]);
   double output = counter_td_tmp_[0];
-  if (fabs(output) > 100.0)
+  if (std::abs(output) > 100.0)
   {
     output = 0.0;
   }
@@ -225,7 +225,7 @@ void VescWheelController::controlTimerCallback(const ros::TimerEvent& e)
 {
   control(velocity_reference_, static_cast<double>(steps_), reset_);
   interface_ptr_->requestState();
-  reset_ = fabs(velocity_reference_) < 0.0001;  // disable PID control when command is 0
+  reset_ = std::abs(velocity_reference_) < 0.0001;  // disable PID control when command is 0
 }
 
 void VescWheelController::updateSensor(const std::shared_ptr<const VescPacket>& packet)

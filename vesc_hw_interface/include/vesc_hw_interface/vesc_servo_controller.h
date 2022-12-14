@@ -18,7 +18,9 @@
 #define VESC_HW_INTERFACE_VESC_SERVO_CONTROLLER_H_
 
 #include <cmath>
+#include <string>
 
+#include <angles/angles.h>
 #include <ros/ros.h>
 #include <vesc_driver/vesc_interface.h>
 
@@ -41,6 +43,7 @@ public:
   void setTorqueConst(const double torque_const);
   void setRotorPoles(const int rotor_poles);
   void setHallSensors(const int hall_sensors);
+  void setJointType(const std::string joint_type);
   double getZeroPosition() const;
   double getPositionSens(void);
   double getVelocitySens(void);
@@ -72,7 +75,8 @@ private:
   ros::Time time_previous_;
   int num_rotor_poles_;               // the number of rotor poles
   int num_hall_sensors_;              // the number of hall sensors
-  double gear_ratio_, torque_const_;  // physical params.
+  double gear_ratio_, torque_const_;  // physical params
+  std::string joint_type_;            // joint type
   double speed_limit_;
   ros::Timer control_timer_;
 

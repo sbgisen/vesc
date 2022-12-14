@@ -49,7 +49,7 @@ private:
   double i_clamp_;
   bool antiwindup_;
   double duty_limiter_;
-  double num_rotor_pole_pairs_;
+  double num_rotor_pole_pairs_, num_rotor_poles_;
   double num_hall_sensors_;
   double gear_ratio_, torque_const_;
 

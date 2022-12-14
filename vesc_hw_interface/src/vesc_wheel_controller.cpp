@@ -205,6 +205,7 @@ void VescWheelController::setTorqueConst(const double torque_const)
 void VescWheelController::setRotorPolePairs(const int rotor_pole_pairs)
 {
   num_rotor_pole_pairs_ = static_cast<double>(rotor_pole_pairs);
+  num_rotor_poles_ = num_rotor_pole_pairs_ * 2;
   ROS_INFO("[VescWheelController]The number of rotor pole pairs is set to %d", rotor_pole_pairs);
 }
 

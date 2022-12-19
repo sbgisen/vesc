@@ -71,13 +71,15 @@ void VescWheelController::control(const double target_velocity, const double cur
   }
 
   // overflow check
-  if (target_steps_ > std::numeric_limits<int>::max())
+  if ((target_steps_ - current_steps) > std::numeric_limits<int>::max())
   {
-    target_steps_ += std::numeric_limits<int>::min();
+    target_steps_ +=
+        static_cast<double>(std::numeric_limits<int>::min()) - static_cast<double>(std::numeric_limits<int>::max());
   }
-  else if (target_steps_ < std::numeric_limits<int>::min())
+  else if ((target_steps_ - current_steps) < std::numeric_limits<int>::min())
   {
-    target_steps_ += std::numeric_limits<int>::max();
+    target_steps_ +=
+        static_cast<double>(std::numeric_limits<int>::max()) - static_cast<double>(std::numeric_limits<int>::min());
   }
 
   // pid control

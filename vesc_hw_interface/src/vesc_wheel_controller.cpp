@@ -16,7 +16,6 @@
  ********************************************************************/
 
 #include "vesc_hw_interface/vesc_wheel_controller.h"
-#include "ros/forwards.h"
 
 namespace vesc_hw_interface
 {
@@ -72,13 +71,13 @@ void VescWheelController::control(const double target_velocity, const double cur
   }
 
   // overflow check
-  if (target_steps_ > static_cast<double>(LONG_MAX))
+  if (target_steps_ > std::numeric_limits<int>::max())
   {
-    target_steps_ += static_cast<double>(LONG_MIN);
+    target_steps_ += std::numeric_limits<int>::min();
   }
-  else if (target_steps_ < static_cast<double>(LONG_MIN))
+  else if (target_steps_ < std::numeric_limits<int>::min())
   {
-    target_steps_ += static_cast<double>(LONG_MAX);
+    target_steps_ += std::numeric_limits<int>::max();
   }
 
   // pid control
@@ -222,7 +221,7 @@ double VescWheelController::getEffortSens()
 
 void VescWheelController::controlTimerCallback(const ros::TimerEvent& e)
 {
-  control(velocity_reference_, steps_, reset_);
+  control(velocity_reference_, static_cast<double>(steps_), reset_);
   interface_ptr_->requestState();
   reset_ = fabs(velocity_reference_) < 0.0001;  // disable PID control when command is 0
 }

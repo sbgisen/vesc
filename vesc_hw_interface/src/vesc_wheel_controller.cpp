@@ -235,17 +235,17 @@ void VescWheelController::updateSensor(const std::shared_ptr<const VescPacket>& 
     const double current = values->getMotorCurrent();
     const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_rotor_pole_pairs_) * gear_ratio_;
     prev_steps_ = steps_;
-    steps_ = values->getPosition();
+    steps_ = static_cast<int>(values->getPosition());
     if (initialize_)
     {
       prev_steps_ = steps_;
       initialize_ = false;
     }
 
-    position_sens_ += ((steps_ - prev_steps_) * 2.0 * M_PI) / (num_rotor_poles_ * num_hall_sensors_) *
-                      gear_ratio_;                         // convert steps to rad
-    velocity_sens_ = velocity_rpm * 2 * M_PI / 60;         // convert rpm to rad/s
-    effort_sens_ = current * torque_const_ / gear_ratio_;  // unit: Nm or N
+    position_sens_ += (static_cast<double>(steps_ - prev_steps_) * 2.0 * M_PI) /
+                      (num_rotor_poles_ * num_hall_sensors_) * gear_ratio_;  // convert steps to rad
+    velocity_sens_ = velocity_rpm * 2 * M_PI / 60;                           // convert rpm to rad/s
+    effort_sens_ = current * torque_const_ / gear_ratio_;                    // unit: Nm or N
   }
 }
 }  // namespace vesc_hw_interface

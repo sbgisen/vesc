@@ -58,8 +58,8 @@ private:
   void controlTimerCallback(const ros::TimerEvent& e);
 
   double velocity_reference_;
-  double steps_;
-  double prev_steps_;
+  int steps_;
+  int prev_steps_;
   double position_sens_;
   double velocity_sens_;
   double effort_sens_;

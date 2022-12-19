@@ -43,9 +43,11 @@ void VescWheelController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
   ROS_INFO("[Motor Gains] I clamp: %f, Antiwindup: %s", i_clamp_, antiwindup_ ? "true" : "false");
 
   reset_ = true;
+  initialize_ = true;
   position_sens_ = 0.0;
   velocity_reference_ = 0.0;
   steps_ = 0.0;
+  prev_steps_ = 0.0;
   velocity_sens_ = 0.0;
   effort_sens_ = 0.0;
 
@@ -232,11 +234,18 @@ void VescWheelController::updateSensor(const std::shared_ptr<const VescPacket>& 
     std::shared_ptr<VescPacketValues const> values = std::dynamic_pointer_cast<VescPacketValues const>(packet);
     const double current = values->getMotorCurrent();
     const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_rotor_pole_pairs_) * gear_ratio_;
+    prev_steps_ = steps_;
     steps_ = values->getPosition();
-    position_sens_ =
-        (steps_ * 2.0 * M_PI) / (num_rotor_poles_ * num_hall_sensors_) * gear_ratio_;  // convert steps to rad
-    velocity_sens_ = velocity_rpm * 2 * M_PI / 60;                                     // convert rpm to rad/s
-    effort_sens_ = current * torque_const_ / gear_ratio_;                              // unit: Nm or N
+    if (initialize_)
+    {
+      prev_steps_ = steps_;
+      initialize_ = false;
+    }
+
+    position_sens_ += ((steps_ - prev_steps_) * 2.0 * M_PI) / (num_rotor_poles_ * num_hall_sensors_) *
+                      gear_ratio_;                         // convert steps to rad
+    velocity_sens_ = velocity_rpm * 2 * M_PI / 60;         // convert rpm to rad/s
+    effort_sens_ = current * torque_const_ / gear_ratio_;  // unit: Nm or N
   }
 }
 }  // namespace vesc_hw_interface

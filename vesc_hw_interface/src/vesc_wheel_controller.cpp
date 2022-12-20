@@ -16,7 +16,6 @@
  ********************************************************************/
 
 #include "vesc_hw_interface/vesc_wheel_controller.h"
-#include "ros/forwards.h"
 
 namespace vesc_hw_interface
 {
@@ -43,9 +42,11 @@ void VescWheelController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
   ROS_INFO("[Motor Gains] I clamp: %f, Antiwindup: %s", i_clamp_, antiwindup_ ? "true" : "false");
 
   reset_ = true;
+  initialize_ = true;
   position_sens_ = 0.0;
   velocity_reference_ = 0.0;
   steps_ = 0.0;
+  prev_steps_ = 0.0;
   velocity_sens_ = 0.0;
   effort_sens_ = 0.0;
 
@@ -70,13 +71,15 @@ void VescWheelController::control(const double target_velocity, const double cur
   }
 
   // overflow check
-  if (target_steps_ > static_cast<double>(LONG_MAX))
+  if ((target_steps_ - current_steps) > std::numeric_limits<int>::max())
   {
-    target_steps_ += static_cast<double>(LONG_MIN);
+    target_steps_ +=
+        static_cast<double>(std::numeric_limits<int>::min()) - static_cast<double>(std::numeric_limits<int>::max());
   }
-  else if (target_steps_ < static_cast<double>(LONG_MIN))
+  else if ((target_steps_ - current_steps) < std::numeric_limits<int>::min())
   {
-    target_steps_ += static_cast<double>(LONG_MAX);
+    target_steps_ +=
+        static_cast<double>(std::numeric_limits<int>::max()) - static_cast<double>(std::numeric_limits<int>::min());
   }
 
   // pid control
@@ -220,7 +223,7 @@ double VescWheelController::getEffortSens()
 
 void VescWheelController::controlTimerCallback(const ros::TimerEvent& e)
 {
-  control(velocity_reference_, steps_, reset_);
+  control(velocity_reference_, static_cast<double>(steps_), reset_);
   interface_ptr_->requestState();
   reset_ = fabs(velocity_reference_) < 0.0001;  // disable PID control when command is 0
 }
@@ -232,11 +235,18 @@ void VescWheelController::updateSensor(const std::shared_ptr<const VescPacket>& 
     std::shared_ptr<VescPacketValues const> values = std::dynamic_pointer_cast<VescPacketValues const>(packet);
     const double current = values->getMotorCurrent();
     const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_rotor_pole_pairs_) * gear_ratio_;
-    steps_ = values->getPosition();
-    position_sens_ =
-        (steps_ * 2.0 * M_PI) / (num_rotor_poles_ * num_hall_sensors_) * gear_ratio_;  // convert steps to rad
-    velocity_sens_ = velocity_rpm * 2 * M_PI / 60;                                     // convert rpm to rad/s
-    effort_sens_ = current * torque_const_ / gear_ratio_;                              // unit: Nm or N
+    prev_steps_ = steps_;
+    steps_ = static_cast<int>(values->getPosition());
+    if (initialize_)
+    {
+      prev_steps_ = steps_;
+      initialize_ = false;
+    }
+
+    position_sens_ += (static_cast<double>(steps_ - prev_steps_) * 2.0 * M_PI) /
+                      (num_rotor_poles_ * num_hall_sensors_) * gear_ratio_;  // convert steps to rad
+    velocity_sens_ = velocity_rpm * 2 * M_PI / 60;                           // convert rpm to rad/s
+    effort_sens_ = current * torque_const_ / gear_ratio_;                    // unit: Nm or N
   }
 }
 }  // namespace vesc_hw_interface

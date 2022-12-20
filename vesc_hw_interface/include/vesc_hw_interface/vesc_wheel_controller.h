@@ -58,7 +58,8 @@ private:
   void controlTimerCallback(const ros::TimerEvent& e);
 
   double velocity_reference_;
-  double steps_;
+  int steps_;
+  int prev_steps_;
   double position_sens_;
   double velocity_sens_;
   double effort_sens_;
@@ -66,6 +67,7 @@ private:
   double error_, error_dt_, error_integ_, error_integ_prev_;
   double target_steps_;
   bool reset_;
+  bool initialize_;
 
   double counterTD(const double count_in, bool reset);
   uint16_t counter_changed_log_[10][2];

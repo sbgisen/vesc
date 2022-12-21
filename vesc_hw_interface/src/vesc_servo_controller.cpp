@@ -1,5 +1,5 @@
 /*********************************************************************
- * Copyright (c) 2019, SoftBank Corp.
+ * Copyright (c) 2022, SoftBank Corp.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,8 +40,11 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
   }
 
   calibration_flag_ = true;
+  initialize_ = true;
   zero_position_ = 0.0;
   error_integ_ = 0.0;
+  prev_steps_ = 0;
+  position_steps_ = 0;
 
   // reads parameters
   nh.param("servo/Kp", Kp_, 50.0);
@@ -291,11 +294,19 @@ void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& 
     std::shared_ptr<VescPacketValues const> values = std::dynamic_pointer_cast<VescPacketValues const>(packet);
     const double current = values->getMotorCurrent();
     const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_rotor_poles_) / 2;
-    const double steps = values->getPosition();
+    const int steps = static_cast<int>(values->getPosition());
+    if (initialize_)
+    {
+      prev_steps_ = steps;
+      initialize_ = false;
+    }
+    position_steps_ += static_cast<double>(steps - prev_steps_);
+    prev_steps_ = steps;
+
     position_sens_ =
-        steps / (num_hall_sensors_ * num_rotor_poles_) * gear_ratio_ - getZeroPosition();  // unit: rad or m
-    velocity_sens_ = velocity_rpm / 60.0 * 2.0 * M_PI * gear_ratio_;                       // unit: rad/s or m/s
-    effort_sens_ = current * torque_const_ / gear_ratio_;                                  // unit: Nm or N
+        position_steps_ / (num_hall_sensors_ * num_rotor_poles_) * gear_ratio_ - getZeroPosition();  // unit: revolution
+    velocity_sens_ = velocity_rpm / 60.0 * 2.0 * M_PI * gear_ratio_;                                 // unit: rad/s
+    effort_sens_ = current * torque_const_ / gear_ratio_;
   }
   return;
 }

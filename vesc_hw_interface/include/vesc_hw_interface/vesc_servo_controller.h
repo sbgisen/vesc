@@ -79,6 +79,9 @@ private:
   std::string joint_type_;            // joint type
   double speed_limit_;
   ros::Timer control_timer_;
+  double position_steps_;
+  int prev_steps_;
+  bool initialize_;
 
   bool calibrate(const double);
   bool isSaturated(const double) const;

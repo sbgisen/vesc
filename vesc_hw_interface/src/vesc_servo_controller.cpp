@@ -319,17 +319,19 @@ void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& 
     velocity_sens_ = velocity_rpm / 60.0 * 2.0 * M_PI * gear_ratio_;                                 // unit: rad/s
     effort_sens_ = current * torque_const_ / gear_ratio_;
 
-    if (joint_type_ == "revolute")
-    {
-      position_sens_ = angles::normalize_angle(position_sens_ * 2 * M_PI);  // convert to radians
-    }
-    else if (joint_type_ == "continuous")
-    {
-      position_sens_ = position_sens_ * 2 * M_PI;  // convert to radians
-    }
-    else if (joint_type_ == "prismatic")
-    {
-      position_sens_ = position_sens_ * screw_lead_;
+    if (!calibration_flag_){
+      if (joint_type_ == "revolute")
+      {
+        position_sens_ = angles::normalize_angle(position_sens_ * 2 * M_PI);  // convert to radians
+      }
+      else if (joint_type_ == "continuous")
+      {
+        position_sens_ = position_sens_ * 2 * M_PI;  // convert to radians
+      }
+      else if (joint_type_ == "prismatic")
+      {
+        position_sens_ = position_sens_ * screw_lead_;
+      }
     }
   }
   return;

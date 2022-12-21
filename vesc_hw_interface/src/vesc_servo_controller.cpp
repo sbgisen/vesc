@@ -170,6 +170,12 @@ void VescServoController::setJointType(const std::string joint_type)
   ROS_INFO("[VescServoController]Joint type is set to %s", joint_type_.data());
 }
 
+void VescServoController::setScrewLead(const double screw_lead)
+{
+  screw_lead_ = screw_lead;
+  ROS_INFO("[VescServoController]Screw lead is set to %f", screw_lead_);
+}
+
 double VescServoController::getZeroPosition() const
 {
   return zero_position_;
@@ -313,13 +319,17 @@ void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& 
     velocity_sens_ = velocity_rpm / 60.0 * 2.0 * M_PI * gear_ratio_;                                 // unit: rad/s
     effort_sens_ = current * torque_const_ / gear_ratio_;
 
-    if (!calibration_flag_ && joint_type_ == "revolute")
+    if (joint_type_ == "revolute")
     {
       position_sens_ = angles::normalize_angle(position_sens_ * 2 * M_PI);  // convert to radians
     }
-    else if (!calibration_flag_ && joint_type_ == "continuous")
+    else if (joint_type_ == "continuous")
     {
       position_sens_ = position_sens_ * 2 * M_PI;  // convert to radians
+    }
+    else if (joint_type_ == "prismatic")
+    {
+      position_sens_ = position_sens_ * screw_lead_;
     }
   }
   return;

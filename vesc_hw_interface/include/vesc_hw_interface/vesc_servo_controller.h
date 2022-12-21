@@ -40,6 +40,7 @@ public:
   void control(const double, const double);
   void setTargetPosition(const double position_reference);
   void setGearRatio(const double gear_ratio);
+  void setScrewLead(const double screw_lead);
   void setTorqueConst(const double torque_const);
   void setRotorPoles(const int rotor_poles);
   void setHallSensors(const int hall_sensors);
@@ -73,10 +74,10 @@ private:
   double error_previous_;
   double error_integ_;
   ros::Time time_previous_;
-  int num_rotor_poles_;               // the number of rotor poles
-  int num_hall_sensors_;              // the number of hall sensors
-  double gear_ratio_, torque_const_;  // physical params
-  std::string joint_type_;            // joint type
+  int num_rotor_poles_;                            // the number of rotor poles
+  int num_hall_sensors_;                           // the number of hall sensors
+  double gear_ratio_, torque_const_, screw_lead_;  // physical params
+  std::string joint_type_;                         // joint type
   double speed_limit_;
   ros::Timer control_timer_;
   double position_steps_;

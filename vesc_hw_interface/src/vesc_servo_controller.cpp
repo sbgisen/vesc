@@ -45,6 +45,8 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
   error_integ_ = 0.0;
   prev_steps_ = 0;
   position_steps_ = 0;
+  calibration_steps_ = 0;
+  calibration_previous_position_ = 0.0;
 
   // reads parameters
   nh.param("servo/Kp", Kp_, 50.0);
@@ -194,9 +196,6 @@ void VescServoController::executeCalibration()
 
 bool VescServoController::calibrate(const double position_current)
 {
-  static double position_previous;
-  static uint16_t step = 0;
-
   // sends a command for calibration
   if (calibration_mode_ == CURRENT)
   {
@@ -212,14 +211,14 @@ bool VescServoController::calibrate(const double position_current)
     return false;
   }
 
-  step++;
+  calibration_steps_++;
 
-  if (step % 20 == 0)
+  if (calibration_steps_ % 20 == 0)
   {
-    if (position_current == position_previous)
+    if (position_current == calibration_previous_position_)
     {
       // finishes calibrating
-      step = 0;
+      calibration_steps_ = 0;
       zero_position_ = position_current - calibration_position_;
       position_sens_ = calibration_position_;
       position_sens_previous_ = calibration_position_;
@@ -232,7 +231,7 @@ bool VescServoController::calibrate(const double position_current)
     }
     else
     {
-      position_previous = position_current;
+      calibration_previous_position_ = position_current;
       return false;
     }
   }

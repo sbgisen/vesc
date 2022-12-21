@@ -78,6 +78,8 @@ private:
   double position_steps_;
   int prev_steps_;
   bool initialize_;
+  int calibration_steps_;
+  double calibration_previous_position_;
 
   bool calibrate(const double);
   bool isSaturated(const double) const;

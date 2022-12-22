@@ -19,7 +19,9 @@
 
 #include <cmath>
 
+#include <angles/angles.h>
 #include <ros/ros.h>
+#include <urdf_model/joint.h>
 #include <vesc_driver/vesc_interface.h>
 
 namespace vesc_hw_interface

@@ -314,19 +314,22 @@ void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& 
     prev_steps_ = steps;
 
     position_sens_ = position_steps_ / (num_hall_sensors_ * num_rotor_poles_) * gear_ratio_;  // unit: revolution
-    velocity_sens_ = velocity_rpm / 60.0 * 2.0 * M_PI * gear_ratio_;                          // unit: rad/s
+    velocity_sens_ = velocity_rpm * gear_ratio_;                                              // unit: rpm
     effort_sens_ = current * torque_const_ / gear_ratio_;
 
     switch (joint_type_)
     {
       case urdf::Joint::REVOLUTE:
         position_sens_ = angles::normalize_angle(position_sens_ * 2.0 * M_PI);  // unit: rad
+        velocity_sens_ = velocity_sens_ / 60.0 * 2.0 * M_PI;                    // unit: rad/s
         break;
       case urdf::Joint::CONTINUOUS:
-        position_sens_ = position_sens_ * 2.0 * M_PI;  // unit: rad
+        position_sens_ = position_sens_ * 2.0 * M_PI;         // unit: rad
+        velocity_sens_ = velocity_sens_ / 60.0 * 2.0 * M_PI;  // unit: rad/s
         break;
       case urdf::Joint::PRISMATIC:
-        position_sens_ = position_sens_ * screw_lead_;  // unit: m
+        position_sens_ = position_sens_ * screw_lead_;         // unit: m
+        velocity_sens_ = velocity_sens_ / 60.0 * screw_lead_;  // unit: m/s
         break;
     }
 

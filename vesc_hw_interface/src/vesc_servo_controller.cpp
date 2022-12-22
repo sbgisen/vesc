@@ -76,7 +76,7 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
 
 void VescServoController::control(const double position_reference, const double position_current)
 {
-  // executes caribration
+  // executes calibration
   if (calibration_flag_)
   {
     calibrate(position_current);

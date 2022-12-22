@@ -72,7 +72,7 @@ private:
   ros::Time time_previous_;
   int num_rotor_poles_;               // the number of rotor poles
   int num_hall_sensors_;              // the number of hall sensors
-  double gear_ratio_, torque_const_;  // physical params.
+  double gear_ratio_, torque_const_;  // physical params
   double speed_limit_;
   ros::Timer control_timer_;
 

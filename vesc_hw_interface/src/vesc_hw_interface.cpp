@@ -94,9 +94,11 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
   nh.param<double>("gear_ratio", gear_ratio_, 1.0);
   nh.param<double>("torque_const", torque_const_, 1.0);
   nh.param<int>("num_hall_sensors", num_hall_sensors_, 3);
+  nh.param<double>("screw_lead", screw_lead_, 1.0);
   ROS_INFO("Gear ratio is set to %f", gear_ratio_);
   ROS_INFO("Torque constant is set to %f", torque_const_);
   ROS_INFO("The number of hall sensors is set to %d", num_hall_sensors_);
+  ROS_INFO("Screw lead is set to %f", screw_lead_);
 
   // check num of rotor poles
   nh.param<int>("num_rotor_poles", num_rotor_poles_, 2);
@@ -159,6 +161,7 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
     servo_controller_.setRotorPoles(num_rotor_poles_);
     servo_controller_.setHallSensors(num_hall_sensors_);
     servo_controller_.setJointType(joint_type_);
+    servo_controller_.setScrewLead(screw_lead_);
   }
   else if (command_mode_ == "velocity" || command_mode_ == "velocity_duty")
   {

@@ -42,6 +42,7 @@ public:
   void setRotorPoles(const int rotor_poles);
   void setHallSensors(const int hall_sensors);
   void setJointType(const int joint_type);
+  void setScrewLead(const double screw_lead);
   double getZeroPosition() const;
   double getPositionSens(void);
   double getVelocitySens(void);
@@ -74,6 +75,7 @@ private:
   int num_rotor_poles_;               // the number of rotor poles
   int num_hall_sensors_;              // the number of hall sensors
   double gear_ratio_, torque_const_;  // physical params
+  double screw_lead_;                 // linear distance (m) of 1 revolution
   int joint_type_;
   double speed_limit_;
   ros::Timer control_timer_;

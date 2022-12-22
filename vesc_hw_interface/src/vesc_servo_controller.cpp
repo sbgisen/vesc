@@ -169,6 +169,12 @@ void VescServoController::setJointType(const int joint_type)
   joint_type_ = joint_type;
 }
 
+void VescServoController::setScrewLead(const double screw_lead)
+{
+  screw_lead_ = screw_lead;
+  ROS_INFO("[VescServoController]Screw lead is set to %f", screw_lead_);
+}
+
 double VescServoController::getZeroPosition() const
 {
   return zero_position_;

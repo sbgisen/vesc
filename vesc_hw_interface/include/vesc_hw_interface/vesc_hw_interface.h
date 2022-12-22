@@ -69,7 +69,8 @@ private:
   VescServoController servo_controller_;
   VescWheelController wheel_controller_;
 
-  std::string joint_name_, command_mode_, joint_type_;
+  std::string joint_name_, command_mode_;
+  int joint_type_;
 
   double command_;
   double position_, velocity_, effort_;  // joint states

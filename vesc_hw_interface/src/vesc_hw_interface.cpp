@@ -158,6 +158,7 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
     servo_controller_.setTorqueConst(torque_const_);
     servo_controller_.setRotorPoles(num_rotor_poles_);
     servo_controller_.setHallSensors(num_hall_sensors_);
+    servo_controller_.setJointType(joint_type_);
   }
   else if (command_mode_ == "velocity" || command_mode_ == "velocity_duty")
   {

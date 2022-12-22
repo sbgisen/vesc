@@ -164,6 +164,11 @@ void VescServoController::setHallSensors(const int hall_sensors)
   ROS_INFO("[VescServoController]The number of hall sensors is set to %d", num_hall_sensors_);
 }
 
+void VescServoController::setJointType(const int joint_type)
+{
+  joint_type_ = joint_type;
+}
+
 double VescServoController::getZeroPosition() const
 {
   return zero_position_;

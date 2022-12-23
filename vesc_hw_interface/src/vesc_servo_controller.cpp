@@ -309,9 +309,6 @@ void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& 
     switch (joint_type_)
     {
       case urdf::Joint::REVOLUTE:
-        position_sens_ = angles::normalize_angle(position_sens_ * 2.0 * M_PI);  // unit: rad
-        velocity_sens_ = velocity_sens_ / 60.0 * 2.0 * M_PI;                    // unit: rad/s
-        break;
       case urdf::Joint::CONTINUOUS:
         position_sens_ = position_sens_ * 2.0 * M_PI;         // unit: rad
         velocity_sens_ = velocity_sens_ / 60.0 * 2.0 * M_PI;  // unit: rad/s

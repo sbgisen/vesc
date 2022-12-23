@@ -226,7 +226,7 @@ bool VescServoController::calibrate(const double position_current)
 
   if (calibration_steps_ % 20 == 0)
   {
-    if (position_current == calibration_previous_position_)
+    if (std::abs(position_current - calibration_previous_position_) <= std::numeric_limits<double>::epsilon())
     {
       // finishes calibrating
       calibration_steps_ = 0;

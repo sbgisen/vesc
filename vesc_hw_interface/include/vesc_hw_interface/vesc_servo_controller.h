@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 
 #include <angles/angles.h>
 #include <ros/ros.h>

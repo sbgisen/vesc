@@ -88,7 +88,6 @@ void VescServoController::control(const double position_reference, const double 
     // initializes/resets control variables
     time_previous_ = ros::Time::now();
     position_sens_previous_ = position_current;
-    position_reference_ = calibration_position_;
     position_reference_previous_ = calibration_position_;
     error_previous_ = 0.0;
     return;
@@ -231,11 +230,7 @@ bool VescServoController::calibrate(const double position_current)
       // finishes calibrating
       calibration_steps_ = 0;
       zero_position_ = position_current - calibration_position_;
-      position_sens_ = calibration_position_;
-      position_sens_previous_ = calibration_position_;
       position_target_ = calibration_position_;
-      position_reference_ = calibration_position_;
-      position_reference_previous_ = calibration_position_;
       ROS_INFO("Calibration Finished");
       calibration_flag_ = false;
       return true;

@@ -17,6 +17,7 @@
 #ifndef VESC_HW_INTERFACE_VESC_SERVO_CONTROLLER_H_
 #define VESC_HW_INTERFACE_VESC_SERVO_CONTROLLER_H_
 
+#include <algorithm>
 #include <cmath>
 
 #include <angles/angles.h>

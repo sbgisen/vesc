@@ -260,18 +260,7 @@ bool VescServoController::isSaturated(const double arg) const
 
 double VescServoController::saturate(const double arg) const
 {
-  if (arg > 1.0)
-  {
-    return 1.0;
-  }
-  else if (arg < -1.0)
-  {
-    return -1.0;
-  }
-  else
-  {
-    return arg;
-  }
+  return std::clamp(arg, -1.0, 1.0);
 }
 
 void VescServoController::updateSpeedLimitedPositionReference(void)

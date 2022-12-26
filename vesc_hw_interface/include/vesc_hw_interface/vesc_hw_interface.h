@@ -64,17 +64,26 @@ public:
   void write(const ros::Time&, const ros::Duration&);
   ros::Time getTime() const;
   ros::Duration getPeriod() const;
+  double getZeroPosition();
 
 private:
   VescInterface vesc_interface_;
   VescServoController servo_controller_;
   VescWheelController wheel_controller_;
 
+  bool initialize_;
+  double position_steps_;
+  int prev_steps_;
+  double control_rate_;
+  ros::Timer control_timer_;
+
   std::string joint_name_, command_mode_;
   int joint_type_;
 
   double command_;
   double position_, velocity_, effort_;  // joint states
+  double vesc_command_;
+  double vesc_position_, vesc_velocity_, vesc_effort_;
 
   int num_rotor_poles_;               // the number of rotor poles
   int num_hall_sensors_;              // the number of hall sensors
@@ -93,6 +102,7 @@ private:
 
   void packetCallback(const std::shared_ptr<VescPacket const>&);
   void errorCallback(const std::string&);
+  void controlTimerCallback(const ros::TimerEvent& e);
 };
 
 }  // namespace vesc_hw_interface

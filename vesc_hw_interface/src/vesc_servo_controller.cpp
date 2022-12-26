@@ -18,7 +18,7 @@
 
 namespace vesc_hw_interface
 {
-VescServoController::VescServoController() : gear_ratio_(1.0), torque_const_(1.0), num_rotor_poles_(1)
+VescServoController::VescServoController()
 {
 }
 
@@ -40,20 +40,15 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
   }
 
   calibration_flag_ = true;
-  initialize_ = true;
   zero_position_ = 0.0;
   error_integ_ = 0.0;
-  prev_steps_ = 0;
-  position_steps_ = 0;
   calibration_steps_ = 0;
   calibration_previous_position_ = 0.0;
 
   // reads parameters
-  nh.param("servo/Kp", Kp_, 50.0);
+  nh.param("servo/Kp", Kp_, 1.0);
   nh.param("servo/Ki", Ki_, 0.0);
-  nh.param("servo/Kd", Kd_, 1.0);
-  nh.param("servo/control_rate", control_rate_, 100.0);
-  control_period_ = 1.0 / control_rate_;
+  nh.param("servo/Kd", Kd_, 0.0);
   nh.param("servo/calibration_current", calibration_current_, 6.0);
   nh.param("servo/calibration_duty", calibration_duty_, 0.1);
   nh.param<std::string>("servo/calibration_mode", calibration_mode_, "current");
@@ -74,13 +69,13 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
   {
     ROS_ERROR("[Servo Calibration] Invalid mode");
   }
-  // Create timer callback for PID servo control
-  control_timer_ = nh.createTimer(ros::Duration(control_period_), &VescServoController::controlTimerCallback, this);
   return;
 }
 
 void VescServoController::control(const double position_reference, const double position_current)
 {
+  double position_target = updateSpeedLimitedPositionReference(position_reference);
+
   // executes calibration
   if (calibration_flag_)
   {
@@ -95,7 +90,7 @@ void VescServoController::control(const double position_reference, const double 
 
   const ros::Time time_current = ros::Time::now();
   // calculates PD control
-  const double error_current = position_reference - position_current;
+  const double error_current = position_target - position_current;
   const double u_pd = Kp_ * error_current + Kd_ * (error_current - error_previous_) / control_period_;
 
   double u = 0.0;
@@ -127,75 +122,32 @@ void VescServoController::control(const double position_reference, const double 
   error_previous_ = error_current;
   time_previous_ = time_current;
   position_sens_previous_ = position_current;
-  position_reference_previous_ = position_reference;
+  position_reference_previous_ = position_target;
 
   // command duty
   interface_ptr_->setDutyCycle(u);
   return;
 }
 
-void VescServoController::setTargetPosition(const double position)
+void VescServoController::setControlRate(const double control_rate)
 {
-  position_target_ = position;
+  control_rate_ = control_rate;
+  control_period_ = 1 / control_rate;
 }
 
-void VescServoController::setGearRatio(const double gear_ratio)
+bool VescServoController::isCalibrating()
 {
-  gear_ratio_ = gear_ratio;
-  ROS_INFO("[VescServoController]Gear ratio is set to %f", gear_ratio_);
+  return calibration_flag_;
 }
 
-void VescServoController::setTorqueConst(const double torque_const)
+double VescServoController::getCalibratingPosition() const
 {
-  torque_const_ = torque_const;
-  ROS_INFO("[VescServoController]Torque constant is set to %f", torque_const_);
-}
-
-void VescServoController::setRotorPoles(const int rotor_poles)
-{
-  num_rotor_poles_ = rotor_poles;
-  ROS_INFO("[VescServoController]The number of rotor pole is set to %d", num_rotor_poles_);
-}
-
-void VescServoController::setHallSensors(const int hall_sensors)
-{
-  num_hall_sensors_ = hall_sensors;
-  ROS_INFO("[VescServoController]The number of hall sensors is set to %d", num_hall_sensors_);
-}
-
-void VescServoController::setJointType(const int joint_type)
-{
-  joint_type_ = joint_type;
-}
-
-void VescServoController::setScrewLead(const double screw_lead)
-{
-  screw_lead_ = screw_lead;
-  ROS_INFO("[VescServoController]Screw lead is set to %f", screw_lead_);
+  return calibration_position_;
 }
 
 double VescServoController::getZeroPosition() const
 {
   return zero_position_;
-}
-
-double VescServoController::getPositionSens(void)
-{
-  if (calibration_flag_)
-  {
-    return calibration_position_;
-  }
-  return position_sens_;
-}
-
-double VescServoController::getVelocitySens(void)
-{
-  return velocity_sens_;
-}
-
-double VescServoController::getEffortSens(void)
-{
-  return effort_sens_;
 }
 
 void VescServoController::executeCalibration()
@@ -230,7 +182,6 @@ bool VescServoController::calibrate(const double position_current)
       // finishes calibrating
       calibration_steps_ = 0;
       zero_position_ = position_current - calibration_position_;
-      position_target_ = calibration_position_;
       ROS_INFO("Calibration Finished");
       calibration_flag_ = false;
       return true;
@@ -258,64 +209,20 @@ double VescServoController::saturate(const double arg) const
   return std::clamp(arg, -1.0, 1.0);
 }
 
-void VescServoController::updateSpeedLimitedPositionReference(void)
+double VescServoController::updateSpeedLimitedPositionReference(double position_target)
 {
-  if (position_target_ > (position_reference_previous_ + speed_limit_ * control_period_))
+  if (position_target > (position_reference_previous_ + speed_limit_ * control_period_))
   {
-    position_reference_ = position_reference_previous_ + speed_limit_ * control_period_;
+    return position_reference_previous_ + speed_limit_ * control_period_;
   }
-  else if (position_target_ < (position_reference_previous_ - speed_limit_ * control_period_))
+  else if (position_target < (position_reference_previous_ - speed_limit_ * control_period_))
   {
-    position_reference_ = position_reference_previous_ - speed_limit_ * control_period_;
+    return position_reference_previous_ - speed_limit_ * control_period_;
   }
   else
   {
-    position_reference_ = position_target_;
+    return position_target;
   }
 }
 
-void VescServoController::controlTimerCallback(const ros::TimerEvent& e)
-{
-  updateSpeedLimitedPositionReference();
-  control(position_reference_, position_sens_);
-  interface_ptr_->requestState();
-}
-
-void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& packet)
-{
-  if (packet->getName() == "Values")
-  {
-    std::shared_ptr<VescPacketValues const> values = std::dynamic_pointer_cast<VescPacketValues const>(packet);
-    const double current = values->getMotorCurrent();
-    const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_rotor_poles_) / 2;
-    const int steps = static_cast<int>(values->getPosition());
-    if (initialize_)
-    {
-      prev_steps_ = steps;
-      initialize_ = false;
-    }
-    position_steps_ += static_cast<double>(steps - prev_steps_);
-    prev_steps_ = steps;
-
-    position_sens_ = position_steps_ / (num_hall_sensors_ * num_rotor_poles_) * gear_ratio_;  // unit: revolution
-    velocity_sens_ = velocity_rpm * gear_ratio_;                                              // unit: rpm
-    effort_sens_ = current * torque_const_ / gear_ratio_;
-
-    switch (joint_type_)
-    {
-      case urdf::Joint::REVOLUTE:
-      case urdf::Joint::CONTINUOUS:
-        position_sens_ = position_sens_ * 2.0 * M_PI;         // unit: rad
-        velocity_sens_ = velocity_sens_ / 60.0 * 2.0 * M_PI;  // unit: rad/s
-        break;
-      case urdf::Joint::PRISMATIC:
-        position_sens_ = position_sens_ * screw_lead_;         // unit: m
-        velocity_sens_ = velocity_sens_ / 60.0 * screw_lead_;  // unit: m/s
-        break;
-    }
-
-    position_sens_ -= getZeroPosition();
-  }
-  return;
-}
 }  // namespace vesc_hw_interface

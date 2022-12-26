@@ -15,6 +15,9 @@
  ********************************************************************/
 
 #include "vesc_hw_interface/vesc_hw_interface.h"
+#include <urdf_model/joint.h>
+#include <cmath>
+#include "ros/forwards.h"
 
 namespace vesc_hw_interface
 {
@@ -121,6 +124,9 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
   velocity_ = 0.0;
   effort_ = 0.0;
 
+  initialize_ = true;
+  position_steps_ = 0.0;
+
   // reads system parameters
   nh.param<double>("gear_ratio", gear_ratio_, 1.0);
   nh.param<double>("torque_const", torque_const_, 1.0);
@@ -170,6 +176,10 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
     return false;
   }
 
+  nh.param<double>("control_rate", control_rate_, 50.0);
+  control_timer_ = nh.createTimer(ros::Duration(1.0 / control_rate_), &VescHwInterface::controlTimerCallback, this);
+  ROS_INFO("Control rate is set to %f Hz", control_rate_);
+
   // registers a state handle and its interface
   hardware_interface::JointStateHandle state_handle(joint_name_, &position_, &velocity_, &effort_);
   joint_state_interface_.registerHandle(state_handle);
@@ -187,12 +197,7 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
 
     // initializes the servo controller
     servo_controller_.init(nh, &vesc_interface_);
-    servo_controller_.setGearRatio(gear_ratio_);
-    servo_controller_.setTorqueConst(torque_const_);
-    servo_controller_.setRotorPoles(num_rotor_poles_);
-    servo_controller_.setHallSensors(num_hall_sensors_);
-    servo_controller_.setJointType(joint_type_);
-    servo_controller_.setScrewLead(screw_lead_);
+    servo_controller_.setControlRate(control_rate_);
   }
   else if (command_mode_ == "velocity" || command_mode_ == "velocity_duty")
   {
@@ -206,7 +211,7 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
     {
       wheel_controller_.init(nh, &vesc_interface_);
       wheel_controller_.setGearRatio(gear_ratio_);
-      wheel_controller_.setTorqueConst(torque_const_);
+      wheel_controller_.setControlRate(control_rate_);
       wheel_controller_.setRotorPoles(num_rotor_poles_);
       wheel_controller_.setHallSensors(num_hall_sensors_);
     }
@@ -232,30 +237,13 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
 
 void VescHwInterface::read()
 {
-  // requests joint states
-  // function `packetCallback` will be called after receiving return packets
-  if (command_mode_ == "position")
-  {
-    // For PID control, request packets are automatically sent in the control cycle.
-    // The latest data is read in this function.
-    position_ = servo_controller_.getPositionSens();
-    velocity_ = servo_controller_.getVelocitySens();
-    effort_ = servo_controller_.getEffortSens();
-  }
-  else if (command_mode_ == "velocity_duty")
-  {
-    position_ = wheel_controller_.getPositionSens();
-    velocity_ = wheel_controller_.getVelocitySens();
-    effort_ = wheel_controller_.getEffortSens();
-  }
-  else
+  position_ = vesc_position_;
+  velocity_ = vesc_velocity_;
+  effort_ = vesc_effort_;
+
+  if (command_mode_ != "position" && command_mode_ != "velocity_duty")
   {
     vesc_interface_.requestState();
-  }
-
-  if (joint_type_ == urdf::Joint::REVOLUTE)
-  {
-    position_ = angles::normalize_angle(position_);
   }
 
   return;
@@ -273,9 +261,7 @@ void VescHwInterface::write()
   if (command_mode_ == "position")
   {
     limit_position_interface_.enforceLimits(getPeriod());
-
-    // executes PID control
-    servo_controller_.setTargetPosition(command_);
+    vesc_command_ = command_;
   }
   else if (command_mode_ == "velocity")
   {
@@ -291,9 +277,7 @@ void VescHwInterface::write()
   else if (command_mode_ == "velocity_duty")
   {
     limit_velocity_interface_.enforceLimits(getPeriod());
-
-    // executes PID control
-    wheel_controller_.setTargetVelocity(command_);
+    vesc_command_ = command_;
   }
   else if (command_mode_ == "effort")
   {
@@ -307,8 +291,7 @@ void VescHwInterface::write()
   }
   else if (command_mode_ == "effort_duty")
   {
-    command_ = std::max(-1.0, command_);
-    command_ = std::min(1.0, command_);
+    command_ = std::clamp(command_, -1.0, 1.0);
 
     // sends a  duty command
     vesc_interface_.setDutyCycle(command_);
@@ -322,6 +305,23 @@ void VescHwInterface::write(const ros::Time& time, const ros::Duration& period)
   return;
 }
 
+void VescHwInterface::controlTimerCallback(const ros::TimerEvent& e)
+{
+  if (command_mode_ == "velocity_duty")
+  {
+    wheel_controller_.control(vesc_command_, position_steps_);
+  }
+  else if (command_mode_ == "position")
+  {
+    servo_controller_.control(vesc_command_, vesc_position_);
+    if (servo_controller_.isCalibrating())
+    {
+      vesc_command_ = servo_controller_.getCalibratingPosition();
+    }
+  }
+  vesc_interface_.requestState();
+}
+
 ros::Time VescHwInterface::getTime() const
 {
   return ros::Time::now();
@@ -332,27 +332,49 @@ ros::Duration VescHwInterface::getPeriod() const
   return ros::Duration(0.01);
 }
 
-void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& packet)
+double VescHwInterface::getZeroPosition()
 {
   if (command_mode_ == "position")
-  {
-    servo_controller_.updateSensor(packet);
-  }
-  else if (command_mode_ == "velocity_duty")
-  {
-    wheel_controller_.updateSensor(packet);
-  }
-  else if (packet->getName() == "Values")
+    return servo_controller_.getZeroPosition();
+  return 0.0;
+}
+
+void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& packet)
+{
+  if (packet->getName() == "Values")
   {
     std::shared_ptr<VescPacketValues const> values = std::dynamic_pointer_cast<VescPacketValues const>(packet);
 
     const double current = values->getMotorCurrent();
-    const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_rotor_poles_) / 2;
-    const double steps = values->getPosition();
+    const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_rotor_poles_ / 2);
+    const int steps = static_cast<int>(values->getPosition());
 
-    position_ = steps / (num_hall_sensors_ * num_rotor_poles_) * gear_ratio_;  // unit: rad or m
-    velocity_ = velocity_rpm / 60.0 * 2.0 * M_PI * gear_ratio_;                // unit: rad/s or m/s
-    effort_ = current * torque_const_ / gear_ratio_;                           // unit: Nm or N
+    if (initialize_)
+    {
+      prev_steps_ = steps;
+      initialize_ = false;
+    }
+    position_steps_ += static_cast<double>(steps - prev_steps_);
+    prev_steps_ = steps;
+
+    vesc_position_ = position_steps_ / (num_hall_sensors_ * num_rotor_poles_) * gear_ratio_;  // unit: revolution
+    vesc_velocity_ = velocity_rpm * gear_ratio_;                                              // unit: rpm
+    vesc_effort_ = current * torque_const_ / gear_ratio_;                                     // unit: Nm or N
+
+    switch (joint_type_)
+    {
+      case urdf::Joint::REVOLUTE:
+      case urdf::Joint::CONTINUOUS:
+        vesc_position_ = vesc_position_ * 2.0 * M_PI;         // unit: rad
+        vesc_velocity_ = vesc_velocity_ / 60.0 * 2.0 * M_PI;  // unit: rad/s
+        break;
+      case urdf::Joint::PRISMATIC:
+        vesc_position_ = vesc_position_ * screw_lead_;         // unit: m
+        vesc_velocity_ = vesc_velocity_ / 60.0 * screw_lead_;  // unit: m/s
+        break;
+    }
+
+    vesc_position_ -= getZeroPosition();
   }
 
   return;

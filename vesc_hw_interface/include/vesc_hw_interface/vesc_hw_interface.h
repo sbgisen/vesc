@@ -34,6 +34,7 @@
 #include <joint_limits_interface/joint_limits_urdf.h>
 #include <ros/ros.h>
 #include <serial/serial.h>
+#include <transmission_interface/transmission_parser.h>
 #include <urdf_model/types.h>
 #include <urdf_parser/urdf_parser.h>
 #include <pluginlib/class_list_macros.hpp>

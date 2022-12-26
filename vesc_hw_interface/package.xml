@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package format="2">
+<package format="3">
   <name>vesc_hw_interface</name>
   <version>1.0.0</version>
   <description>VESC hardware interfaces</description>
@@ -13,6 +13,7 @@
   <depend>serial</depend>
   <depend>hardware_interface</depend>
   <depend>joint_limits_interface</depend>
+  <depend>transmission_interface</depend>
   <depend>controller_manager</depend>
   <depend>pluginlib</depend>
   <depend>urdf</depend>

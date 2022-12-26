@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(vesc_hw_interface)
 
 add_compile_options(-std=c++17)
@@ -9,6 +9,7 @@ find_package(
              serial
              hardware_interface
              joint_limits_interface
+             transmission_interface
              controller_manager
              pluginlib
              urdf
@@ -23,6 +24,7 @@ catkin_package(
     serial
     hardware_interface
     joint_limits_interface
+    transmission_interface
     controller_manager
     pluginlib
     urdf

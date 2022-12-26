@@ -58,8 +58,9 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
   std::string robot_description_name, robot_description;
   nh.param<std::string>("robot_description_name", robot_description_name, "/robot_description");
 
-  // parses the urdf and extract joint type
+  // parses the urdf
   std::string joint_type;
+  command_mode_ = "";
   if (nh.getParam(robot_description_name, robot_description))
   {
     const urdf::ModelInterfaceSharedPtr urdf = urdf::parseURDF(robot_description);
@@ -70,6 +71,7 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
       ROS_INFO("Joint limits are loaded");
     }
 
+    // extract joint type
     switch (urdf_joint->type)
     {
       case urdf::Joint::REVOLUTE:
@@ -81,6 +83,35 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
       case urdf::Joint::PRISMATIC:
         joint_type = "prismatic";
         break;
+    }
+
+    // extract hardware interface type
+    transmission_interface::TransmissionParser parser;
+    std::vector<transmission_interface::TransmissionInfo> transmission_info;
+    if (parser.parse(robot_description, transmission_info))
+    {
+      for (transmission_interface::TransmissionInfo info : transmission_info)
+      {
+        for (transmission_interface::JointInfo joint_info : info.joints_)
+        {
+          if (joint_info.name_ == joint_name_)
+          {
+            std::string interface = joint_info.hardware_interfaces_.front();
+            if (interface == "hardware_interface/PositionJointInterface")
+            {
+              command_mode_ = "position";
+            }
+            else if (interface == "hardware_interface/VelocityJointInterface")
+            {
+              command_mode_ = "velocity";
+            }
+            else if (interface == "hardware_interface/EffortJointInterface")
+            {
+              command_mode_ = "effort";
+            }
+          }
+        }
+      }
     }
   }
 
@@ -112,7 +143,7 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
 
   // reads driving mode setting
   // - assigns an empty string if param. is not found
-  nh.param<std::string>("command_mode", command_mode_, "");
+  nh.getParam("command_mode", command_mode_);
   ROS_INFO("mode: %s", command_mode_.data());
 
   // check joint type

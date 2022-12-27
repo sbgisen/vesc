@@ -69,14 +69,16 @@ private:
   VescServoController servo_controller_;
   VescWheelController wheel_controller_;
 
-  std::string joint_name_, command_mode_, joint_type_;
+  std::string joint_name_, command_mode_;
+  int joint_type_;
 
   double command_;
   double position_, velocity_, effort_;  // joint states
 
   int num_rotor_poles_;               // the number of rotor poles
   int num_hall_sensors_;              // the number of hall sensors
-  double gear_ratio_, torque_const_;  // physical params.
+  double gear_ratio_, torque_const_;  // physical params
+  double screw_lead_;                 // linear distance (m) of 1 revolution
 
   hardware_interface::JointStateInterface joint_state_interface_;
   hardware_interface::PositionJointInterface joint_position_interface_;

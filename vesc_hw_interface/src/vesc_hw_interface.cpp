@@ -58,8 +58,8 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
   std::string robot_description_name, robot_description;
   nh.param<std::string>("robot_description_name", robot_description_name, "/robot_description");
 
-  // parses the urdf
-  joint_type_ = "";
+  // parses the urdf and extract joint type
+  std::string joint_type;
   if (nh.getParam(robot_description_name, robot_description))
   {
     const urdf::ModelInterfaceSharedPtr urdf = urdf::parseURDF(robot_description);
@@ -73,13 +73,13 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
     switch (urdf_joint->type)
     {
       case urdf::Joint::REVOLUTE:
-        joint_type_ = "revolute";
+        joint_type = "revolute";
         break;
       case urdf::Joint::CONTINUOUS:
-        joint_type_ = "continuous";
+        joint_type = "continuous";
         break;
       case urdf::Joint::PRISMATIC:
-        joint_type_ = "prismatic";
+        joint_type = "prismatic";
         break;
     }
   }
@@ -94,9 +94,11 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
   nh.param<double>("gear_ratio", gear_ratio_, 1.0);
   nh.param<double>("torque_const", torque_const_, 1.0);
   nh.param<int>("num_hall_sensors", num_hall_sensors_, 3);
+  nh.param<double>("screw_lead", screw_lead_, 1.0);
   ROS_INFO("Gear ratio is set to %f", gear_ratio_);
   ROS_INFO("Torque constant is set to %f", torque_const_);
   ROS_INFO("The number of hall sensors is set to %d", num_hall_sensors_);
+  ROS_INFO("Screw lead is set to %f", screw_lead_);
 
   // check num of rotor poles
   nh.param<int>("num_rotor_poles", num_rotor_poles_, 2);
@@ -114,9 +116,23 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
   ROS_INFO("mode: %s", command_mode_.data());
 
   // check joint type
-  nh.getParam("joint_type", joint_type_);
-  ROS_INFO("joint type: %s", joint_type_.data());
-  if ((joint_type_ != "revolute") && (joint_type_ != "continuous") && (joint_type_ != "prismatic"))
+  joint_type_ = urdf::Joint::UNKNOWN;
+  nh.getParam("joint_type", joint_type);
+  ROS_INFO("joint type: %s", joint_type.data());
+  if (joint_type == "revolute")
+  {
+    joint_type_ = urdf::Joint::REVOLUTE;
+  }
+  else if (joint_type == "continuous")
+  {
+    joint_type_ = urdf::Joint::CONTINUOUS;
+  }
+  else if (joint_type == "prismatic")
+  {
+    joint_type_ = urdf::Joint::PRISMATIC;
+  }
+  if ((joint_type_ != urdf::Joint::REVOLUTE) && (joint_type_ != urdf::Joint::CONTINUOUS) &&
+      (joint_type_ != urdf::Joint::PRISMATIC))
   {
     ROS_ERROR("Verify your joint type");
     ros::shutdown();
@@ -144,6 +160,8 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
     servo_controller_.setTorqueConst(torque_const_);
     servo_controller_.setRotorPoles(num_rotor_poles_);
     servo_controller_.setHallSensors(num_hall_sensors_);
+    servo_controller_.setJointType(joint_type_);
+    servo_controller_.setScrewLead(screw_lead_);
   }
   else if (command_mode_ == "velocity" || command_mode_ == "velocity_duty")
   {
@@ -204,7 +222,7 @@ void VescHwInterface::read()
     vesc_interface_.requestState();
   }
 
-  if (joint_type_ == "revolute")
+  if (joint_type_ == urdf::Joint::REVOLUTE)
   {
     position_ = angles::normalize_angle(position_);
   }
@@ -299,12 +317,11 @@ void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& pa
 
     const double current = values->getMotorCurrent();
     const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_rotor_poles_) / 2;
-    const double position_pulse = values->getPosition();
+    const double steps = values->getPosition();
 
-    // 3.0 represents the number of hall sensors
-    position_ = position_pulse / (num_hall_sensors_ * num_rotor_poles_) * gear_ratio_;  // unit: rad or m
-    velocity_ = velocity_rpm / 60.0 * 2.0 * M_PI * gear_ratio_;                         // unit: rad/s or m/s
-    effort_ = current * torque_const_ / gear_ratio_;                                    // unit: Nm or N
+    position_ = steps / (num_hall_sensors_ * num_rotor_poles_) * gear_ratio_;  // unit: rad or m
+    velocity_ = velocity_rpm / 60.0 * 2.0 * M_PI * gear_ratio_;                // unit: rad/s or m/s
+    effort_ = current * torque_const_ / gear_ratio_;                           // unit: Nm or N
   }
 
   return;

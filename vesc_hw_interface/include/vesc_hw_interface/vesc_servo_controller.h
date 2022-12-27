@@ -17,9 +17,13 @@
 #ifndef VESC_HW_INTERFACE_VESC_SERVO_CONTROLLER_H_
 #define VESC_HW_INTERFACE_VESC_SERVO_CONTROLLER_H_
 
+#include <algorithm>
 #include <cmath>
+#include <limits>
 
+#include <angles/angles.h>
 #include <ros/ros.h>
+#include <urdf_model/joint.h>
 #include <vesc_driver/vesc_interface.h>
 
 namespace vesc_hw_interface
@@ -41,6 +45,8 @@ public:
   void setTorqueConst(const double torque_const);
   void setRotorPoles(const int rotor_poles);
   void setHallSensors(const int hall_sensors);
+  void setJointType(const int joint_type);
+  void setScrewLead(const double screw_lead);
   double getZeroPosition() const;
   double getPositionSens(void);
   double getVelocitySens(void);
@@ -72,9 +78,16 @@ private:
   ros::Time time_previous_;
   int num_rotor_poles_;               // the number of rotor poles
   int num_hall_sensors_;              // the number of hall sensors
-  double gear_ratio_, torque_const_;  // physical params.
+  double gear_ratio_, torque_const_;  // physical params
+  double screw_lead_;                 // linear distance (m) of 1 revolution
+  int joint_type_;
   double speed_limit_;
   ros::Timer control_timer_;
+  double position_steps_;
+  int prev_steps_;
+  bool initialize_;
+  int calibration_steps_;
+  double calibration_previous_position_;
 
   bool calibrate(const double);
   bool isSaturated(const double) const;

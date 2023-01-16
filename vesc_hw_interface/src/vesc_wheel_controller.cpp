@@ -45,7 +45,7 @@ void VescWheelController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
   initialize_ = true;
   position_sens_ = 0.0;
   velocity_reference_ = 0.0;
-  steps_ = 0.0;
+  position_steps_ = 0.0;
   prev_steps_ = 0.0;
   velocity_sens_ = 0.0;
   effort_sens_ = 0.0;
@@ -223,7 +223,7 @@ double VescWheelController::getEffortSens()
 
 void VescWheelController::controlTimerCallback(const ros::TimerEvent& e)
 {
-  control(velocity_reference_, static_cast<double>(steps_), reset_);
+  control(velocity_reference_, position_steps_, reset_);
   interface_ptr_->requestState();
   reset_ = fabs(velocity_reference_) < 0.0001;  // disable PID control when command is 0
 }
@@ -235,15 +235,16 @@ void VescWheelController::updateSensor(const std::shared_ptr<const VescPacket>& 
     std::shared_ptr<VescPacketValues const> values = std::dynamic_pointer_cast<VescPacketValues const>(packet);
     const double current = values->getMotorCurrent();
     const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_rotor_pole_pairs_) * gear_ratio_;
-    prev_steps_ = steps_;
-    steps_ = static_cast<int>(values->getPosition());
+    const int steps = static_cast<int>(values->getPosition());
     if (initialize_)
     {
-      prev_steps_ = steps_;
+      prev_steps_ = steps;
       initialize_ = false;
     }
+    position_steps_ += static_cast<double>(steps - prev_steps_);
+    prev_steps_ = steps;
 
-    position_sens_ += (static_cast<double>(steps_ - prev_steps_) * 2.0 * M_PI) /
+    position_sens_ = (position_steps_ * 2.0 * M_PI) /
                       (num_rotor_poles_ * num_hall_sensors_) * gear_ratio_;  // convert steps to rad
     velocity_sens_ = velocity_rpm * 2 * M_PI / 60;                           // convert rpm to rad/s
     effort_sens_ = current * torque_const_ / gear_ratio_;                    // unit: Nm or N

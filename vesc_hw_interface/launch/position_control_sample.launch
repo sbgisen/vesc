@@ -9,12 +9,22 @@
     <rosparam>
       joint_name: vesc_joint
       command_mode: position
-      port: /dev/ttyUSB0
+      port: /dev/ttyACM0
       num_rotor_poles: 20
-      gear_ratio: 1
+      gear_ratio: 0.230769
       torque_const: 1
-      servo/calibration_current: 1.0
-      servo/calibration_position: 0.01
+      servo:
+        calibration_current: 1.0
+        calibration_duty: 0.01
+        calibration_position: 0.0
+        calibration_mode: duty
+        Kp: 0.04
+        Ki: 0.1
+        Kd: 0.04
+        i_clamp: 1.0
+        duty_limiter: 1.0
+        antiwindup: true
+        control_rate: 100
     </rosparam>
   </node>
 

@@ -48,6 +48,7 @@ private:
   double kp_, ki_, kd_;
   double i_clamp_;
   bool antiwindup_;
+  bool smooth_diff_;
   double duty_limiter_;
   double num_rotor_pole_pairs_, num_rotor_poles_;
   double num_hall_sensors_;
@@ -70,9 +71,15 @@ private:
   bool initialize_;
 
   double counterTD(const double count_in, bool reset);
-  uint16_t counter_changed_log_[10][2];
-  double counter_td_tmp_[10];
-  uint16_t counter_changed_single_;
+  double counterTDRaw(const double count_in, bool reset);
+  double counterTDVariableWindow(const double count_in, bool reset);
+
+  // Params for counterTDRaw
+  int16_t counter_td_raw_prev_;
+  // Params for counterTDVariableWindow
+  int counter_td_vw_max_window_size_;
+  int counter_td_vw_max_step_;
+  std::vector<int16_t> counter_td_vw_window_;
 };
 }  // namespace vesc_hw_interface
 

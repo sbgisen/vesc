@@ -40,6 +40,22 @@ void VescWheelController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
 
   ROS_INFO("[Motor Gains] P: %f, I: %f, D: %f", kp_, ki_, kd_);
   ROS_INFO("[Motor Gains] I clamp: %f, Antiwindup: %s", i_clamp_, antiwindup_ ? "true" : "false");
+  ROS_INFO("[Motor Control] control_rate: %f", control_rate_);
+
+  // Params for counterTDVariableWindow
+  nh.param<bool>("motor/enable_smooth_diff", smooth_diff_, true);
+  double smooth_diff_max_sampling_time;
+  nh.param<double>("motor/smooth_diff/max_sample_sec", smooth_diff_max_sampling_time, 1.0);
+  nh.param<int>("motor/smooth_diff/max_smooth_step", counter_td_vw_max_step_, 10);
+  counter_td_vw_max_window_size_ = std::max(1, static_cast<int>(control_rate_ * smooth_diff_max_sampling_time));
+  counter_td_vw_window_.resize(counter_td_vw_max_window_size_ + 1);
+  if (smooth_diff_)
+  {
+    ROS_INFO(
+        "[Motor Control] Smooth differentiation enabled, max_sample_sec: %f, max_smooth_step: %d, "
+        "max_window_size:%d,",
+        smooth_diff_max_sampling_time, counter_td_vw_max_step_, counter_td_vw_max_window_size_);
+  }
 
   reset_ = true;
   initialize_ = true;
@@ -83,8 +99,8 @@ void VescWheelController::control(const double target_velocity, const double cur
   }
 
   // pid control
-  double current_vel = this->counterTD(current_steps, false) * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_) *
-                       control_rate_ * gear_ratio_;
+  double step_diff = this->counterTD(current_steps, false);
+  double current_vel = step_diff * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_) * control_rate_ * gear_ratio_;
   error_dt_ = target_velocity - current_vel;
   error_ = (target_steps_ - current_steps) * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_);
   error_integ_prev_ = error_integ_;
@@ -128,51 +144,64 @@ void VescWheelController::control(const double target_velocity, const double cur
 
 double VescWheelController::counterTD(const double count_in, bool reset)
 {
-  if (reset)
+  double output;
+  if (smooth_diff_)
   {
-    counter_changed_single_ = 1;
-    for (int i = 0; i < 10; i++)
-    {
-      counter_changed_log_[i][0] = static_cast<uint16_t>(count_in);
-      counter_changed_log_[i][1] = 100;
-      counter_td_tmp_[i] = 0;
-    }
-    return 0.0;
-  }
-
-  if (counter_changed_log_[0][0] != static_cast<uint16_t>(count_in))
-  {
-    for (int i = 0; i < 10; i++)
-    {
-      counter_changed_log_[10 - i][0] = counter_changed_log_[9 - i][0];
-    }
-    counter_changed_log_[0][0] = static_cast<uint16_t>(count_in);
-    counter_changed_log_[0][1] = counter_changed_single_;
-    counter_changed_single_ = 1;
+    output = this->counterTDVariableWindow(count_in, reset);
   }
   else
   {
-    if (counter_changed_single_ > counter_changed_log_[0][1])
-    {
-      counter_changed_log_[0][1] = counter_changed_single_;
-    }
-    if (counter_changed_single_ < 100)
-    {
-      counter_changed_single_++;
-    }
+    output = this->counterTDRaw(count_in, reset);
   }
+  return output;
+}
 
-  for (int i = 1; i < 10; i++)
+double VescWheelController::counterTDRaw(const double count_in, bool reset)
+{
+  if (reset)
   {
-    counter_td_tmp_[10 - i] = counter_td_tmp_[9 - i];
+    counter_td_raw_prev_ = static_cast<int16_t>(count_in);
+    return 0.0;
   }
-  counter_td_tmp_[0] = static_cast<double>(counter_changed_log_[0][0] - counter_changed_log_[1][0]) /
-                       static_cast<double>(counter_changed_log_[0][1]);
-  double output = counter_td_tmp_[0];
-  if (fabs(output) > 100.0)
+  int16_t step_diff = static_cast<int16_t>(count_in) - counter_td_raw_prev_;
+  double output = static_cast<double>(step_diff);
+  counter_td_raw_prev_ = static_cast<int16_t>(count_in);
+  return output;
+}
+
+double VescWheelController::counterTDVariableWindow(const double count_in, bool reset)
+{
+  if (reset)
   {
-    output = 0.0;
+    for (int i = 0; i < counter_td_vw_window_.size(); i++)
+    {
+      counter_td_vw_window_[i] = static_cast<int16_t>(count_in);
+    }
+    return 0.0;
   }
+  // Increment buffer
+  for (int i = counter_td_vw_window_.size() - 1; i > 0; i--)
+  {
+    counter_td_vw_window_[i] = counter_td_vw_window_[i - 1];
+  }
+  counter_td_vw_window_[0] = static_cast<int16_t>(count_in);
+  // Calculate window size
+  int latest_step_diff = abs(counter_td_vw_window_[0] - counter_td_vw_window_[1]);
+  int window_size = counter_td_vw_max_window_size_;
+  if (latest_step_diff > counter_td_vw_max_step_ - 1)
+  {
+    window_size = 1;
+  }
+  else if (latest_step_diff > 0)
+  {
+    window_size = counter_td_vw_max_window_size_ *
+                  (1.0 - static_cast<double>(latest_step_diff) / static_cast<double>(counter_td_vw_max_step_));
+  }
+  // Get output
+  int16_t step_diff = counter_td_vw_window_[0] - counter_td_vw_window_[window_size];
+  double output = static_cast<double>(step_diff) / static_cast<double>(window_size);
+  // ROS_WARN("[VescWheelController]window,step0,step1,latest_step_diff,output: %d, %d, %d, %d, %f", window_size,
+  //          counter_td_vw_window_[0], counter_td_vw_window_[window_size], latest_step_diff, output);
   return output;
 }
 

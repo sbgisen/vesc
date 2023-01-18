@@ -15,12 +15,17 @@
       gear_ratio: 0.230769
       torque_const: 1
       motor:
-        Kp: 0.1
-        Ki: 1.0
-        Kd: 0.01
-        i_clamp: 0.2
+        Kp: 0.04
+        Ki: 0.1
+        Kd: 0.04
+        i_clamp: 1.0
         duty_limiter: 1.0
         antiwindup: true
+        control_rate: 100
+        enable_smooth_diff: true
+        smooth_diff:
+          max_sample_sec: 1.0
+          max_smooth_step: 10
     </rosparam>
   </node>
 

@@ -113,6 +113,12 @@ public:
    * @return Returns true if the serial port is open, false otherwise.
    */
   bool isConnected() const;
+  /**
+   * Returns whether the data has been updated or not.
+   *
+   * @return Returns true if the data has been updated, false otherwise.
+   */
+  bool isRxDataUpdated() const;
 
   /**
    * Send a VESC packet.

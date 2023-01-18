@@ -26,7 +26,8 @@ int main(int argc, char** argv)
 
   controller_manager::ControllerManager controller_manager(&vesc_hw_interface, nh);
 
-  ros::Rate loop_rate(1.0 / vesc_hw_interface.getPeriod().toSec());
+  double update_rate = 100;
+  ros::Rate loop_rate(update_rate);
   ros::AsyncSpinner spinner(1);
 
   spinner.start();
@@ -34,10 +35,10 @@ int main(int argc, char** argv)
   while (ros::ok())
   {
     // sends commands
-    vesc_hw_interface.write();
+    vesc_hw_interface.write(ros::Duration(1.0 / update_rate));
 
     // updates the hardware interface control
-    controller_manager.update(vesc_hw_interface.getTime(), vesc_hw_interface.getPeriod());
+    controller_manager.update(vesc_hw_interface.getTime(), ros::Duration(1.0 / update_rate));
 
     // gets current states
     vesc_hw_interface.read();

@@ -25,12 +25,14 @@
 #include <ros/ros.h>
 #include <urdf_model/joint.h>
 #include <vesc_driver/vesc_interface.h>
+#include <vesc_hw_interface/vesc_step_difference.h>
 
 namespace vesc_hw_interface
 {
 using vesc_driver::VescInterface;
 using vesc_driver::VescPacket;
 using vesc_driver::VescPacketValues;
+using vesc_step_difference::VescStepDifference;
 
 class VescServoController
 {
@@ -39,7 +41,7 @@ public:
   ~VescServoController();
 
   void init(ros::NodeHandle, VescInterface*);
-  void control(const double, const double);
+  void control();
   void setTargetPosition(const double position_reference);
   void setGearRatio(const double gear_ratio);
   void setTorqueConst(const double torque_const);
@@ -56,6 +58,7 @@ public:
 
 private:
   VescInterface* interface_ptr_;
+  VescStepDifference vesc_step_difference_;
 
   const std::string DUTY = "duty";
   const std::string CURRENT = "current";
@@ -67,24 +70,24 @@ private:
   double calibration_position_;   // unit: rad or m
   double zero_position_;          // unit: rad or m
   double Kp_, Ki_, Kd_;
-  double control_rate_, control_period_;
-  double position_target_;
-  double position_reference_;  // limited with speed (speed_limit_)
-  double position_reference_previous_;
-  double position_sens_, velocity_sens_, effort_sens_;
-  double position_sens_previous_;
-  double error_previous_;
-  double error_integ_;
-  ros::Time time_previous_;
+  double control_rate_;
   int num_rotor_poles_;               // the number of rotor poles
   int num_hall_sensors_;              // the number of hall sensors
   double gear_ratio_, torque_const_;  // physical params
   double screw_lead_;                 // linear distance (m) of 1 revolution
   int joint_type_;
-  double speed_limit_;
+  double speed_max_;
   ros::Timer control_timer_;
+  // Internal variables for PID control
+  double target_pose_;
+  double target_pose_limited_;
+  double target_pose_previous_;
+  double sens_pose_, sens_vel_, sens_eff_;
+  double sens_pose_previous_;
   double position_steps_;
-  int prev_steps_;
+  int16_t steps_previous_;
+  double error_integ_;
+  // Internal variables for initialization
   bool initialize_;
   int calibration_steps_;
   double calibration_previous_position_;
@@ -92,7 +95,7 @@ private:
   bool calibrate(const double);
   bool isSaturated(const double) const;
   double saturate(const double) const;
-  void updateSpeedLimitedPositionReference(void);
+  void limitTargetSpeed(void);
   void controlTimerCallback(const ros::TimerEvent& e);
 };
 

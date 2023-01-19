@@ -44,6 +44,7 @@ public:
     : serial_(std::string(), 115200, serial::Timeout::simpleTimeout(100), serial::eightbits, serial::parity_none,
               serial::stopbits_one, serial::flowcontrol_none)
   {
+    data_updated_ = false;
   }
 
   void* rxThread(void);
@@ -59,6 +60,7 @@ public:
   ErrorHandlerFunction error_handler_;
   serial::Serial serial_;
   VescFrame::CRC send_crc_;
+  bool data_updated_;
 };
 
 void* VescInterface::Impl::rxThread(void)
@@ -84,6 +86,8 @@ void* VescInterface::Impl::rxThread(void)
           VescPacketConstPtr packet = VescPacketFactory::createPacket(iter, buffer.end(), &bytes_needed, &error);
           if (packet)
           {
+            // Packet received;
+            data_updated_ = true;
             // good packet, check if we skipped any data
             if (std::distance(iter_begin, iter) > 0)
             {
@@ -216,6 +220,13 @@ void VescInterface::disconnect()
 bool VescInterface::isConnected() const
 {
   return impl_->serial_.isOpen();
+}
+
+bool VescInterface::isRxDataUpdated() const
+{
+  bool output = impl_->data_updated_;
+  impl_->data_updated_ = false;
+  return output;
 }
 
 void VescInterface::send(const VescPacket& packet)

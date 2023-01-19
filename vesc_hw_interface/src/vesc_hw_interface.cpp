@@ -303,6 +303,10 @@ ros::Duration VescHwInterface::getPeriod() const
 
 void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& packet)
 {
+  if (!vesc_interface_.isRxDataUpdated())
+  {
+    ROS_WARN("[VescHwInterface::packetCallback]packetCallcack called, but no packet received");
+  }
   if (command_mode_ == "position")
   {
     servo_controller_.updateSensor(packet);

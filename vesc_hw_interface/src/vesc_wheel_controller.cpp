@@ -42,19 +42,18 @@ void VescWheelController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
   ROS_INFO("[Motor Gains] I clamp: %f, Antiwindup: %s", i_clamp_, antiwindup_ ? "true" : "false");
   ROS_INFO("[Motor Control] control_rate: %f", control_rate_);
 
-  // Params for counterTDVariableWindow
-  nh.param<bool>("motor/enable_smooth_diff", smooth_diff_, true);
-  double smooth_diff_max_sampling_time;
-  nh.param<double>("motor/smooth_diff/max_sample_sec", smooth_diff_max_sampling_time, 1.0);
-  nh.param<int>("motor/smooth_diff/max_smooth_step", counter_td_vw_max_step_, 10);
-  counter_td_vw_max_window_size_ = std::max(1, static_cast<int>(control_rate_ * smooth_diff_max_sampling_time));
-  counter_td_vw_window_.resize(counter_td_vw_max_window_size_ + 1);
-  if (smooth_diff_)
+  // Smoothing differentiation when hall sensor resolution is insufficient
+  bool smooth_diff;
+  nh.param<bool>("motor/enable_smooth_diff", smooth_diff, true);
+  if (smooth_diff)
   {
-    ROS_INFO(
-        "[Motor Control] Smooth differentiation enabled, max_sample_sec: %f, max_smooth_step: %d, "
-        "max_window_size:%d,",
-        smooth_diff_max_sampling_time, counter_td_vw_max_step_, counter_td_vw_max_window_size_);
+    double smooth_diff_max_sampling_time;
+    int counter_td_vw_max_step;
+    nh.param<double>("motor/smooth_diff/max_sample_sec", smooth_diff_max_sampling_time, 1.0);
+    nh.param<int>("motor/smooth_diff/max_smooth_step", counter_td_vw_max_step, 10);
+    vesc_step_difference_.enableSmooth(control_rate_, smooth_diff_max_sampling_time, counter_td_vw_max_step);
+    ROS_INFO("[Motor Control] Smooth differentiation enabled, max_sample_sec: %f, max_smooth_step: %d",
+             smooth_diff_max_sampling_time, counter_td_vw_max_step);
   }
 
   reset_ = true;
@@ -78,7 +77,7 @@ void VescWheelController::control(const double target_velocity, const double cur
     error_dt_ = 0.0;
     error_integ_ = 0.0;
     error_integ_prev_ = 0.0;
-    this->counterTD(current_steps, true);
+    vesc_step_difference_.getStepDifference(current_steps, true);
   }
   else
   {  // convert rad/s to steps
@@ -99,7 +98,7 @@ void VescWheelController::control(const double target_velocity, const double cur
   }
 
   // pid control
-  double step_diff = this->counterTD(current_steps, false);
+  double step_diff = vesc_step_difference_.getStepDifference(current_steps, false);
   double current_vel = step_diff * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_) * control_rate_ * gear_ratio_;
   error_dt_ = target_velocity - current_vel;
   error_ = (target_steps_ - current_steps) * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_);
@@ -140,69 +139,6 @@ void VescWheelController::control(const double target_velocity, const double cur
   // limit duty value
   duty = std::clamp(duty, -duty_limiter_, duty_limiter_);
   interface_ptr_->setDutyCycle(fabs(target_velocity) < 0.0001 ? 0.0 : duty);
-}
-
-double VescWheelController::counterTD(const double count_in, bool reset)
-{
-  double output;
-  if (smooth_diff_)
-  {
-    output = this->counterTDVariableWindow(count_in, reset);
-  }
-  else
-  {
-    output = this->counterTDRaw(count_in, reset);
-  }
-  return output;
-}
-
-double VescWheelController::counterTDRaw(const double count_in, bool reset)
-{
-  if (reset)
-  {
-    counter_td_raw_prev_ = static_cast<int16_t>(count_in);
-    return 0.0;
-  }
-  int16_t step_diff = static_cast<int16_t>(count_in) - counter_td_raw_prev_;
-  double output = static_cast<double>(step_diff);
-  counter_td_raw_prev_ = static_cast<int16_t>(count_in);
-  return output;
-}
-
-double VescWheelController::counterTDVariableWindow(const double count_in, bool reset)
-{
-  if (reset)
-  {
-    for (int i = 0; i < counter_td_vw_window_.size(); i++)
-    {
-      counter_td_vw_window_[i] = static_cast<int16_t>(count_in);
-    }
-    return 0.0;
-  }
-  // Increment buffer
-  for (int i = counter_td_vw_window_.size() - 1; i > 0; i--)
-  {
-    counter_td_vw_window_[i] = counter_td_vw_window_[i - 1];
-  }
-  counter_td_vw_window_[0] = static_cast<int16_t>(count_in);
-  // Calculate window size
-  int latest_step_diff = abs(counter_td_vw_window_[0] - counter_td_vw_window_[1]);
-  int window_size = counter_td_vw_max_window_size_;
-  if (latest_step_diff > counter_td_vw_max_step_ - 1)
-  {
-    window_size = 1;
-  }
-  else if (latest_step_diff > 0)
-  {
-    window_size = counter_td_vw_max_window_size_ *
-                  (1.0 - static_cast<double>(latest_step_diff) / static_cast<double>(counter_td_vw_max_step_));
-  }
-  // Get output
-  int16_t step_diff = counter_td_vw_window_[0] - counter_td_vw_window_[window_size];
-  double output = static_cast<double>(step_diff) / static_cast<double>(window_size);
-  // ROS_WARN("[VescWheelController]window,step0,step1,latest_step_diff,output: %d, %d, %d, %d, %f", window_size,
-  //          counter_td_vw_window_[0], counter_td_vw_window_[window_size], latest_step_diff, output);
-  return output;
 }
 
 void VescWheelController::setTargetVelocity(const double velocity_reference)
@@ -273,10 +209,10 @@ void VescWheelController::updateSensor(const std::shared_ptr<const VescPacket>& 
     position_steps_ += static_cast<double>(steps - prev_steps_);
     prev_steps_ = steps;
 
-    position_sens_ = (position_steps_ * 2.0 * M_PI) /
-                      (num_rotor_poles_ * num_hall_sensors_) * gear_ratio_;  // convert steps to rad
-    velocity_sens_ = velocity_rpm * 2 * M_PI / 60;                           // convert rpm to rad/s
-    effort_sens_ = current * torque_const_ / gear_ratio_;                    // unit: Nm or N
+    position_sens_ =
+        (position_steps_ * 2.0 * M_PI) / (num_rotor_poles_ * num_hall_sensors_) * gear_ratio_;  // convert steps to rad
+    velocity_sens_ = velocity_rpm * 2 * M_PI / 60;                                              // convert rpm to rad/s
+    effort_sens_ = current * torque_const_ / gear_ratio_;                                       // unit: Nm or N
   }
 }
 }  // namespace vesc_hw_interface

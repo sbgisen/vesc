@@ -20,12 +20,14 @@
 
 #include <ros/ros.h>
 #include <vesc_driver/vesc_interface.h>
+#include <vesc_hw_interface/vesc_step_difference.h>
 
 namespace vesc_hw_interface
 {
 using vesc_driver::VescInterface;
 using vesc_driver::VescPacket;
 using vesc_driver::VescPacketValues;
+using vesc_step_difference::VescStepDifference;
 
 class VescWheelController
 {
@@ -44,11 +46,11 @@ public:
 
 private:
   VescInterface* interface_ptr_;
+  VescStepDifference vesc_step_difference_;
 
   double kp_, ki_, kd_;
   double i_clamp_;
   bool antiwindup_;
-  bool smooth_diff_;
   double duty_limiter_;
   double num_rotor_pole_pairs_, num_rotor_poles_;
   double num_hall_sensors_;
@@ -69,17 +71,6 @@ private:
   double target_steps_;
   bool reset_;
   bool initialize_;
-
-  double counterTD(const double count_in, bool reset);
-  double counterTDRaw(const double count_in, bool reset);
-  double counterTDVariableWindow(const double count_in, bool reset);
-
-  // Params for counterTDRaw
-  int16_t counter_td_raw_prev_;
-  // Params for counterTDVariableWindow
-  int counter_td_vw_max_window_size_;
-  int counter_td_vw_max_step_;
-  std::vector<int16_t> counter_td_vw_window_;
 };
 }  // namespace vesc_hw_interface
 

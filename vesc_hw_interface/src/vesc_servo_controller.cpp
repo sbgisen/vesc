@@ -52,6 +52,7 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
   nh.param("servo/Kp", Kp_, 50.0);
   nh.param("servo/Ki", Ki_, 0.0);
   nh.param("servo/Kd", Kd_, 1.0);
+  nh.param<double>("servo/i_clamp", i_clamp_, 1.0);
   nh.param("servo/control_rate", control_rate_, 100.0);
   nh.param("servo/calibration_current", calibration_current_, 6.0);
   nh.param("servo/calibration_duty", calibration_duty_, 0.1);
@@ -113,7 +114,16 @@ void VescServoController::control()
   double error_dt = target_vel - current_vel;
   double error_integ_prev = error_integ_;
   error_integ_ += (error / control_rate_);
-
+  if (Ki_ * error_integ_ > i_clamp_)
+  {
+    error_integ_ = i_clamp_ / Ki_;
+  }
+  else if (Ki_ * error_integ_ < -i_clamp_)
+  {
+    error_integ_ = -i_clamp_ / Ki_;
+  }
+  // ROS_INFO("[VescServoController::control()] P: %f, I: %f, D: %f, Duty: %f", error, error_integ_, error_dt,
+  //          (Kp_ * error + Kd_ * error_dt + Ki_ * error_integ_));
   const double u_pd = Kp_ * error + Kd_ * error_dt;
   double u = 0.0;
 

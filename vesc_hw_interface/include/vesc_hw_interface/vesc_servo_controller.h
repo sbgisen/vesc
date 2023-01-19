@@ -70,6 +70,7 @@ private:
   double calibration_position_;   // unit: rad or m
   double zero_position_;          // unit: rad or m
   double Kp_, Ki_, Kd_;
+  double i_clamp_;
   double control_rate_;
   int num_rotor_poles_;               // the number of rotor poles
   int num_hall_sensors_;              // the number of hall sensors

@@ -40,6 +40,7 @@ add_library(
   src/vesc_hw_interface.cpp
   src/vesc_servo_controller.cpp
   src/vesc_wheel_controller.cpp
+  src/vesc_step_difference.cpp
 )
 add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})

@@ -199,7 +199,7 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
   return true;
 }
 
-void VescHwInterface::read()
+void VescHwInterface::read(const ros::Time& time, const ros::Duration& period)
 {
   // requests joint states
   // function `packetCallback` will be called after receiving return packets
@@ -230,13 +230,7 @@ void VescHwInterface::read()
   return;
 }
 
-void VescHwInterface::read(const ros::Time& time, const ros::Duration& period)
-{
-  read();
-  return;
-}
-
-void VescHwInterface::write(const ros::Duration& period)
+void VescHwInterface::write(const ros::Time& time, const ros::Duration& period)
 {
   // sends commands
   if (command_mode_ == "position")
@@ -282,12 +276,6 @@ void VescHwInterface::write(const ros::Duration& period)
     // sends a  duty command
     vesc_interface_.setDutyCycle(command_);
   }
-  return;
-}
-
-void VescHwInterface::write(const ros::Time& time, const ros::Duration& period)
-{
-  write(period);
   return;
 }
 

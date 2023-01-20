@@ -199,7 +199,7 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
   return true;
 }
 
-void VescHwInterface::read()
+void VescHwInterface::read(const ros::Time& time, const ros::Duration& period)
 {
   // requests joint states
   // function `packetCallback` will be called after receiving return packets
@@ -230,25 +230,19 @@ void VescHwInterface::read()
   return;
 }
 
-void VescHwInterface::read(const ros::Time& time, const ros::Duration& period)
-{
-  read();
-  return;
-}
-
-void VescHwInterface::write()
+void VescHwInterface::write(const ros::Time& time, const ros::Duration& period)
 {
   // sends commands
   if (command_mode_ == "position")
   {
-    limit_position_interface_.enforceLimits(getPeriod());
+    limit_position_interface_.enforceLimits(period);
 
     // executes PID control
     servo_controller_.setTargetPosition(command_);
   }
   else if (command_mode_ == "velocity")
   {
-    limit_velocity_interface_.enforceLimits(getPeriod());
+    limit_velocity_interface_.enforceLimits(period);
 
     // converts the velocity unit: rad/s or m/s -> rpm -> erpm
     const double command_rpm = command_ * 60.0 / 2.0 / M_PI / gear_ratio_;
@@ -259,14 +253,14 @@ void VescHwInterface::write()
   }
   else if (command_mode_ == "velocity_duty")
   {
-    limit_velocity_interface_.enforceLimits(getPeriod());
+    limit_velocity_interface_.enforceLimits(period);
 
     // executes PID control
     wheel_controller_.setTargetVelocity(command_);
   }
   else if (command_mode_ == "effort")
   {
-    limit_effort_interface_.enforceLimits(getPeriod());
+    limit_effort_interface_.enforceLimits(period);
 
     // converts the command unit: Nm or N -> A
     const double command_current = command_ * gear_ratio_ / torque_const_;
@@ -285,20 +279,9 @@ void VescHwInterface::write()
   return;
 }
 
-void VescHwInterface::write(const ros::Time& time, const ros::Duration& period)
-{
-  write();
-  return;
-}
-
 ros::Time VescHwInterface::getTime() const
 {
   return ros::Time::now();
-}
-
-ros::Duration VescHwInterface::getPeriod() const
-{
-  return ros::Duration(0.01);
 }
 
 void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& packet)

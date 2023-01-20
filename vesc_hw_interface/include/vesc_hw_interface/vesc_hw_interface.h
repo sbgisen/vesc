@@ -57,12 +57,9 @@ public:
   ~VescHwInterface();
 
   bool init(ros::NodeHandle&, ros::NodeHandle&);
-  void read();
   void read(const ros::Time&, const ros::Duration&);
-  void write();
   void write(const ros::Time&, const ros::Duration&);
   ros::Time getTime() const;
-  ros::Duration getPeriod() const;
 
 private:
   VescInterface vesc_interface_;

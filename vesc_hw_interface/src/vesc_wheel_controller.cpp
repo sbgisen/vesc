@@ -36,7 +36,7 @@ void VescWheelController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
   nh.param<double>("motor/i_clamp", i_clamp_, 0.2);
   nh.param<double>("motor/duty_limiter", duty_limiter_, 1.0);
   nh.param<bool>("motor/antiwindup", antiwindup_, true);
-  nh.param("motor/control_rate", control_rate_, 50.0);
+  nh.param("motor/control_rate", control_rate_, 100.0);
 
   ROS_INFO("[Motor Gains] P: %f, I: %f, D: %f", kp_, ki_, kd_);
   ROS_INFO("[Motor Gains] I clamp: %f, Antiwindup: %s", i_clamp_, antiwindup_ ? "true" : "false");

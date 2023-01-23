@@ -18,14 +18,18 @@
         calibration_duty: 0.01
         calibration_position: 0.0
         calibration_mode: duty
-        Kp: 0.04
-        Ki: 0.1
-        Kd: 0.04
+        Kp: 0.1
+        Ki: 0.01
+        Kd: 0.02
         i_clamp: 1.0
         duty_limiter: 1.0
         antiwindup: true
         control_rate: 100
-        speed_limit: 100
+        enable_speed_limit: false
+        speed_limit: 4
+        smooth_diff:
+          max_sample_sec: 0.2
+          max_smooth_step: 10
     </rosparam>
   </node>
 

@@ -69,14 +69,16 @@ private:
   std::string calibration_mode_;  // "duty" or "current" (default: "current")
   double calibration_position_;   // unit: rad or m
   double zero_position_;          // unit: rad or m
-  double Kp_, Ki_, Kd_;
-  double i_clamp_;
+  double kp_, ki_, kd_;
+  double i_clamp_, duty_limiter_;
+  bool antiwindup_;
   double control_rate_;
   int num_rotor_poles_;               // the number of rotor poles
   int num_hall_sensors_;              // the number of hall sensors
   double gear_ratio_, torque_const_;  // physical params
   double screw_lead_;                 // linear distance (m) of 1 revolution
   int joint_type_;
+  bool enable_speed_limit_;
   double speed_max_;
   ros::Timer control_timer_;
   // Internal variables for PID control

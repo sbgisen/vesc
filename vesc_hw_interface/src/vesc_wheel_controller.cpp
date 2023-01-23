@@ -36,7 +36,7 @@ void VescWheelController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
   nh.param<double>("motor/i_clamp", i_clamp_, 0.2);
   nh.param<double>("motor/duty_limiter", duty_limiter_, 1.0);
   nh.param<bool>("motor/antiwindup", antiwindup_, true);
-  nh.param("motor/control_rate", control_rate_, 100.0);
+  nh.param<double>("motor/control_rate", control_rate_, 100.0);
 
   ROS_INFO("[Motor Gains] P: %f, I: %f, D: %f", kp_, ki_, kd_);
   ROS_INFO("[Motor Gains] I clamp: %f, Antiwindup: %s", i_clamp_, antiwindup_ ? "true" : "false");
@@ -104,41 +104,47 @@ void VescWheelController::control(const double target_velocity, const double cur
   error_ = (target_steps_ - current_steps) * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_);
   error_integ_prev_ = error_integ_;
   error_integ_ += (error_ / control_rate_);
-  double duty = (kp_ * error_ + ki_ * error_integ_ + kd_ * error_dt_);
 
-  if (antiwindup_)
+  // limit integral
+  if (ki_ * error_integ_ > i_clamp_)
   {
-    if (duty > duty_limiter_)
-    {
-      duty = duty_limiter_;
-      if (error_integ_ > error_integ_prev_)
-      {
-        error_integ_ = error_integ_prev_;
-        duty = (kp_ * error_ + ki_ * error_integ_ + kd_ * error_dt_);
-      }
-    }
-    else if (duty < -duty_limiter_)
-    {
-      duty = -duty_limiter_;
-      if (error_integ_ < error_integ_prev_)
-      {
-        error_integ_ = error_integ_prev_;
-        duty = (kp_ * error_ + ki_ * error_integ_ + kd_ * error_dt_);
-      }
-    }
-    if (ki_ * error_integ_ > i_clamp_)
-    {
-      error_integ_ = i_clamp_ / ki_;
-    }
-    else if (ki_ * error_integ_ < -i_clamp_)
-    {
-      error_integ_ = -i_clamp_ / ki_;
-    }
+    error_integ_ = i_clamp_ / ki_;
   }
+  else if (ki_ * error_integ_ < -i_clamp_)
+  {
+    error_integ_ = -i_clamp_ / ki_;
+  }
+  const double u_p = kp_ * error_;
+  const double u_d = kd_ * error_dt_;
+  const double u_i = ki_ * error_integ_;
+  double u = u_p + u_d + u_i;
 
   // limit duty value
-  duty = std::clamp(duty, -duty_limiter_, duty_limiter_);
-  interface_ptr_->setDutyCycle(fabs(target_velocity) < 0.0001 ? 0.0 : duty);
+  if (antiwindup_)
+  {
+    if (u > duty_limiter_)
+    {
+      u = duty_limiter_;
+      if (error_integ_ > 0)
+      {
+        error_integ_ = std::max(0.0, (duty_limiter_ - u_p - u_d) / ki_);
+      }
+    }
+    else if (u < -duty_limiter_)
+    {
+      u = -duty_limiter_;
+      if (error_integ_ < 0)
+      {
+        error_integ_ = std::min(0.0, (-duty_limiter_ - u_p - u_d) / ki_);
+      }
+    }
+  }
+  else
+  {
+    u = std::clamp(u, -duty_limiter_, duty_limiter_);
+  }
+
+  interface_ptr_->setDutyCycle(fabs(target_velocity) < 0.0001 ? 0.0 : u);
 }
 
 void VescWheelController::setTargetVelocity(const double velocity_reference)

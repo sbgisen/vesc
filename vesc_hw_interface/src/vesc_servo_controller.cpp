@@ -49,19 +49,26 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
   calibration_previous_position_ = 0.0;
 
   // reads parameters
-  nh.param("servo/Kp", Kp_, 50.0);
-  nh.param("servo/Ki", Ki_, 0.0);
-  nh.param("servo/Kd", Kd_, 1.0);
+  nh.param<double>("servo/Kp", kp_, 50.0);
+  nh.param<double>("servo/Ki", ki_, 0.0);
+  nh.param<double>("servo/Kd", kd_, 1.0);
   nh.param<double>("servo/i_clamp", i_clamp_, 1.0);
-  nh.param("servo/control_rate", control_rate_, 100.0);
-  nh.param("servo/calibration_current", calibration_current_, 6.0);
-  nh.param("servo/calibration_duty", calibration_duty_, 0.1);
+  nh.param<double>("servo/duty_limiter", duty_limiter_, 1.0);
+  nh.param<bool>("servo/antiwindup", antiwindup_, true);
+  nh.param<double>("servo/control_rate", control_rate_, 100.0);
+  nh.param<double>("servo/calibration_current", calibration_current_, 6.0);
+  nh.param<double>("servo/calibration_duty", calibration_duty_, 0.1);
   nh.param<std::string>("servo/calibration_mode", calibration_mode_, "current");
-  nh.param("servo/calibration_position", calibration_position_, 0.0);
-  nh.param("servo/speed_limit", speed_max_, 1.0);
+  nh.param<double>("servo/calibration_position", calibration_position_, 0.0);
+
+  nh.param<bool>("servo/enable_speed_limit", enable_speed_limit_, false);
+  if (enable_speed_limit_)
+  {
+    nh.param<double>("servo/speed_limit", speed_max_, 1.0);
+  }
 
   // shows parameters
-  ROS_INFO("[Servo Gains] P: %f, I: %f, D: %f", Kp_, Ki_, Kd_);
+  ROS_INFO("[Servo Gains] P: %f, I: %f, D: %f", kp_, ki_, kd_);
   if (calibration_mode_ == CURRENT)
   {
     ROS_INFO("[Servo Calibration] Mode: %s, value: %f", CURRENT.data(), calibration_current_);
@@ -114,39 +121,44 @@ void VescServoController::control()
   double error_dt = target_vel - current_vel;
   double error_integ_prev = error_integ_;
   error_integ_ += (error / control_rate_);
-  if (Ki_ * error_integ_ > i_clamp_)
+  if (ki_ * error_integ_ > i_clamp_)
   {
-    error_integ_ = i_clamp_ / Ki_;
+    error_integ_ = i_clamp_ / ki_;
   }
-  else if (Ki_ * error_integ_ < -i_clamp_)
+  else if (ki_ * error_integ_ < -i_clamp_)
   {
-    error_integ_ = -i_clamp_ / Ki_;
+    error_integ_ = -i_clamp_ / ki_;
   }
-  // ROS_INFO("[VescServoController::control()] P: %f, I: %f, D: %f, Duty: %f", error, error_integ_, error_dt,
-  //          (Kp_ * error + Kd_ * error_dt + Ki_ * error_integ_));
-  const double u_pd = Kp_ * error + Kd_ * error_dt;
-  double u = 0.0;
+  ROS_INFO("[VescServoController::control()] P: %f, I: %f, D: %f, Duty: %f", error, error_integ_, error_dt,
+           (kp_ * error + kd_ * error_dt + ki_ * error_integ_));
+  const double u_p = kp_ * error;
+  const double u_d = kd_ * error_dt;
+  const double u_i = ki_ * error_integ_;
+  double u = u_p + u_d + u_i;
 
-  // calculates I control if PD input is not saturated
-  if (isSaturated(u_pd))
+  // limit duty value
+  if (antiwindup_)
   {
-    u = saturate(u_pd);
+    if (u > duty_limiter_)
+    {
+      u = duty_limiter_;
+      if (error_integ_ > 0)
+      {
+        error_integ_ = std::max(0.0, (duty_limiter_ - u_p - u_d) / ki_);
+      }
+    }
+    else if (u < -duty_limiter_)
+    {
+      u = -duty_limiter_;
+      if (error_integ_ < 0)
+      {
+        error_integ_ = std::min(0.0, (-duty_limiter_ - u_p - u_d) / ki_);
+      }
+    }
   }
   else
   {
-    const double u_pid = u_pd + Ki_ * error_integ_;
-
-    // not use I control if PID input is saturated
-    // since error integration causes bugs
-    if (isSaturated(u_pid))
-    {
-      u = saturate(u_pid);
-    }
-    else
-    {
-      u = u_pid;
-      error_integ_ = error_integ_prev;
-    }
+    u = std::clamp(u, -duty_limiter_, duty_limiter_);
   }
 
   // updates previous data
@@ -285,13 +297,20 @@ double VescServoController::saturate(const double arg) const
 
 void VescServoController::limitTargetSpeed(void)
 {
-  if (target_pose_ > (target_pose_previous_ + speed_max_ / control_rate_))
+  if (enable_speed_limit_)
   {
-    target_pose_limited_ = target_pose_previous_ + speed_max_ / control_rate_;
-  }
-  else if (target_pose_ < (target_pose_previous_ - speed_max_ / control_rate_))
-  {
-    target_pose_limited_ = target_pose_previous_ - speed_max_ / control_rate_;
+    if (target_pose_ > (target_pose_previous_ + speed_max_ / control_rate_))
+    {
+      target_pose_limited_ = target_pose_previous_ + speed_max_ / control_rate_;
+    }
+    else if (target_pose_ < (target_pose_previous_ - speed_max_ / control_rate_))
+    {
+      target_pose_limited_ = target_pose_previous_ - speed_max_ / control_rate_;
+    }
+    else
+    {
+      target_pose_limited_ = target_pose_;
+    }
   }
   else
   {

@@ -49,6 +49,16 @@ double VescStepDifference::getStepDifference(const double step_in, bool reset)
   return output;
 }
 
+/**
+ * Function called when the filter is disabled
+ *
+ * Outputs the difference of the counter value from the previous value.
+ * This function is used when no filter is used.
+ *
+ * @step_in Enter the current counter value
+ * @reset Used for initialization.
+ * @return Returns the difference from the previous value.
+ */
 double VescStepDifference::stepDifferenceRaw(const double step_in, bool reset)
 {
   if (reset)
@@ -62,6 +72,18 @@ double VescStepDifference::stepDifferenceRaw(const double step_in, bool reset)
   return output;
 }
 
+/**
+ * Function called when the filter is enabled
+ *
+ * Output smoothed differences.
+ * The smaller the difference, the longer the sampling time is stretched and smoothed.
+ * If the latest difference is greater than max_step_diff, no smoothing is performed.
+ * Smoothing is performed for max_sampling_time seconds when the latest difference is 0.
+ *
+ * @step_in Enter the current counter value
+ * @reset Used for initialization.
+ * @return Returns the difference from the previous value.
+ */
 double VescStepDifference::stepDifferenceVariableWindow(const double step_in, bool reset)
 {
   if (reset)

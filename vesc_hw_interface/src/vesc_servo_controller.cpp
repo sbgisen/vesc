@@ -306,7 +306,6 @@ void VescServoController::limitTargetSpeed(void)
   {
     target_pose_limited_ = target_pose_;
   }
-  // target_pose_limited_ = target_pose_;
 }
 
 void VescServoController::controlTimerCallback(const ros::TimerEvent& e)

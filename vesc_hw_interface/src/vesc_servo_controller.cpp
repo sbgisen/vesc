@@ -285,16 +285,6 @@ bool VescServoController::calibrate(const double current_pose)
   }
 }
 
-bool VescServoController::isSaturated(const double arg) const
-{
-  return std::abs(arg) > 1.0;
-}
-
-double VescServoController::saturate(const double arg) const
-{
-  return std::clamp(arg, -1.0, 1.0);
-}
-
 void VescServoController::limitTargetSpeed(void)
 {
   if (enable_speed_limit_)

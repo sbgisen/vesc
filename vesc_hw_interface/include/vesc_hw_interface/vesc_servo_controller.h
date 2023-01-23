@@ -96,8 +96,6 @@ private:
   double calibration_previous_position_;
 
   bool calibrate(const double);
-  bool isSaturated(const double) const;
-  double saturate(const double) const;
   void limitTargetSpeed(void);
   void controlTimerCallback(const ros::TimerEvent& e);
 };

@@ -40,7 +40,7 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
   }
 
   calibration_flag_ = true;
-  initialize_ = true;
+  sensor_initialize_ = true;
   zero_position_ = 0.0;
   error_integ_ = 0.0;
   steps_previous_ = 0;
@@ -129,12 +129,12 @@ void VescServoController::control()
   {
     error_integ_ = -i_clamp_ / ki_;
   }
-  ROS_INFO("[VescServoController::control()] P: %f, I: %f, D: %f, Duty: %f", error, error_integ_, error_dt,
-           (kp_ * error + kd_ * error_dt + ki_ * error_integ_));
   const double u_p = kp_ * error;
   const double u_d = kd_ * error_dt;
   const double u_i = ki_ * error_integ_;
   double u = u_p + u_d + u_i;
+  // ROS_INFO("[VescServoController::control()] P: %f, I: %f, D: %f", error, error_integ_, error_dt);
+  // ROS_INFO("[VescServoController::control()] up: %f, ui: %f, ud: %f", u_p, u_i, u_d);
 
   // limit duty value
   if (antiwindup_)
@@ -306,6 +306,7 @@ void VescServoController::limitTargetSpeed(void)
   {
     target_pose_limited_ = target_pose_;
   }
+  // target_pose_limited_ = target_pose_;
 }
 
 void VescServoController::controlTimerCallback(const ros::TimerEvent& e)
@@ -323,10 +324,10 @@ void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& 
     const double current = values->getMotorCurrent();
     const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_rotor_poles_ / 2);
     const int16_t steps = static_cast<int16_t>(values->getPosition());
-    if (initialize_)
+    if (sensor_initialize_)
     {
       steps_previous_ = steps;
-      initialize_ = false;
+      sensor_initialize_ = false;
       vesc_step_difference_.getStepDifference(0, true);
     }
     const int16_t steps_diff = steps - steps_previous_;

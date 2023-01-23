@@ -91,7 +91,7 @@ private:
   int16_t steps_previous_;
   double error_integ_;
   // Internal variables for initialization
-  bool initialize_;
+  bool sensor_initialize_;
   int calibration_steps_;
   double calibration_previous_position_;
 

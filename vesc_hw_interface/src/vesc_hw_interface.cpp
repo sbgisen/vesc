@@ -235,6 +235,7 @@ void VescHwInterface::write(const ros::Time& time, const ros::Duration& period)
   // sends commands
   if (command_mode_ == "position")
   {
+    // Limit the speed using the parameters listed in xacro
     limit_position_interface_.enforceLimits(period);
 
     // executes PID control

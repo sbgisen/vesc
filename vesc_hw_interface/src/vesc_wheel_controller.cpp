@@ -56,10 +56,10 @@ void VescWheelController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
              smooth_diff_max_sampling_time, counter_td_vw_max_step);
   }
 
-  reset_ = true;
-  initialize_ = true;
+  sensor_initialize_ = true;
+  pid_initialize_ = true;
   position_sens_ = 0.0;
-  velocity_reference_ = 0.0;
+  target_velocity_ = 0.0;
   position_steps_ = 0.0;
   prev_steps_ = 0.0;
   velocity_sens_ = 0.0;
@@ -68,40 +68,46 @@ void VescWheelController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
   control_timer_ = nh.createTimer(ros::Duration(1.0 / control_rate_), &VescWheelController::controlTimerCallback, this);
 }
 
-void VescWheelController::control(const double target_velocity, const double current_steps, bool reset)
+void VescWheelController::control()
 {
-  if (reset)
+  if (pid_initialize_)
   {
-    target_steps_ = current_steps;
+    if (!sensor_initialize_)
+    {
+      // Start PID control only when sensor initialization is complete
+      pid_initialize_ = false;
+    }
+    target_steps_ = position_steps_;
     error_ = 0.0;
     error_dt_ = 0.0;
     error_integ_ = 0.0;
     error_integ_prev_ = 0.0;
-    vesc_step_difference_.getStepDifference(current_steps, true);
+    vesc_step_difference_.getStepDifference(position_steps_, true);
+    interface_ptr_->setDutyCycle(0.0);
   }
   else
   {  // convert rad/s to steps
     target_steps_ +=
-        target_velocity * (num_rotor_poles_ * num_hall_sensors_) / (2 * M_PI) / control_rate_ / gear_ratio_;
+        target_velocity_ * (num_rotor_poles_ * num_hall_sensors_) / (2 * M_PI) / control_rate_ / gear_ratio_;
   }
 
   // overflow check
-  if ((target_steps_ - current_steps) > std::numeric_limits<int>::max())
+  if ((target_steps_ - position_steps_) > std::numeric_limits<int>::max())
   {
     target_steps_ +=
         static_cast<double>(std::numeric_limits<int>::min()) - static_cast<double>(std::numeric_limits<int>::max());
   }
-  else if ((target_steps_ - current_steps) < std::numeric_limits<int>::min())
+  else if ((target_steps_ - position_steps_) < std::numeric_limits<int>::min())
   {
     target_steps_ +=
         static_cast<double>(std::numeric_limits<int>::max()) - static_cast<double>(std::numeric_limits<int>::min());
   }
 
   // pid control
-  double step_diff = vesc_step_difference_.getStepDifference(current_steps, false);
+  double step_diff = vesc_step_difference_.getStepDifference(position_steps_, false);
   double current_vel = step_diff * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_) * control_rate_ * gear_ratio_;
-  error_dt_ = target_velocity - current_vel;
-  error_ = (target_steps_ - current_steps) * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_);
+  error_dt_ = target_velocity_ - current_vel;
+  error_ = (target_steps_ - position_steps_) * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_);
   error_integ_prev_ = error_integ_;
   error_integ_ += (error_ / control_rate_);
 
@@ -144,12 +150,12 @@ void VescWheelController::control(const double target_velocity, const double cur
     u = std::clamp(u, -duty_limiter_, duty_limiter_);
   }
 
-  interface_ptr_->setDutyCycle(fabs(target_velocity) < 0.0001 ? 0.0 : u);
+  interface_ptr_->setDutyCycle(u);
 }
 
 void VescWheelController::setTargetVelocity(const double velocity_reference)
 {
-  velocity_reference_ = velocity_reference;
+  target_velocity_ = velocity_reference;
 }
 
 void VescWheelController::setGearRatio(const double gear_ratio)
@@ -194,9 +200,9 @@ double VescWheelController::getEffortSens()
 
 void VescWheelController::controlTimerCallback(const ros::TimerEvent& e)
 {
-  control(velocity_reference_, position_steps_, reset_);
+  control();
   interface_ptr_->requestState();
-  reset_ = fabs(velocity_reference_) < 0.0001;  // disable PID control when command is 0
+  pid_initialize_ = fabs(target_velocity_) < 0.0001;  // disable PID control when command is 0
 }
 
 void VescWheelController::updateSensor(const std::shared_ptr<const VescPacket>& packet)
@@ -207,10 +213,10 @@ void VescWheelController::updateSensor(const std::shared_ptr<const VescPacket>& 
     const double current = values->getMotorCurrent();
     const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_rotor_pole_pairs_) * gear_ratio_;
     const int steps = static_cast<int>(values->getPosition());
-    if (initialize_)
+    if (sensor_initialize_)
     {
       prev_steps_ = steps;
-      initialize_ = false;
+      sensor_initialize_ = false;
     }
     position_steps_ += static_cast<double>(steps - prev_steps_);
     prev_steps_ = steps;

@@ -81,7 +81,6 @@ void VescWheelController::control()
     error_ = 0.0;
     error_dt_ = 0.0;
     error_integ_ = 0.0;
-    error_integ_prev_ = 0.0;
     vesc_step_difference_.getStepDifference(position_steps_, true);
     interface_ptr_->setDutyCycle(0.0);
     return;
@@ -107,7 +106,6 @@ void VescWheelController::control()
   double current_vel = step_diff * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_) * control_rate_ * gear_ratio_;
   error_dt_ = target_velocity_ - current_vel;
   error_ = (target_steps_ - position_steps_) * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_);
-  error_integ_prev_ = error_integ_;
   error_integ_ += (error_ / control_rate_);
 
   // limit integral

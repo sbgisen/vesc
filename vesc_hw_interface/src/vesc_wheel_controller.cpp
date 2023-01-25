@@ -152,9 +152,9 @@ void VescWheelController::control()
   interface_ptr_->setDutyCycle(u);
 }
 
-void VescWheelController::setTargetVelocity(const double velocity_reference)
+void VescWheelController::setTargetVelocity(const double velocity)
 {
-  target_velocity_ = velocity_reference;
+  target_velocity_ = velocity;
 }
 
 void VescWheelController::setGearRatio(const double gear_ratio)

@@ -42,13 +42,13 @@ public:
 
   void init(ros::NodeHandle, VescInterface*);
   void control();
-  void setTargetPosition(const double position_reference);
-  void setGearRatio(const double gear_ratio);
-  void setTorqueConst(const double torque_const);
-  void setRotorPoles(const int rotor_poles);
-  void setHallSensors(const int hall_sensors);
-  void setJointType(const int joint_type);
-  void setScrewLead(const double screw_lead);
+  void setTargetPosition(const double);
+  void setGearRatio(const double);
+  void setTorqueConst(const double);
+  void setRotorPoles(const int);
+  void setHallSensors(const int);
+  void setJointType(const int);
+  void setScrewLead(const double);
   double getZeroPosition() const;
   double getPositionSens(void);
   double getVelocitySens(void);

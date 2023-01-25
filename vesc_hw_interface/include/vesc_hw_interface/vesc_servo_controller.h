@@ -50,9 +50,9 @@ public:
   void setJointType(const int);
   void setScrewLead(const double);
   double getZeroPosition() const;
-  double getPositionSens(void);
-  double getVelocitySens(void);
-  double getEffortSens(void);
+  double getPositionSens();
+  double getVelocitySens();
+  double getEffortSens();
   void executeCalibration();
   void updateSensor(const std::shared_ptr<VescPacket const>&);
 
@@ -96,7 +96,7 @@ private:
   double calibration_previous_position_;
 
   bool calibrate(const double);
-  void limitTargetSpeed(void);
+  void limitTargetSpeed();
   void controlTimerCallback(const ros::TimerEvent& e);
 };
 

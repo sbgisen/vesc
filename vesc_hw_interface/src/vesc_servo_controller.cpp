@@ -215,7 +215,7 @@ double VescServoController::getZeroPosition() const
   return zero_position_;
 }
 
-double VescServoController::getPositionSens(void)
+double VescServoController::getPositionSens()
 {
   if (calibration_flag_)
   {
@@ -224,12 +224,12 @@ double VescServoController::getPositionSens(void)
   return sens_pose_;
 }
 
-double VescServoController::getVelocitySens(void)
+double VescServoController::getVelocitySens()
 {
   return sens_vel_;
 }
 
-double VescServoController::getEffortSens(void)
+double VescServoController::getEffortSens()
 {
   return sens_eff_;
 }
@@ -285,7 +285,7 @@ bool VescServoController::calibrate(const double current_position)
   }
 }
 
-void VescServoController::limitTargetSpeed(void)
+void VescServoController::limitTargetSpeed()
 {
   if (enable_speed_limit_)
   {

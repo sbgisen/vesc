@@ -95,7 +95,7 @@ private:
   int calibration_steps_;
   double calibration_previous_position_;
 
-  bool calibrate(const double);
+  bool calibrate();
   void limitTargetSpeed();
   void controlTimerCallback(const ros::TimerEvent& e);
 };

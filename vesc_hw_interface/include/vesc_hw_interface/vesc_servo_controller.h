@@ -82,11 +82,11 @@ private:
   double speed_max_;
   ros::Timer control_timer_;
   // Internal variables for PID control
-  double target_pos_;
-  double target_pos_limited_;
-  double target_pos_previous_;
-  double sens_pos_, sens_vel_, sens_eff_;
-  double sens_pos_previous_;
+  double target_position_;
+  double target_position_limited_;
+  double target_position_previous_;
+  double sens_position_, sens_velocity_, sens_effort_;
+  double sens_position_previous_;
   double position_steps_;
   int16_t steps_previous_;
   double error_integ_;

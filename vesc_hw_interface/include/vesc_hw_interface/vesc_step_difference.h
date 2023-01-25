@@ -38,11 +38,11 @@ private:
   // Enable smooth difference
   bool enable_smooth_;
   // Params for counterTDRaw
-  int16_t step_in_previous_;
+  int32_t step_in_previous_;
   // Params for counterTDVariableWindow
   int step_diff_vw_max_window_size_;
   int step_diff_vw_max_step_;
-  std::deque<int16_t> step_input_queue_;
+  std::deque<int32_t> step_input_queue_;
 };
 }  // namespace vesc_step_difference
 

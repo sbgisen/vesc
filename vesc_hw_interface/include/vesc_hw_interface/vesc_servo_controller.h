@@ -88,7 +88,7 @@ private:
   double sens_position_, sens_velocity_, sens_effort_;
   double sens_position_previous_;
   double position_steps_;
-  int16_t steps_previous_;
+  int32_t steps_previous_;
   double error_integ_;
   // Internal variables for initialization
   bool sensor_initialize_;

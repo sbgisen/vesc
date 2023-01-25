@@ -306,14 +306,14 @@ void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& 
     std::shared_ptr<VescPacketValues const> values = std::dynamic_pointer_cast<VescPacketValues const>(packet);
     const double current = values->getMotorCurrent();
     const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_rotor_poles_ / 2);
-    const int16_t steps = static_cast<int16_t>(values->getPosition());
+    const int32_t steps = static_cast<int32_t>(values->getPosition());
     if (sensor_initialize_)
     {
       steps_previous_ = steps;
       sensor_initialize_ = false;
       vesc_step_difference_.getStepDifference(0, true);
     }
-    const int16_t steps_diff = steps - steps_previous_;
+    const int32_t steps_diff = steps - steps_previous_;
     position_steps_ += static_cast<double>(steps_diff);
     steps_previous_ = steps;
 

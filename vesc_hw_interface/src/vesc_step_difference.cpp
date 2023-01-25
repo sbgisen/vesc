@@ -79,11 +79,11 @@ double VescStepDifference::stepDifferenceRaw(const double step_in, bool reset)
 {
   if (reset)
   {
-    step_in_previous_ = static_cast<int16_t>(step_in);
+    step_in_previous_ = static_cast<int32_t>(step_in);
     return 0.0;
   }
-  int16_t step_diff = static_cast<int16_t>(step_in) - step_in_previous_;
-  step_in_previous_ = static_cast<int16_t>(step_in);
+  int32_t step_diff = static_cast<int32_t>(step_in) - step_in_previous_;
+  step_in_previous_ = static_cast<int32_t>(step_in);
   return static_cast<double>(step_diff);
 }
 
@@ -104,12 +104,12 @@ double VescStepDifference::stepDifferenceVariableWindow(const double step_in, bo
   if (reset)
   {
     // Fill the buffer with the current value
-    std::fill(step_input_queue_.begin(), step_input_queue_.end(), static_cast<int16_t>(step_in));
+    std::fill(step_input_queue_.begin(), step_input_queue_.end(), static_cast<int32_t>(step_in));
     return 0.0;
   }
   // Increment buffer
   step_input_queue_.pop_back();
-  step_input_queue_.push_front(static_cast<int16_t>(step_in));
+  step_input_queue_.push_front(static_cast<int32_t>(step_in));
   // Calculate window size
   int latest_step_diff = std::abs(step_input_queue_[0] - step_input_queue_[1]);
   int window_size = step_diff_vw_max_window_size_;
@@ -123,7 +123,7 @@ double VescStepDifference::stepDifferenceVariableWindow(const double step_in, bo
                   (1.0 - static_cast<double>(latest_step_diff) / static_cast<double>(step_diff_vw_max_step_));
   }
   // Get output
-  int16_t step_diff = step_input_queue_[0] - step_input_queue_[window_size];
+  int32_t step_diff = step_input_queue_[0] - step_input_queue_[window_size];
   return static_cast<double>(step_diff) / static_cast<double>(window_size);
 }
 

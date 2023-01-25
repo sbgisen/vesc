@@ -38,7 +38,7 @@ private:
   // Enable smooth difference
   bool enable_smooth_;
   // Params for counterTDRaw
-  int16_t step_in_prev_;
+  int16_t step_in_previous_;
   // Params for counterTDVariableWindow
   int step_diff_vw_max_window_size_;
   int step_diff_vw_max_step_;

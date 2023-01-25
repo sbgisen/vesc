@@ -79,11 +79,11 @@ double VescStepDifference::stepDifferenceRaw(const double step_in, bool reset)
 {
   if (reset)
   {
-    step_in_prev_ = static_cast<int16_t>(step_in);
+    step_in_previous_ = static_cast<int16_t>(step_in);
     return 0.0;
   }
-  int16_t step_diff = static_cast<int16_t>(step_in) - step_in_prev_;
-  step_in_prev_ = static_cast<int16_t>(step_in);
+  int16_t step_diff = static_cast<int16_t>(step_in) - step_in_previous_;
+  step_in_previous_ = static_cast<int16_t>(step_in);
   return static_cast<double>(step_diff);
 }
 

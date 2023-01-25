@@ -240,7 +240,7 @@ void VescServoController::executeCalibration()
   return;
 }
 
-bool VescServoController::calibrate(const double current_pose)
+bool VescServoController::calibrate(const double current_position)
 {
   // sends a command for calibration
   if (calibration_mode_ == CURRENT)
@@ -261,11 +261,11 @@ bool VescServoController::calibrate(const double current_pose)
 
   if (calibration_steps_ % 20 == 0)
   {
-    if (std::abs(current_pose - calibration_previous_position_) <= std::numeric_limits<double>::epsilon())
+    if (std::abs(current_position - calibration_previous_position_) <= std::numeric_limits<double>::epsilon())
     {
       // finishes calibrating
       calibration_steps_ = 0;
-      zero_position_ = current_pose - calibration_position_;
+      zero_position_ = current_position - calibration_position_;
       target_pose_ = calibration_position_;
       ROS_INFO("Calibration Finished");
       vesc_step_difference_.getStepDifference(position_steps_, true);
@@ -274,7 +274,7 @@ bool VescServoController::calibrate(const double current_pose)
     }
     else
     {
-      calibration_previous_position_ = current_pose;
+      calibration_previous_position_ = current_position;
       return false;
     }
   }

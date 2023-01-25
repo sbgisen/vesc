@@ -283,18 +283,8 @@ void VescServoController::limitTargetSpeed()
 {
   if (enable_speed_limit_)
   {
-    if (target_position_ > (target_position_previous_ + speed_max_ / control_rate_))
-    {
-      target_position_limited_ = target_position_previous_ + speed_max_ / control_rate_;
-    }
-    else if (target_position_ < (target_position_previous_ - speed_max_ / control_rate_))
-    {
-      target_position_limited_ = target_position_previous_ - speed_max_ / control_rate_;
-    }
-    else
-    {
-      target_position_limited_ = target_position_;
-    }
+    target_position_limited_ = std::clamp(target_position_, target_position_previous_ - speed_max_ / control_rate_,
+                                          target_position_previous_ + speed_max_ / control_rate_);
   }
   else
   {

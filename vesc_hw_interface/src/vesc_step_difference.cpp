@@ -40,10 +40,18 @@ VescStepDifference::~VescStepDifference()
  */
 void VescStepDifference::enableSmooth(double control_rate, double max_sampling_time, int max_step_diff)
 {
-  enable_smooth_ = true;
   step_diff_vw_max_step_ = max_step_diff;
-  step_diff_vw_max_window_size_ = std::max(1, static_cast<int>(control_rate * max_sampling_time));
-  step_input_queue_.resize(step_diff_vw_max_window_size_ + 1);
+  step_diff_vw_max_window_size_ = static_cast<int>(std::round(control_rate * max_sampling_time));
+  if (step_diff_vw_max_window_size_ > 0)
+  {
+    enable_smooth_ = true;
+    step_input_queue_.resize(step_diff_vw_max_window_size_ + 1);
+  }
+  else
+  {
+    // Disable smoothing if step_diff_vw_max_window_size_ is too small
+    enable_smooth_ = false;
+  }
   return;
 }
 
@@ -112,15 +120,18 @@ double VescStepDifference::stepDifferenceVariableWindow(const double step_in, bo
   step_input_queue_.push_front(static_cast<int32_t>(step_in));
   // Calculate window size
   int latest_step_diff = std::abs(step_input_queue_[0] - step_input_queue_[1]);
-  int window_size = step_diff_vw_max_window_size_;
+  int window_size = step_input_queue_.size() - 1;
   if (latest_step_diff >= step_diff_vw_max_step_)
   {
     window_size = 1;
   }
   else if (latest_step_diff > 0)
   {
-    window_size = step_diff_vw_max_window_size_ *
-                  (1.0 - static_cast<double>(latest_step_diff) / static_cast<double>(step_diff_vw_max_step_));
+    // The larger the latest_step_diff, the smaller the window_size.
+    // window_size: minimum 1, maximum "step_input_queue_.size() - 1" ( == step_diff_vw_max_window_size)
+    window_size = 1 + static_cast<int>(std::round(
+                          static_cast<double>(step_input_queue_.size() - 2) *
+                          (1.0 - static_cast<double>(latest_step_diff) / static_cast<double>(step_diff_vw_max_step_))));
   }
   // Get output
   int32_t step_diff = step_input_queue_[0] - step_input_queue_[window_size];

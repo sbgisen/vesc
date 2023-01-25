@@ -40,21 +40,21 @@ public:
   VescServoController();
   ~VescServoController();
 
-  void init(ros::NodeHandle, VescInterface*);
+  void init(ros::NodeHandle nh, VescInterface* interface_ptr);
   void control();
-  void setTargetPosition(const double);
-  void setGearRatio(const double);
-  void setTorqueConst(const double);
-  void setRotorPoles(const int);
-  void setHallSensors(const int);
-  void setJointType(const int);
-  void setScrewLead(const double);
+  void setTargetPosition(const double position);
+  void setGearRatio(const double gear_ratio);
+  void setTorqueConst(const double torque_const);
+  void setRotorPoles(const int rotor_poles);
+  void setHallSensors(const int hall_sensors);
+  void setJointType(const int joint_type);
+  void setScrewLead(const double screw_lead);
   double getZeroPosition() const;
   double getPositionSens();
   double getVelocitySens();
   double getEffortSens();
   void executeCalibration();
-  void updateSensor(const std::shared_ptr<VescPacket const>&);
+  void updateSensor(const std::shared_ptr<VescPacket const>& packet);
 
 private:
   VescInterface* interface_ptr_;

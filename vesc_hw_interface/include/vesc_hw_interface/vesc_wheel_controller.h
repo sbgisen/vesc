@@ -34,15 +34,15 @@ class VescWheelController
 public:
   void init(ros::NodeHandle nh, VescInterface* vesc_interface);
   void control();
-  void setTargetVelocity(const double);
-  void setGearRatio(const double);
-  void setTorqueConst(const double);
-  void setRotorPoles(const int);
-  void setHallSensors(const int);
+  void setTargetVelocity(const double velocity);
+  void setGearRatio(const double gear_ratio);
+  void setTorqueConst(const double torque_const);
+  void setRotorPoles(const int rotor_poles);
+  void setHallSensors(const int hall_sensors);
   double getPositionSens();
   double getVelocitySens();
   double getEffortSens();
-  void updateSensor(const std::shared_ptr<VescPacket const>&);
+  void updateSensor(const std::shared_ptr<const VescPacket>& packet);
 
 private:
   VescInterface* interface_ptr_;

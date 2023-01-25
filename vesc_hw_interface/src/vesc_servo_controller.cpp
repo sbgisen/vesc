@@ -109,6 +109,7 @@ void VescServoController::control()
     // initializes/resets control variables
     sens_position_previous_ = sens_position_;
     target_position_previous_ = calibration_position_;
+    vesc_step_difference_.getStepDifference(position_steps_, true);
     return;
   }
 
@@ -127,8 +128,6 @@ void VescServoController::control()
   const double u_d = kd_ * error_dt;
   const double u_i = ki_ * error_integ_;
   double u = u_p + u_d + u_i;
-  // ROS_INFO("[VescServoController::control()] P: %f, I: %f, D: %f", error, error_integ_, error_dt);
-  // ROS_INFO("[VescServoController::control()] up: %f, ui: %f, ud: %f", u_p, u_i, u_d);
 
   // limit duty value
   if (antiwindup_)
@@ -262,7 +261,6 @@ bool VescServoController::calibrate()
       zero_position_ = sens_position_ - calibration_position_;
       target_position_ = calibration_position_;
       ROS_INFO("Calibration Finished");
-      vesc_step_difference_.getStepDifference(position_steps_, true);
       calibration_flag_ = false;
       return true;
     }
@@ -311,7 +309,6 @@ void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& 
     {
       steps_previous_ = steps;
       sensor_initialize_ = false;
-      vesc_step_difference_.getStepDifference(0, true);
     }
     const int32_t steps_diff = steps - steps_previous_;
     position_steps_ += static_cast<double>(steps_diff);

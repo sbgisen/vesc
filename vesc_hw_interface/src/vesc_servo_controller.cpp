@@ -121,14 +121,8 @@ void VescServoController::control()
   double error_dt = target_vel - current_vel;
   double error_integ_prev = error_integ_;
   error_integ_ += (error / control_rate_);
-  if (ki_ * error_integ_ > i_clamp_)
-  {
-    error_integ_ = i_clamp_ / ki_;
-  }
-  else if (ki_ * error_integ_ < -i_clamp_)
-  {
-    error_integ_ = -i_clamp_ / ki_;
-  }
+  error_integ_ = std::clamp(error_integ_, -i_clamp_ / ki_, i_clamp_ / ki_);
+
   const double u_p = kp_ * error;
   const double u_d = kd_ * error_dt;
   const double u_i = ki_ * error_integ_;

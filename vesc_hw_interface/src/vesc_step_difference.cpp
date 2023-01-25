@@ -79,13 +79,12 @@ double VescStepDifference::stepDifferenceRaw(const double step_in, bool reset)
 {
   if (reset)
   {
-    step_diff_raw_prev_ = static_cast<int16_t>(step_in);
+    step_in_prev_ = static_cast<int16_t>(step_in);
     return 0.0;
   }
-  int16_t step_diff = static_cast<int16_t>(step_in) - step_diff_raw_prev_;
-  double output = static_cast<double>(step_diff);
-  step_diff_raw_prev_ = static_cast<int16_t>(step_in);
-  return output;
+  int16_t step_diff = static_cast<int16_t>(step_in) - step_in_prev_;
+  step_in_prev_ = static_cast<int16_t>(step_in);
+  return static_cast<double>(step_diff);
 }
 
 /**
@@ -125,10 +124,7 @@ double VescStepDifference::stepDifferenceVariableWindow(const double step_in, bo
   }
   // Get output
   int16_t step_diff = step_input_queue_[0] - step_input_queue_[window_size];
-  double output = static_cast<double>(step_diff) / static_cast<double>(window_size);
-  // ROS_WARN("[VescStepDifference]window,step0,step1,latest_step_diff,output: %d, %d, %d, %d, %f", window_size,
-  //          step_input_queue_[0], step_input_queue_[window_size], latest_step_diff, output);
-  return output;
+  return static_cast<double>(step_diff) / static_cast<double>(window_size);
 }
 
 }  // namespace vesc_step_difference

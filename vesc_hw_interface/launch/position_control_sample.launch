@@ -25,8 +25,9 @@
         duty_limiter: 1.0
         antiwindup: true
         control_rate: 100
-        enable_speed_limit: false
+        enable_speed_limit: true
         speed_limit: 4
+        enable_smooth_diff: true
         smooth_diff:
           max_sample_sec: 0.2
           max_smooth_step: 10

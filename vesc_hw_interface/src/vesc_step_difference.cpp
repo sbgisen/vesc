@@ -1,5 +1,5 @@
 /*********************************************************************
- * Copyright (c) 2022 SoftBank Corp.
+ * Copyright (c) 2023 SoftBank Corp.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,13 @@
 #include "vesc_hw_interface/vesc_step_difference.h"
 namespace vesc_step_difference
 {
+/**
+ * Hall sensors attached to brushless motors have low angular resolution.
+ * When looking at the time variation of the counter value obtained from the Hall sensor,
+ * the value is slow and oscillatory. (The value will be either 0 or 1)
+ * To prevent this, when the speed is slow, the sampling time is increased and the time variation of the counter value
+ * is smoothed. This means that the smoothing filter is applied only at low speeds.
+ */
 VescStepDifference::VescStepDifference()
 {
 }
@@ -26,15 +33,24 @@ VescStepDifference::~VescStepDifference()
 {
 }
 
+/**
+ * Enables smoothing and initializes internal parameters.
+ * If this function is not called, smoothing is disabled and the getStepDifference function outputs the difference from
+ * the previous step as is.
+ */
 void VescStepDifference::enableSmooth(double control_rate, double max_sampling_time, int max_step_diff)
 {
   enable_smooth_ = true;
   step_diff_vw_max_step_ = max_step_diff;
   step_diff_vw_max_window_size_ = std::max(1, static_cast<int>(control_rate * max_sampling_time));
-  step_diff_log_.resize(step_diff_vw_max_window_size_ + 1);
+  step_input_queue_.resize(step_diff_vw_max_window_size_ + 1);
   return;
 }
 
+/**
+ * Outputs the difference between the previous input and the current input.
+ * Smoothing is performed when "enable_smooth_" is true
+ */
 double VescStepDifference::getStepDifference(const double step_in, bool reset)
 {
   double output;
@@ -88,22 +104,17 @@ double VescStepDifference::stepDifferenceVariableWindow(const double step_in, bo
 {
   if (reset)
   {
-    for (int i = 0; i < step_diff_log_.size(); i++)
-    {
-      step_diff_log_[i] = static_cast<int16_t>(step_in);
-    }
+    // Fill the buffer with the current value
+    std::fill(step_input_queue_.begin(), step_input_queue_.end(), static_cast<int16_t>(step_in));
     return 0.0;
   }
   // Increment buffer
-  for (int i = step_diff_log_.size() - 1; i > 0; i--)
-  {
-    step_diff_log_[i] = step_diff_log_[i - 1];
-  }
-  step_diff_log_[0] = static_cast<int16_t>(step_in);
+  step_input_queue_.pop_back();
+  step_input_queue_.push_front(static_cast<int16_t>(step_in));
   // Calculate window size
-  int latest_step_diff = abs(step_diff_log_[0] - step_diff_log_[1]);
+  int latest_step_diff = std::abs(step_input_queue_[0] - step_input_queue_[1]);
   int window_size = step_diff_vw_max_window_size_;
-  if (latest_step_diff > step_diff_vw_max_step_ - 1)
+  if (latest_step_diff >= step_diff_vw_max_step_)
   {
     window_size = 1;
   }
@@ -113,10 +124,10 @@ double VescStepDifference::stepDifferenceVariableWindow(const double step_in, bo
                   (1.0 - static_cast<double>(latest_step_diff) / static_cast<double>(step_diff_vw_max_step_));
   }
   // Get output
-  int16_t step_diff = step_diff_log_[0] - step_diff_log_[window_size];
+  int16_t step_diff = step_input_queue_[0] - step_input_queue_[window_size];
   double output = static_cast<double>(step_diff) / static_cast<double>(window_size);
   // ROS_WARN("[VescStepDifference]window,step0,step1,latest_step_diff,output: %d, %d, %d, %d, %f", window_size,
-  //          step_diff_log_[0], step_diff_log_[window_size], latest_step_diff, output);
+  //          step_input_queue_[0], step_input_queue_[window_size], latest_step_diff, output);
   return output;
 }
 

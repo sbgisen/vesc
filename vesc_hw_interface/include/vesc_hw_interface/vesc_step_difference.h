@@ -19,6 +19,8 @@
 #define VESC_STEP_DIFFERENCE_H_
 
 #include <ros/ros.h>
+#include <deque>
+
 namespace vesc_step_difference
 {
 class VescStepDifference
@@ -40,7 +42,7 @@ private:
   // Params for counterTDVariableWindow
   int step_diff_vw_max_window_size_;
   int step_diff_vw_max_step_;
-  std::vector<int16_t> step_diff_log_;
+  std::deque<int16_t> step_input_queue_;
 };
 }  // namespace vesc_step_difference
 

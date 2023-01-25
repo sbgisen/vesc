@@ -84,12 +84,11 @@ void VescWheelController::control()
     error_integ_prev_ = 0.0;
     vesc_step_difference_.getStepDifference(position_steps_, true);
     interface_ptr_->setDutyCycle(0.0);
+    return;
   }
-  else
-  {  // convert rad/s to steps
-    target_steps_ +=
-        target_velocity_ * (num_rotor_poles_ * num_hall_sensors_) / (2 * M_PI) / control_rate_ / gear_ratio_;
-  }
+
+  // convert rad/s to steps
+  target_steps_ += target_velocity_ * (num_rotor_poles_ * num_hall_sensors_) / (2 * M_PI) / control_rate_ / gear_ratio_;
 
   // overflow check
   if ((target_steps_ - position_steps_) > std::numeric_limits<int>::max())
@@ -202,7 +201,7 @@ void VescWheelController::controlTimerCallback(const ros::TimerEvent& e)
 {
   control();
   interface_ptr_->requestState();
-  pid_initialize_ = fabs(target_velocity_) < 0.0001;  // disable PID control when command is 0
+  pid_initialize_ = std::fabs(target_velocity_) < 0.0001;  // disable PID control when command is 0
 }
 
 void VescWheelController::updateSensor(const std::shared_ptr<const VescPacket>& packet)

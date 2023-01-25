@@ -92,7 +92,7 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
     nh.param<double>("servo/smooth_diff/max_sample_sec", smooth_diff_max_sampling_time, 1.0);
     nh.param<int>("servo/smooth_diff/max_smooth_step", counter_td_vw_max_step, 10);
     vesc_step_difference_.enableSmooth(control_rate_, smooth_diff_max_sampling_time, counter_td_vw_max_step);
-    ROS_INFO("[Motor Control] Smooth differentiation enabled, max_sample_sec: %f, max_smooth_step: %d",
+    ROS_INFO("[Servo Control] Smooth differentiation enabled, max_sample_sec: %f, max_smooth_step: %d",
              smooth_diff_max_sampling_time, counter_td_vw_max_step);
   }
   // Create timer callback for PID servo control
@@ -115,7 +115,7 @@ void VescServoController::control()
   // calculates PID control
   double step_diff = vesc_step_difference_.getStepDifference(position_steps_, false);
   double current_vel = step_diff * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_) * control_rate_ * gear_ratio_;
-  double target_vel = (target_pose_limited_ - target_pose_previous_) / control_rate_;
+  double target_vel = (target_pos_limited_ - target_pos_previous_) * control_rate_;
 
   double error = target_pos_limited_ - sens_pos_;
   double error_dt = target_vel - current_vel;

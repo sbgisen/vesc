@@ -1,5 +1,5 @@
 /*********************************************************************
- * Copyright (c) 2022 SoftBank Corp.
+ * Copyright (c) 2023 SoftBank Corp.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,6 @@ private:
   // Params for counterTDRaw
   int32_t step_in_previous_;
   // Params for counterTDVariableWindow
-  int step_diff_vw_max_window_size_;
   int step_diff_vw_max_step_;
   std::deque<int32_t> step_input_queue_;
 };

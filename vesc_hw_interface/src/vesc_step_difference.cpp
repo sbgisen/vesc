@@ -41,7 +41,7 @@ VescStepDifference::~VescStepDifference()
 void VescStepDifference::enableSmooth(double control_rate, double max_sampling_time, int max_step_diff)
 {
   step_diff_vw_max_step_ = max_step_diff;
-  step_diff_vw_max_window_size_ = static_cast<int>(std::round(control_rate * max_sampling_time));
+  int step_diff_vw_max_window_size_ = static_cast<int>(std::round(control_rate * max_sampling_time));
   if (step_diff_vw_max_window_size_ > 0)
   {
     enable_smooth_ = true;

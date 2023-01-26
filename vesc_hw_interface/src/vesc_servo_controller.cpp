@@ -126,27 +126,16 @@ void VescServoController::control()
   // limit duty value
   if (antiwindup_)
   {
-    if (u > duty_limiter_)
+    if (u > duty_limiter_ && error_integ_ > 0)
     {
-      u = duty_limiter_;
-      if (error_integ_ > 0)
-      {
-        error_integ_ = std::max(0.0, (duty_limiter_ - u_p - u_d) / ki_);
-      }
+      error_integ_ = std::max(0.0, (duty_limiter_ - u_p - u_d) / ki_);
     }
-    else if (u < -duty_limiter_)
+    else if (u < -duty_limiter_ && error_integ_ < 0)
     {
-      u = -duty_limiter_;
-      if (error_integ_ < 0)
-      {
-        error_integ_ = std::min(0.0, (-duty_limiter_ - u_p - u_d) / ki_);
-      }
+      error_integ_ = std::min(0.0, (-duty_limiter_ - u_p - u_d) / ki_);
     }
   }
-  else
-  {
-    u = std::clamp(u, -duty_limiter_, duty_limiter_);
-  }
+  u = std::clamp(u, -duty_limiter_, duty_limiter_);
 
   // updates previous data
   sens_position_previous_ = sens_position_;

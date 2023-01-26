@@ -61,12 +61,6 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
   nh.param<std::string>("servo/calibration_mode", calibration_mode_, "current");
   nh.param<double>("servo/calibration_position", calibration_position_, 0.0);
 
-  nh.param<bool>("servo/enable_speed_limit", enable_speed_limit_, false);
-  if (enable_speed_limit_)
-  {
-    nh.param<double>("servo/speed_limit", speed_max_, 1.0);
-  }
-
   // shows parameters
   ROS_INFO("[Servo Gains] P: %f, I: %f, D: %f", kp_, ki_, kd_);
   if (calibration_mode_ == CURRENT)
@@ -116,9 +110,9 @@ void VescServoController::control()
   // calculates PID control
   double step_diff = vesc_step_difference_.getStepDifference(position_steps_, false);
   double current_vel = step_diff * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_) * control_rate_ * gear_ratio_;
-  double target_vel = (target_position_limited_ - target_position_previous_) * control_rate_;
+  double target_vel = (target_position_ - target_position_previous_) * control_rate_;
 
-  double error = target_position_limited_ - sens_position_;
+  double error = target_position_ - sens_position_;
   double error_dt = target_vel - current_vel;
   double error_integ_prev = error_integ_;
   error_integ_ += (error / control_rate_);
@@ -156,7 +150,7 @@ void VescServoController::control()
 
   // updates previous data
   sens_position_previous_ = sens_position_;
-  target_position_previous_ = target_position_limited_;
+  target_position_previous_ = target_position_;
 
   // command duty
   interface_ptr_->setDutyCycle(u);
@@ -277,22 +271,8 @@ bool VescServoController::calibrate()
   }
 }
 
-void VescServoController::limitTargetSpeed()
-{
-  if (enable_speed_limit_)
-  {
-    target_position_limited_ = std::clamp(target_position_, target_position_previous_ - speed_max_ / control_rate_,
-                                          target_position_previous_ + speed_max_ / control_rate_);
-  }
-  else
-  {
-    target_position_limited_ = target_position_;
-  }
-}
-
 void VescServoController::controlTimerCallback(const ros::TimerEvent& e)
 {
-  limitTargetSpeed();
   control();
   interface_ptr_->requestState();
 }

@@ -78,8 +78,6 @@ private:
   double gear_ratio_, torque_const_;  // physical params
   double screw_lead_;                 // linear distance (m) of 1 revolution
   int joint_type_;
-  bool enable_speed_limit_;
-  double speed_max_;
   ros::Timer control_timer_;
   // Internal variables for PID control
   double target_position_;
@@ -96,7 +94,6 @@ private:
   double calibration_previous_position_;
 
   bool calibrate();
-  void limitTargetSpeed();
   void controlTimerCallback(const ros::TimerEvent& e);
 };
 

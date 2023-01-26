@@ -76,12 +76,13 @@ void VescWheelController::control()
     {
       // Start PID control only when sensor initialization is complete
       pid_initialize_ = false;
+      vesc_step_difference_.getStepDifference(position_steps_, true);
     }
     target_steps_ = position_steps_;
     error_ = 0.0;
     error_dt_ = 0.0;
     error_integ_ = 0.0;
-    vesc_step_difference_.getStepDifference(position_steps_, true);
+    vesc_step_difference_.getStepDifference(position_steps_, false);
     interface_ptr_->setDutyCycle(0.0);
     return;
   }

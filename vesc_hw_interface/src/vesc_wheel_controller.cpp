@@ -107,16 +107,8 @@ void VescWheelController::control()
   error_dt_ = target_velocity_ - current_vel;
   error_ = (target_steps_ - position_steps_) * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_);
   error_integ_ += (error_ / control_rate_);
+  error_integ_ = std::clamp(error_integ_, -i_clamp_ / ki_, i_clamp_ / ki_);
 
-  // limit integral
-  if (ki_ * error_integ_ > i_clamp_)
-  {
-    error_integ_ = i_clamp_ / ki_;
-  }
-  else if (ki_ * error_integ_ < -i_clamp_)
-  {
-    error_integ_ = -i_clamp_ / ki_;
-  }
   const double u_p = kp_ * error_;
   const double u_d = kd_ * error_dt_;
   const double u_i = ki_ * error_integ_;

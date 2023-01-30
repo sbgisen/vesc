@@ -28,7 +28,8 @@ class VescStepDifference
 public:
   VescStepDifference();
   ~VescStepDifference();
-  double getStepDifference(const double step_in, bool reset);
+  double getStepDifference(const double step_in);
+  void resetStepDifference(const double step_in);
   void enableSmooth(double control_rate, double max_sampling_time, int max_step_diff);
 
 private:

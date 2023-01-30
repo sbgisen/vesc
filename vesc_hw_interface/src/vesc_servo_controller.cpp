@@ -103,12 +103,12 @@ void VescServoController::control()
     // initializes/resets control variables
     sens_position_previous_ = sens_position_;
     target_position_previous_ = calibration_position_;
-    vesc_step_difference_.getStepDifference(position_steps_, true);
+    vesc_step_difference_.resetStepDifference(position_steps_);
     return;
   }
 
-  // calculates PID control
-  double step_diff = vesc_step_difference_.getStepDifference(position_steps_, false);
+  // PID control
+  double step_diff = vesc_step_difference_.getStepDifference(position_steps_);
   double current_vel = step_diff * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_) * control_rate_ * gear_ratio_;
   double target_vel = (target_position_ - target_position_previous_) * control_rate_;
 
@@ -123,7 +123,7 @@ void VescServoController::control()
   const double u_i = ki_ * error_integ_;
   double u = u_p + u_d + u_i;
 
-  // limit duty value
+  // limit integral
   if (antiwindup_)
   {
     if (u > duty_limiter_ && error_integ_ > 0)
@@ -135,6 +135,8 @@ void VescServoController::control()
       error_integ_ = std::min(0.0, (-duty_limiter_ - u_p - u_d) / ki_);
     }
   }
+
+  // limit duty value
   u = std::clamp(u, -duty_limiter_, duty_limiter_);
 
   // updates previous data

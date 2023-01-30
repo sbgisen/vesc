@@ -58,19 +58,35 @@ void VescStepDifference::enableSmooth(double control_rate, double max_sampling_t
 }
 
 /**
+ * Initialize the buffer (past values) for calculating the step difference.
+ * You must enter the current step for input.
+ */
+void VescStepDifference::resetStepDifference(const double step_in)
+{
+  if (enable_smooth_)
+  {
+    this->stepDifferenceVariableWindow(step_in, true);
+  }
+  else
+  {
+    this->stepDifferenceRaw(step_in, true);
+  }
+}
+
+/**
  * Outputs the difference between the previous input and the current input.
  * Smoothing is performed when "enable_smooth_" is true
  */
-double VescStepDifference::getStepDifference(const double step_in, bool reset)
+double VescStepDifference::getStepDifference(const double step_in)
 {
   double output;
   if (enable_smooth_)
   {
-    output = this->stepDifferenceVariableWindow(step_in, reset);
+    output = this->stepDifferenceVariableWindow(step_in, false);
   }
   else
   {
-    output = this->stepDifferenceRaw(step_in, reset);
+    output = this->stepDifferenceRaw(step_in, false);
   }
   return output;
 }

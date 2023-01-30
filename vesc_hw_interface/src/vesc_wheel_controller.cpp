@@ -76,13 +76,13 @@ void VescWheelController::control()
     {
       // Start PID control only when sensor initialization is complete
       pid_initialize_ = false;
-      vesc_step_difference_.getStepDifference(position_steps_, true);
+      vesc_step_difference_.resetStepDifference(position_steps_);
     }
     target_steps_ = position_steps_;
     error_ = 0.0;
     error_dt_ = 0.0;
     error_integ_ = 0.0;
-    vesc_step_difference_.getStepDifference(position_steps_, false);
+    vesc_step_difference_.getStepDifference(position_steps_);
     interface_ptr_->setDutyCycle(0.0);
     return;
   }
@@ -102,8 +102,8 @@ void VescWheelController::control()
         static_cast<double>(std::numeric_limits<int>::max()) - static_cast<double>(std::numeric_limits<int>::min());
   }
 
-  // pid control
-  double step_diff = vesc_step_difference_.getStepDifference(position_steps_, false);
+  // PID control
+  double step_diff = vesc_step_difference_.getStepDifference(position_steps_);
   double current_vel = step_diff * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_) * control_rate_ * gear_ratio_;
   error_dt_ = target_velocity_ - current_vel;
   error_ = (target_steps_ - position_steps_) * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_);
@@ -115,7 +115,7 @@ void VescWheelController::control()
   const double u_i = ki_ * error_integ_;
   double u = u_p + u_d + u_i;
 
-  // limit duty value
+  // limit integral
   if (antiwindup_)
   {
     if (u > duty_limiter_ && error_integ_ > 0)
@@ -127,7 +127,8 @@ void VescWheelController::control()
       error_integ_ = std::min(0.0, (-duty_limiter_ - u_p - u_d) / ki_);
     }
   }
-  // limit integral
+
+  // limit duty value
   u = std::clamp(u, -duty_limiter_, duty_limiter_);
 
   interface_ptr_->setDutyCycle(u);

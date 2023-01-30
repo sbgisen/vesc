@@ -101,7 +101,6 @@ void VescServoController::control()
   {
     calibrate();
     // initializes/resets control variables
-    sens_position_previous_ = sens_position_;
     target_position_previous_ = calibration_position_;
     vesc_step_difference_.resetStepDifference(position_steps_);
     return;
@@ -140,7 +139,6 @@ void VescServoController::control()
   u = std::clamp(u, -duty_limiter_, duty_limiter_);
 
   // updates previous data
-  sens_position_previous_ = sens_position_;
   target_position_previous_ = target_position_;
 
   // command duty

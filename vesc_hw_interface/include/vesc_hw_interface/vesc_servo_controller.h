@@ -25,12 +25,14 @@
 #include <ros/ros.h>
 #include <urdf_model/joint.h>
 #include <vesc_driver/vesc_interface.h>
+#include <vesc_hw_interface/vesc_step_difference.h>
 
 namespace vesc_hw_interface
 {
 using vesc_driver::VescInterface;
 using vesc_driver::VescPacket;
 using vesc_driver::VescPacketValues;
+using vesc_step_difference::VescStepDifference;
 
 class VescServoController
 {
@@ -38,9 +40,9 @@ public:
   VescServoController();
   ~VescServoController();
 
-  void init(ros::NodeHandle, VescInterface*);
-  void control(const double, const double);
-  void setTargetPosition(const double position_reference);
+  void init(ros::NodeHandle nh, VescInterface* interface_ptr);
+  void control();
+  void setTargetPosition(const double position);
   void setGearRatio(const double gear_ratio);
   void setTorqueConst(const double torque_const);
   void setRotorPoles(const int rotor_poles);
@@ -48,14 +50,15 @@ public:
   void setJointType(const int joint_type);
   void setScrewLead(const double screw_lead);
   double getZeroPosition() const;
-  double getPositionSens(void);
-  double getVelocitySens(void);
-  double getEffortSens(void);
+  double getPositionSens();
+  double getVelocitySens();
+  double getEffortSens();
   void executeCalibration();
-  void updateSensor(const std::shared_ptr<VescPacket const>&);
+  void updateSensor(const std::shared_ptr<VescPacket const>& packet);
 
 private:
   VescInterface* interface_ptr_;
+  VescStepDifference vesc_step_difference_;
 
   const std::string DUTY = "duty";
   const std::string CURRENT = "current";
@@ -66,33 +69,29 @@ private:
   std::string calibration_mode_;  // "duty" or "current" (default: "current")
   double calibration_position_;   // unit: rad or m
   double zero_position_;          // unit: rad or m
-  double Kp_, Ki_, Kd_;
-  double control_rate_, control_period_;
-  double position_target_;
-  double position_reference_;  // limited with speed (speed_limit_)
-  double position_reference_previous_;
-  double position_sens_, velocity_sens_, effort_sens_;
-  double position_sens_previous_;
-  double error_previous_;
-  double error_integ_;
-  ros::Time time_previous_;
+  double kp_, ki_, kd_;
+  double i_clamp_, duty_limiter_;
+  bool antiwindup_;
+  double control_rate_;
   int num_rotor_poles_;               // the number of rotor poles
   int num_hall_sensors_;              // the number of hall sensors
   double gear_ratio_, torque_const_;  // physical params
   double screw_lead_;                 // linear distance (m) of 1 revolution
   int joint_type_;
-  double speed_limit_;
   ros::Timer control_timer_;
+  // Internal variables for PID control
+  double target_position_;
+  double target_position_previous_;
+  double sens_position_, sens_velocity_, sens_effort_;
   double position_steps_;
-  int prev_steps_;
-  bool initialize_;
+  int32_t steps_previous_;
+  double error_integ_;
+  // Internal variables for initialization
+  bool sensor_initialize_;
   int calibration_steps_;
   double calibration_previous_position_;
 
-  bool calibrate(const double);
-  bool isSaturated(const double) const;
-  double saturate(const double) const;
-  void updateSpeedLimitedPositionReference(void);
+  bool calibrate();
   void controlTimerCallback(const ros::TimerEvent& e);
 };
 

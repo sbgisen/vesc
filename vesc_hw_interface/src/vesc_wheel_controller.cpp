@@ -36,15 +36,30 @@ void VescWheelController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
   nh.param<double>("motor/i_clamp", i_clamp_, 0.2);
   nh.param<double>("motor/duty_limiter", duty_limiter_, 1.0);
   nh.param<bool>("motor/antiwindup", antiwindup_, true);
-  nh.param("motor/control_rate", control_rate_, 100.0);
+  nh.param<double>("motor/control_rate", control_rate_, 100.0);
 
   ROS_INFO("[Motor Gains] P: %f, I: %f, D: %f", kp_, ki_, kd_);
   ROS_INFO("[Motor Gains] I clamp: %f, Antiwindup: %s", i_clamp_, antiwindup_ ? "true" : "false");
+  ROS_INFO("[Motor Control] control_rate: %f", control_rate_);
 
-  reset_ = true;
-  initialize_ = true;
+  // Smoothing differentiation when hall sensor resolution is insufficient
+  bool smooth_diff;
+  nh.param<bool>("motor/enable_smooth_diff", smooth_diff, true);
+  if (smooth_diff)
+  {
+    double smooth_diff_max_sampling_time;
+    int counter_td_vw_max_step;
+    nh.param<double>("motor/smooth_diff/max_sample_sec", smooth_diff_max_sampling_time, 1.0);
+    nh.param<int>("motor/smooth_diff/max_smooth_step", counter_td_vw_max_step, 10);
+    vesc_step_difference_.enableSmooth(control_rate_, smooth_diff_max_sampling_time, counter_td_vw_max_step);
+    ROS_INFO("[Motor Control] Smooth differentiation enabled, max_sample_sec: %f, max_smooth_step: %d",
+             smooth_diff_max_sampling_time, counter_td_vw_max_step);
+  }
+
+  sensor_initialize_ = true;
+  pid_initialize_ = true;
   position_sens_ = 0.0;
-  velocity_reference_ = 0.0;
+  target_velocity_ = 0.0;
   position_steps_ = 0.0;
   prev_steps_ = 0.0;
   velocity_sens_ = 0.0;
@@ -53,132 +68,75 @@ void VescWheelController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
   control_timer_ = nh.createTimer(ros::Duration(1.0 / control_rate_), &VescWheelController::controlTimerCallback, this);
 }
 
-void VescWheelController::control(const double target_velocity, const double current_steps, bool reset)
+void VescWheelController::control()
 {
-  if (reset)
+  if (pid_initialize_)
   {
-    target_steps_ = current_steps;
+    if (!sensor_initialize_)
+    {
+      // Start PID control only when sensor initialization is complete
+      pid_initialize_ = false;
+      vesc_step_difference_.resetStepDifference(position_steps_);
+    }
+    target_steps_ = position_steps_;
     error_ = 0.0;
     error_dt_ = 0.0;
     error_integ_ = 0.0;
-    error_integ_prev_ = 0.0;
-    this->counterTD(current_steps, true);
-  }
-  else
-  {  // convert rad/s to steps
-    target_steps_ +=
-        target_velocity * (num_rotor_poles_ * num_hall_sensors_) / (2 * M_PI) / control_rate_ / gear_ratio_;
+    vesc_step_difference_.getStepDifference(position_steps_);
+    interface_ptr_->setDutyCycle(0.0);
+    return;
   }
 
+  // convert rad/s to steps
+  target_steps_ += target_velocity_ * (num_rotor_poles_ * num_hall_sensors_) / (2 * M_PI) / control_rate_ / gear_ratio_;
+
   // overflow check
-  if ((target_steps_ - current_steps) > std::numeric_limits<int>::max())
+  if ((target_steps_ - position_steps_) > std::numeric_limits<int>::max())
   {
     target_steps_ +=
         static_cast<double>(std::numeric_limits<int>::min()) - static_cast<double>(std::numeric_limits<int>::max());
   }
-  else if ((target_steps_ - current_steps) < std::numeric_limits<int>::min())
+  else if ((target_steps_ - position_steps_) < std::numeric_limits<int>::min())
   {
     target_steps_ +=
         static_cast<double>(std::numeric_limits<int>::max()) - static_cast<double>(std::numeric_limits<int>::min());
   }
 
-  // pid control
-  double current_vel = this->counterTD(current_steps, false) * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_) *
-                       control_rate_ * gear_ratio_;
-  error_dt_ = target_velocity - current_vel;
-  error_ = (target_steps_ - current_steps) * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_);
-  error_integ_prev_ = error_integ_;
+  // PID control
+  double step_diff = vesc_step_difference_.getStepDifference(position_steps_);
+  double current_vel = step_diff * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_) * control_rate_ * gear_ratio_;
+  error_dt_ = target_velocity_ - current_vel;
+  error_ = (target_steps_ - position_steps_) * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_);
   error_integ_ += (error_ / control_rate_);
-  double duty = (kp_ * error_ + ki_ * error_integ_ + kd_ * error_dt_);
+  error_integ_ = std::clamp(error_integ_, -i_clamp_ / ki_, i_clamp_ / ki_);
 
+  const double u_p = kp_ * error_;
+  const double u_d = kd_ * error_dt_;
+  const double u_i = ki_ * error_integ_;
+  double u = u_p + u_d + u_i;
+
+  // limit integral
   if (antiwindup_)
   {
-    if (duty > duty_limiter_)
+    if (u > duty_limiter_ && error_integ_ > 0)
     {
-      duty = duty_limiter_;
-      if (error_integ_ > error_integ_prev_)
-      {
-        error_integ_ = error_integ_prev_;
-        duty = (kp_ * error_ + ki_ * error_integ_ + kd_ * error_dt_);
-      }
+      error_integ_ = std::max(0.0, (duty_limiter_ - u_p - u_d) / ki_);
     }
-    else if (duty < -duty_limiter_)
+    else if (u < -duty_limiter_ && error_integ_ < 0)
     {
-      duty = -duty_limiter_;
-      if (error_integ_ < error_integ_prev_)
-      {
-        error_integ_ = error_integ_prev_;
-        duty = (kp_ * error_ + ki_ * error_integ_ + kd_ * error_dt_);
-      }
-    }
-    if (ki_ * error_integ_ > i_clamp_)
-    {
-      error_integ_ = i_clamp_ / ki_;
-    }
-    else if (ki_ * error_integ_ < -i_clamp_)
-    {
-      error_integ_ = -i_clamp_ / ki_;
+      error_integ_ = std::min(0.0, (-duty_limiter_ - u_p - u_d) / ki_);
     }
   }
 
   // limit duty value
-  duty = std::clamp(duty, -duty_limiter_, duty_limiter_);
-  interface_ptr_->setDutyCycle(fabs(target_velocity) < 0.0001 ? 0.0 : duty);
+  u = std::clamp(u, -duty_limiter_, duty_limiter_);
+
+  interface_ptr_->setDutyCycle(u);
 }
 
-double VescWheelController::counterTD(const double count_in, bool reset)
+void VescWheelController::setTargetVelocity(const double velocity)
 {
-  if (reset)
-  {
-    counter_changed_single_ = 1;
-    for (int i = 0; i < 10; i++)
-    {
-      counter_changed_log_[i][0] = static_cast<uint16_t>(count_in);
-      counter_changed_log_[i][1] = 100;
-      counter_td_tmp_[i] = 0;
-    }
-    return 0.0;
-  }
-
-  if (counter_changed_log_[0][0] != static_cast<uint16_t>(count_in))
-  {
-    for (int i = 0; i < 10; i++)
-    {
-      counter_changed_log_[10 - i][0] = counter_changed_log_[9 - i][0];
-    }
-    counter_changed_log_[0][0] = static_cast<uint16_t>(count_in);
-    counter_changed_log_[0][1] = counter_changed_single_;
-    counter_changed_single_ = 1;
-  }
-  else
-  {
-    if (counter_changed_single_ > counter_changed_log_[0][1])
-    {
-      counter_changed_log_[0][1] = counter_changed_single_;
-    }
-    if (counter_changed_single_ < 100)
-    {
-      counter_changed_single_++;
-    }
-  }
-
-  for (int i = 1; i < 10; i++)
-  {
-    counter_td_tmp_[10 - i] = counter_td_tmp_[9 - i];
-  }
-  counter_td_tmp_[0] = static_cast<double>(counter_changed_log_[0][0] - counter_changed_log_[1][0]) /
-                       static_cast<double>(counter_changed_log_[0][1]);
-  double output = counter_td_tmp_[0];
-  if (fabs(output) > 100.0)
-  {
-    output = 0.0;
-  }
-  return output;
-}
-
-void VescWheelController::setTargetVelocity(const double velocity_reference)
-{
-  velocity_reference_ = velocity_reference;
+  target_velocity_ = velocity;
 }
 
 void VescWheelController::setGearRatio(const double gear_ratio)
@@ -223,9 +181,9 @@ double VescWheelController::getEffortSens()
 
 void VescWheelController::controlTimerCallback(const ros::TimerEvent& e)
 {
-  control(velocity_reference_, position_steps_, reset_);
+  control();
   interface_ptr_->requestState();
-  reset_ = fabs(velocity_reference_) < 0.0001;  // disable PID control when command is 0
+  pid_initialize_ = std::fabs(target_velocity_) < 0.0001;  // disable PID control when command is 0
 }
 
 void VescWheelController::updateSensor(const std::shared_ptr<const VescPacket>& packet)
@@ -235,19 +193,19 @@ void VescWheelController::updateSensor(const std::shared_ptr<const VescPacket>& 
     std::shared_ptr<VescPacketValues const> values = std::dynamic_pointer_cast<VescPacketValues const>(packet);
     const double current = values->getMotorCurrent();
     const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_rotor_pole_pairs_) * gear_ratio_;
-    const int steps = static_cast<int>(values->getPosition());
-    if (initialize_)
+    const int32_t steps = static_cast<int32_t>(values->getPosition());
+    if (sensor_initialize_)
     {
       prev_steps_ = steps;
-      initialize_ = false;
+      sensor_initialize_ = false;
     }
     position_steps_ += static_cast<double>(steps - prev_steps_);
     prev_steps_ = steps;
 
-    position_sens_ = (position_steps_ * 2.0 * M_PI) /
-                      (num_rotor_poles_ * num_hall_sensors_) * gear_ratio_;  // convert steps to rad
-    velocity_sens_ = velocity_rpm * 2 * M_PI / 60;                           // convert rpm to rad/s
-    effort_sens_ = current * torque_const_ / gear_ratio_;                    // unit: Nm or N
+    position_sens_ =
+        (position_steps_ * 2.0 * M_PI) / (num_rotor_poles_ * num_hall_sensors_) * gear_ratio_;  // convert steps to rad
+    velocity_sens_ = velocity_rpm * 2 * M_PI / 60;                                              // convert rpm to rad/s
+    effort_sens_ = current * torque_const_ / gear_ratio_;                                       // unit: Nm or N
   }
 }
 }  // namespace vesc_hw_interface

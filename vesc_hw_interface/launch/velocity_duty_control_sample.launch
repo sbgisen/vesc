@@ -16,11 +16,16 @@
       torque_const: 1
       motor:
         Kp: 0.1
-        Ki: 1.0
-        Kd: 0.01
-        i_clamp: 0.2
+        Ki: 0.01
+        Kd: 0.02
+        i_clamp: 1.0
         duty_limiter: 1.0
         antiwindup: true
+        control_rate: 100
+        enable_smooth_diff: true
+        smooth_diff:
+          max_sample_sec: 0.2
+          max_smooth_step: 10
     </rosparam>
   </node>
 

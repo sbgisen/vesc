@@ -20,19 +20,21 @@
 
 #include <ros/ros.h>
 #include <vesc_driver/vesc_interface.h>
+#include <vesc_hw_interface/vesc_step_difference.h>
 
 namespace vesc_hw_interface
 {
 using vesc_driver::VescInterface;
 using vesc_driver::VescPacket;
 using vesc_driver::VescPacketValues;
+using vesc_step_difference::VescStepDifference;
 
 class VescWheelController
 {
 public:
   void init(ros::NodeHandle nh, VescInterface* vesc_interface);
-  void control(const double target_velocity, const double current_steps, bool reset);
-  void setTargetVelocity(const double velocity_reference);
+  void control();
+  void setTargetVelocity(const double velocity);
   void setGearRatio(const double gear_ratio);
   void setTorqueConst(const double torque_const);
   void setRotorPoles(const int rotor_poles);
@@ -40,10 +42,11 @@ public:
   double getPositionSens();
   double getVelocitySens();
   double getEffortSens();
-  void updateSensor(const std::shared_ptr<VescPacket const>&);
+  void updateSensor(const std::shared_ptr<const VescPacket>& packet);
 
 private:
   VescInterface* interface_ptr_;
+  VescStepDifference vesc_step_difference_;
 
   double kp_, ki_, kd_;
   double i_clamp_;
@@ -53,26 +56,21 @@ private:
   double num_hall_sensors_;
   double gear_ratio_, torque_const_;
 
-  double control_rate_;
-  ros::Timer control_timer_;
-  void controlTimerCallback(const ros::TimerEvent& e);
-
-  double velocity_reference_;
+  double target_velocity_;
   double position_steps_;
   int prev_steps_;
   double position_sens_;
   double velocity_sens_;
   double effort_sens_;
 
-  double error_, error_dt_, error_integ_, error_integ_prev_;
+  double error_, error_dt_, error_integ_;
   double target_steps_;
-  bool reset_;
-  bool initialize_;
+  bool pid_initialize_;
+  bool sensor_initialize_;
 
-  double counterTD(const double count_in, bool reset);
-  uint16_t counter_changed_log_[10][2];
-  double counter_td_tmp_[10];
-  uint16_t counter_changed_single_;
+  double control_rate_;
+  ros::Timer control_timer_;
+  void controlTimerCallback(const ros::TimerEvent& e);
 };
 }  // namespace vesc_hw_interface
 

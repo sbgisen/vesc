@@ -27,6 +27,7 @@ namespace vesc_step_difference
  */
 VescStepDifference::VescStepDifference()
 {
+  enable_smooth_ = false;
 }
 
 VescStepDifference::~VescStepDifference()
@@ -50,6 +51,7 @@ void VescStepDifference::enableSmooth(double control_rate, double max_sampling_t
   else
   {
     // Disable smoothing if step_diff_vw_max_window_size_ is too small
+    ROS_WARN("[VescStepDifference::enableSmooth] max_sampling_time is too small, disable smoothing");
     enable_smooth_ = false;
   }
   return;

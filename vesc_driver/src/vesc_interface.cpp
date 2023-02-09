@@ -33,16 +33,16 @@
  * Corp. takes over development as new packages.
  ********************************************************************/
 
-#include "vesc_driver/vesc_interface.h"
+#include "vesc_driver/vesc_interface.hpp"
+#include <serial_driver/serial_driver.hpp>
+#include <rclcpp/rclcpp.hpp>
 
 namespace vesc_driver
 {
 class VescInterface::Impl
 {
 public:
-  Impl()
-    : serial_(std::string(), 115200, serial::Timeout::simpleTimeout(100), serial::eightbits, serial::parity_none,
-              serial::stopbits_one, serial::flowcontrol_none)
+  Impl() : owned_ctx(new IoContext(2)), serial_driver_(new drivers::serial_driver::SerialDriver(*owned_ctx))
   {
     data_updated_ = false;
   }
@@ -58,19 +58,31 @@ public:
   bool rx_thread_run_;
   PacketHandlerFunction packet_handler_;
   ErrorHandlerFunction error_handler_;
-  serial::Serial serial_;
+  std::unique_ptr<IoContext> owned_ctx{};
+  std::unique_ptr<drivers::serial_driver::SerialPortConfig> device_config_;
   VescFrame::CRC send_crc_;
   bool data_updated_;
+  std::unique_ptr<drivers::serial_driver::SerialDriver> serial_driver_;
 };
 
 void* VescInterface::Impl::rxThread(void)
 {
   Buffer buffer;
   buffer.reserve(4096);
+  auto temp_buffer = Buffer(4096);
 
   while (rx_thread_run_)
   {
     int bytes_needed = VescFrame::VESC_MIN_FRAME_SIZE;
+    // attempt to read at least bytes_needed bytes from the serial port
+    const auto bytes_read = serial_driver_->port()->receive(temp_buffer);
+    buffer.reserve(buffer.size() + bytes_read);
+    buffer.insert(buffer.end(), temp_buffer.begin(), temp_buffer.begin() + bytes_read);
+    // RCLCPP_INFO(rclcpp::get_logger("VescDriver"), "Read packets: %d", bytes_read);
+    if (bytes_needed > 0 && 0 == bytes_read && !buffer.empty())
+    {
+      error_handler_("Possibly out-of-sync with VESC, read timout in the middle of a frame.");
+    }
     if (!buffer.empty())
     {
       // search buffer for valid packet(s)
@@ -132,14 +144,6 @@ void* VescInterface::Impl::rxThread(void)
       }
       buffer.erase(buffer.begin(), iter);
     }
-
-    // attempt to read at least bytes_needed bytes from the serial port
-    int bytes_to_read = std::max(bytes_needed, std::min(4096, static_cast<int>(serial_.available())));
-    int bytes_read = serial_.read(buffer, bytes_to_read);
-    if (bytes_needed > 0 && 0 == bytes_read && !buffer.empty())
-    {
-      error_handler_("Possibly out-of-sync with VESC, read timout in the middle of a frame.");
-    }
   }
 }
 
@@ -186,8 +190,16 @@ void VescInterface::connect(const std::string& port)
   // connect to serial port
   try
   {
-    impl_->serial_.setPort(port);
-    impl_->serial_.open();
+    const uint32_t baud_rate = 115200;
+    const auto fc = drivers::serial_driver::FlowControl::NONE;
+    const auto pt = drivers::serial_driver::Parity::NONE;
+    const auto sb = drivers::serial_driver::StopBits::ONE;
+    impl_->device_config_ = std::make_unique<drivers::serial_driver::SerialPortConfig>(baud_rate, fc, pt, sb);
+    impl_->serial_driver_->init_port(port, *impl_->device_config_);
+    if (!impl_->serial_driver_->port()->is_open())
+    {
+      impl_->serial_driver_->port()->open();
+    }
   }
   catch (const std::exception& e)
   {
@@ -213,13 +225,22 @@ void VescInterface::disconnect()
     int result = pthread_join(impl_->rx_thread_, NULL);
     assert(0 == result);
 
-    impl_->serial_.close();
+    impl_->serial_driver_->port()->close();
   }
 }
 
 bool VescInterface::isConnected() const
 {
-  return impl_->serial_.isOpen();
+  auto port = impl_->serial_driver_->port();
+
+  if (port)
+  {
+    return port->is_open();
+  }
+  else
+  {
+    return false;
+  }
 }
 
 bool VescInterface::isRxDataUpdated() const
@@ -231,7 +252,7 @@ bool VescInterface::isRxDataUpdated() const
 
 void VescInterface::send(const VescPacket& packet)
 {
-  size_t written = impl_->serial_.write(packet.getFrame());
+  std::size_t written = impl_->serial_driver_->port()->send(packet.getFrame());
   if (written != packet.getFrame().size())
   {
     std::stringstream ss;

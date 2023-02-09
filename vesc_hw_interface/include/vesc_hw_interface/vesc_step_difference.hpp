@@ -15,10 +15,10 @@
  *
  ********************************************************************/
 
-#ifndef VESC_STEP_DIFFERENCE_H_
-#define VESC_STEP_DIFFERENCE_H_
+#ifndef VESC_STEP_DIFFERENCE_HPP_
+#define VESC_STEP_DIFFERENCE_HPP_
 
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 #include <deque>
 
 namespace vesc_step_difference
@@ -46,4 +46,4 @@ private:
 };
 }  // namespace vesc_step_difference
 
-#endif
+#endif  // VESC_STEP_DIFFERENCE_HPP_

@@ -1,69 +1,87 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.8)
 project(vesc_hw_interface)
 
 add_compile_options(-std=c++17)
 
-find_package(
-  catkin REQUIRED
-  COMPONENTS roscpp
-             serial
-             hardware_interface
-             joint_limits_interface
-             controller_manager
-             pluginlib
-             urdf
-             vesc_driver
+if(CMAKE_COMPILER_IS_GNUCXX
+   OR CMAKE_CXX_COMPILER_ID
+      MATCHES
+      "Clang"
 )
+  add_compile_options(
+    -Wall
+    -Wextra
+    -Wpedantic
+  )
+endif()
 
-catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES ${PROJECT_NAME}
-  CATKIN_DEPENDS
-    roscpp
-    serial
+set(DEPENDENCIES
+    angles
     hardware_interface
-    joint_limits_interface
-    controller_manager
+    joint_limits
     pluginlib
-    urdf
+    rclcpp
+    rclcpp_lifecycle
+    vesc_msgs
     vesc_driver
 )
 
-include_directories(
-  include
-  ${Boost_INCLUDE_DIRS}
-  ${catkin_INCLUDE_DIRS}
-)
+# find dependencies
+find_package(ament_cmake REQUIRED)
+foreach(Dependency IN ITEMS ${DEPENDENCIES})
+  find_package(${Dependency} REQUIRED)
+endforeach()
+find_package(Threads REQUIRED)
 
 add_library(
-  ${PROJECT_NAME}
+  ${PROJECT_NAME} SHARED
   src/vesc_hw_interface.cpp
   src/vesc_servo_controller.cpp
   src/vesc_wheel_controller.cpp
   src/vesc_step_difference.cpp
 )
-add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
-add_executable(${PROJECT_NAME}_node src/vesc_hw_interface_node.cpp)
-add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS})
-target_link_libraries(
-  ${PROJECT_NAME}_node
-  ${catkin_LIBRARIES}
-  ${PROJECT_NAME}
+target_include_directories(${PROJECT_NAME} PUBLIC include)
+
+ament_target_dependencies(${PROJECT_NAME} ${DEPENDENCIES})
+target_compile_definitions(${PROJECT_NAME} PRIVATE "HARDWARE_INTERFACE_BUILDING_DLL")
+
+pluginlib_export_plugin_description_file(hardware_interface vesc_hw_interface_plugin.xml)
+
+install(
+  DIRECTORY include/
+  DESTINATION include
 )
 
 install(
   TARGETS ${PROJECT_NAME}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  DESTINATION lib
 )
 
 install(
-  DIRECTORY include/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME}
 )
 
-install(
-  DIRECTORY launch/
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  # the following line skips the linter which checks for copyrights
+  # comment the line when a copyright and license is added to all source files
+  set(ament_cmake_copyright_FOUND TRUE)
+  # the following line skips cpplint (only works in a git repo)
+  # comment the line when this package is in a git repo and when
+  # a copyright and license is added to all source files
+  set(ament_cmake_cpplint_FOUND TRUE)
+  ament_lint_auto_find_test_dependencies()
+endif()
+
+ament_export_include_directories(include)
+ament_export_libraries(${PROJECT_NAME})
+ament_export_dependencies(
+  hardware_interface
+  joint_limits
+  pluginlib
+  rclcpp
+  rclcpp_lifecycle
 )
+ament_package()

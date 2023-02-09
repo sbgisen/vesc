@@ -1,20 +1,45 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.8)
 project(vesc_msgs)
 
-find_package(catkin REQUIRED COMPONENTS
+if(CMAKE_COMPILER_IS_GNUCXX
+   OR CMAKE_CXX_COMPILER_ID
+      MATCHES
+      "Clang"
+)
+  add_compile_options(
+    -Wall
+    -Wextra
+    -Wpedantic
+  )
+endif()
+
+find_package(ament_cmake REQUIRED)
+find_package(builtin_interfaces REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
+find_package(std_msgs REQUIRED)
+
+set(msg_files "msg/VescState.msg" "msg/VescStateStamped.msg")
+
+rosidl_generate_interfaces(
+  ${PROJECT_NAME}
+  ${msg_files}
+  DEPENDENCIES
+  builtin_interfaces
   std_msgs
-  message_generation
 )
 
-add_message_files(
-  DIRECTORY msg
-  FILES VescState.msg VescStateStamped.msg
-)
+ament_export_dependencies(rosidl_default_runtime)
 
-generate_messages(
-  DEPENDENCIES std_msgs
-)
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  # the following line skips the linter which checks for copyrights
+  # comment the line when a copyright and license is added to all source files
+  set(ament_cmake_copyright_FOUND TRUE)
+  # the following line skips cpplint (only works in a git repo)
+  # comment the line when this package is in a git repo and when
+  # a copyright and license is added to all source files
+  set(ament_cmake_cpplint_FOUND TRUE)
+  ament_lint_auto_find_test_dependencies()
+endif()
 
-catkin_package(
-  CATKIN_DEPENDS std_msgs message_runtime
-)
+ament_package()

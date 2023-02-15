@@ -260,7 +260,7 @@ hardware_interface::return_type VescHwInterface::read(const rclcpp::Time& /*time
     vesc_interface_->requestState();
   }
 
-  if (joint_type_ == "continuous")
+  if (joint_type_ == "revolute")
   {
     position_ = angles::normalize_angle(position_);
   }

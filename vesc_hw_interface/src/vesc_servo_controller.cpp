@@ -65,6 +65,11 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
   nh.param<std::string>("servo/calibration_result_path", calibration_result_path_, "servo_calibration_result.yaml");
   if (!calibration_flag_)
   {
+    if (!nh.hasParam("servo/last_position"))
+    {
+      ROS_ERROR("[Servo Control] No last_position parameter found. Please calibrate servo first.");
+      ros::shutdown();
+    }
     nh.param<double>("servo/last_position", target_position_, 0.0);
   }
 

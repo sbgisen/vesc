@@ -90,6 +90,7 @@ private:
   bool sensor_initialize_;
   int calibration_steps_;
   double calibration_previous_position_;
+  std::string calibration_result_path_;
 
   bool calibrate();
   void controlTimerCallback(const ros::TimerEvent& e);

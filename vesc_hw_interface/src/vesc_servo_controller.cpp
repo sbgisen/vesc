@@ -15,6 +15,7 @@
  ********************************************************************/
 
 #include "vesc_hw_interface/vesc_servo_controller.h"
+#include <fstream>
 
 namespace vesc_hw_interface
 {
@@ -60,6 +61,12 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
   nh.param<double>("servo/calibration_duty", calibration_duty_, 0.1);
   nh.param<std::string>("servo/calibration_mode", calibration_mode_, "current");
   nh.param<double>("servo/calibration_position", calibration_position_, 0.0);
+  nh.param<bool>("servo/calibration", calibration_flag_, true);
+  nh.param<std::string>("servo/calibration_result_path", calibration_result_path_, "servo_calibration_result.yaml");
+  if (!calibration_flag_)
+  {
+    nh.param<double>("servo/last_position", target_position_, 0.0);
+  }
 
   // shows parameters
   ROS_INFO("[Servo Gains] P: %f, I: %f, D: %f", kp_, ki_, kd_);
@@ -96,6 +103,8 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
 
 void VescServoController::control()
 {
+  if (sensor_initialize_)
+    return;
   // executes calibration
   if (calibration_flag_)
   {
@@ -277,6 +286,26 @@ void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& 
     if (sensor_initialize_)
     {
       steps_previous_ = steps;
+      // Restore last position
+      if (!calibration_flag_)
+      {
+        target_position_previous_ = target_position_;
+        sens_position_ = target_position_;
+
+        position_steps_ = sens_position_ * (num_hall_sensors_ * num_rotor_poles_) / gear_ratio_;
+
+        switch (joint_type_)
+        {
+          case urdf::Joint::REVOLUTE:
+          case urdf::Joint::CONTINUOUS:
+            position_steps_ /= 2.0 * M_PI;
+            break;
+          case urdf::Joint::PRISMATIC:
+            position_steps_ /= screw_lead_;
+            break;
+        }
+        vesc_step_difference_.resetStepDifference(position_steps_);
+      }
       sensor_initialize_ = false;
     }
     const int32_t steps_diff = steps - steps_previous_;
@@ -301,6 +330,11 @@ void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& 
     }
 
     sens_position_ -= getZeroPosition();
+
+    std::ofstream file;
+    file.open(calibration_result_path_, std::ios::out);
+    file << "servo/last_position: " << sens_position_ << std::endl;
+    file.close();
   }
   return;
 }

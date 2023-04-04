@@ -136,6 +136,8 @@ void VescWheelController::control(const double control_rate)
   u = std::clamp(u, -duty_limiter_, duty_limiter_);
 
   interface_ptr_->setDutyCycle(u);
+
+  pid_initialize_ = std::fabs(target_velocity_) < 0.0001;  // disable PID control when command is 0
 }
 
 void VescWheelController::setTargetVelocity(const double velocity)

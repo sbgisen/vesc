@@ -46,8 +46,6 @@
 #include <string>
 
 #include <pthread.h>
-// #include <boost/crc.hpp>
-// #include <boost/noncopyable.hpp>
 
 #include "vesc_driver/vesc_packet.hpp"
 #include "vesc_driver/vesc_packet_factory.hpp"

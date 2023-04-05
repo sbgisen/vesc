@@ -62,7 +62,11 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
   nh.param<std::string>("servo/calibration_mode", calibration_mode_, "current");
   nh.param<double>("servo/calibration_position", calibration_position_, 0.0);
   nh.param<bool>("servo/calibration", calibration_flag_, true);
-  nh.param<std::string>("servo/calibration_result_path", calibration_result_path_, "servo_calibration_result.yaml");
+  nh.param<std::string>("servo/calibration_result_path", calibration_result_path_, "");
+  if (!calibration_result_path_.empty())
+  {
+    ROS_INFO("[Servo Control] Latest position will be saved to %s", calibration_result_path_.data());
+  }
   if (!calibration_flag_)
   {
     if (!nh.hasParam("servo/last_position"))
@@ -336,10 +340,13 @@ void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& 
 
     sens_position_ -= getZeroPosition();
 
-    std::ofstream file;
-    file.open(calibration_result_path_, std::ios::out);
-    file << "servo/last_position: " << sens_position_ << std::endl;
-    file.close();
+    if (!calibration_result_path_.empty())
+    {
+      std::ofstream file;
+      file.open(calibration_result_path_, std::ios::out);
+      file << "servo/last_position: " << sens_position_ << std::endl;
+      file.close();
+    }
   }
   return;
 }

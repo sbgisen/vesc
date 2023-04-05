@@ -159,7 +159,7 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
     servo_controller_.setScrewLead(screw_lead_);
   }
 
-  if (command_mode_ == hardware_interface::HW_IF_VELOCITY || command_mode_ == "velocity_duty")
+  if (command_mode_ == "velocity_duty")
   {
     // initializes the wheel controller
     wheel_controller_.init(info_, vesc_interface_);

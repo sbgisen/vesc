@@ -33,6 +33,7 @@
  * Corp. takes over development as new packages.
  ********************************************************************/
 
+// TODO: Migrate to ROS2
 #include "vesc_driver/vesc_driver.h"
 
 namespace vesc_driver

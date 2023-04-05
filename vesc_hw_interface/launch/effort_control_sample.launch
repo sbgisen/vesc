@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- -*- mode: XML -*- -->
+<!-- TODO: Migrate to ROS2 -->
 <launch>
   <!-- Controller -->
   <arg name="model" default="$(find vesc_hw_interface)/launch/test.xacro"/>

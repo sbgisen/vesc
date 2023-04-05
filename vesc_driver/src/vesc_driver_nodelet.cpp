@@ -33,6 +33,7 @@
  * Corp. takes over development as new packages.
  ********************************************************************/
 
+// TODO: Migrate to ROS2
 #include <nodelet/nodelet.h>
 #include <pluginlib/class_list_macros.h>
 #include <ros/ros.h>

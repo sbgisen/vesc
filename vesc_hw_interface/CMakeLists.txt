@@ -15,25 +15,14 @@ if(CMAKE_COMPILER_IS_GNUCXX
   )
 endif()
 
-set(DEPENDENCIES
-    angles
-    hardware_interface
-    joint_limits
-    pluginlib
-    rclcpp
-    rclcpp_lifecycle
-    vesc_driver
-)
-
 # find dependencies
-find_package(ament_cmake REQUIRED)
-foreach(Dependency IN ITEMS ${DEPENDENCIES})
-  find_package(${Dependency} REQUIRED)
-endforeach()
-find_package(Threads REQUIRED)
+find_package(ament_cmake_auto REQUIRED)
+find_package(Threads)
+ament_auto_find_build_dependencies()
 
-add_library(
-  ${PROJECT_NAME} SHARED
+ament_auto_add_library(
+  ${PROJECT_NAME}
+  SHARED
   src/vesc_hw_interface.cpp
   src/vesc_servo_controller.cpp
   src/vesc_wheel_controller.cpp
@@ -46,16 +35,6 @@ ament_target_dependencies(${PROJECT_NAME} ${DEPENDENCIES})
 target_compile_definitions(${PROJECT_NAME} PRIVATE "HARDWARE_INTERFACE_BUILDING_DLL")
 
 pluginlib_export_plugin_description_file(hardware_interface vesc_hw_interface_plugin.xml)
-
-install(
-  DIRECTORY include/
-  DESTINATION include
-)
-
-install(
-  TARGETS ${PROJECT_NAME}
-  DESTINATION lib
-)
 
 install(
   DIRECTORY launch config
@@ -74,13 +53,4 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-ament_export_include_directories(include)
-ament_export_libraries(${PROJECT_NAME})
-ament_export_dependencies(
-  hardware_interface
-  joint_limits
-  pluginlib
-  rclcpp
-  rclcpp_lifecycle
-)
-ament_package()
+ament_auto_package()

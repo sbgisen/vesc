@@ -55,7 +55,7 @@ namespace vesc_driver
 /**
  * Class providing an interface to the Vedder VESC motor controller via a serial port interface.
  */
-class VescInterface  //: private boost::noncopyable
+class VescInterface
 {
 public:
   typedef std::function<void(const VescPacketConstPtr&)> PacketHandlerFunction;

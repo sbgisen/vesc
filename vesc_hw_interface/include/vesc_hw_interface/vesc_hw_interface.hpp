@@ -26,7 +26,6 @@
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_lifecycle/state.hpp>
 #include <std_msgs/msg/float64.hpp>
-#include "vesc_msgs/msg/vesc_state_stamped.hpp"
 #include "vesc_driver/vesc_interface.hpp"
 #include "vesc_hw_interface/vesc_servo_controller.hpp"
 #include "vesc_hw_interface/vesc_wheel_controller.hpp"

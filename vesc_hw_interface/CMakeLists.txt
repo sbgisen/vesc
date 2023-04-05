@@ -22,7 +22,6 @@ set(DEPENDENCIES
     pluginlib
     rclcpp
     rclcpp_lifecycle
-    vesc_msgs
     vesc_driver
 )
 

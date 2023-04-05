@@ -98,7 +98,6 @@ void VescServoController::init(hardware_interface::HardwareInfo& info,
 
 void VescServoController::control(const double control_rate)
 {
-  auto clock = rclcpp::Clock(RCL_ROS_TIME);
   // executes calibration
   if (calibration_flag_)
   {

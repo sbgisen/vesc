@@ -14,7 +14,7 @@
  * limitations under the License.
  ********************************************************************/
 
-#include "vesc_hw_interface/vesc_servo_controller.h"
+#include "vesc_hw_interface/vesc_servo_controller.hpp"
 
 namespace vesc_hw_interface
 {
@@ -27,12 +27,13 @@ VescServoController::~VescServoController()
   interface_ptr_->setDutyCycle(0.0);
 }
 
-void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
+void VescServoController::init(hardware_interface::HardwareInfo& info,
+                               const std::shared_ptr<VescInterface>& interface_ptr)
 {
   // initializes members
-  if (interface_ptr == NULL)
+  if (!interface_ptr)
   {
-    ros::shutdown();
+    rclcpp::shutdown();
   }
   else
   {
@@ -49,52 +50,53 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
   calibration_previous_position_ = 0.0;
 
   // reads parameters
-  nh.param<double>("servo/Kp", kp_, 50.0);
-  nh.param<double>("servo/Ki", ki_, 0.0);
-  nh.param<double>("servo/Kd", kd_, 1.0);
-  nh.param<double>("servo/i_clamp", i_clamp_, 1.0);
-  nh.param<double>("servo/duty_limiter", duty_limiter_, 1.0);
-  nh.param<bool>("servo/antiwindup", antiwindup_, true);
-  nh.param<double>("servo/control_rate", control_rate_, 100.0);
-  nh.param<double>("servo/calibration_current", calibration_current_, 6.0);
-  nh.param<double>("servo/calibration_duty", calibration_duty_, 0.1);
-  nh.param<std::string>("servo/calibration_mode", calibration_mode_, "current");
-  nh.param<double>("servo/calibration_position", calibration_position_, 0.0);
+  kp_ = std::stod(info.hardware_parameters["servo/Kp"]);
+  ki_ = std::stod(info.hardware_parameters["servo/Ki"]);
+  kd_ = std::stod(info.hardware_parameters["servo/Kd"]);
+  i_clamp_ = std::stod(info.hardware_parameters["servo/i_clamp"]);
+  duty_limiter_ = std::stod(info.hardware_parameters["servo/duty_limiter"]);
+  antiwindup_ = info.hardware_parameters["servo/antiwindup"] == "true";
+  control_rate_ = std::stod(info.hardware_parameters["servo/control_rate"]);
+  calibration_current_ = std::stod(info.hardware_parameters["servo/calibration_current"]);
+  calibration_duty_ = std::stod(info.hardware_parameters["servo/calibration_duty"]);
+  calibration_mode_ = info.hardware_parameters["servo/calibration_mode"];
+  calibration_position_ = std::stod(info.hardware_parameters["servo/calibration_position"]);
 
   // shows parameters
-  ROS_INFO("[Servo Gains] P: %f, I: %f, D: %f", kp_, ki_, kd_);
-  if (calibration_mode_ == CURRENT)
+  RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "[Servo Gains] P: %f, I: %f, D: %f", kp_, ki_, kd_);
+  if (calibration_mode_ == CURRENT_)
   {
-    ROS_INFO("[Servo Calibration] Mode: %s, value: %f", CURRENT.data(), calibration_current_);
+    RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "[Servo Calibration] Mode: %s, value: %f", CURRENT_.data(),
+                calibration_current_);
   }
-  else if (calibration_mode_ == DUTY)
+  else if (calibration_mode_ == DUTY_)
   {
-    ROS_INFO("[Servo Calibration] Mode: %s, value: %f", DUTY.data(), calibration_duty_);
+    RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "[Servo Calibration] Mode: %s, value: %f", DUTY_.data(),
+                calibration_duty_);
   }
   else
   {
-    ROS_ERROR("[Servo Calibration] Invalid mode");
+    RCLCPP_ERROR(rclcpp::get_logger("VescHwInterface"), "[Servo Calibration] Invalid mode");
   }
 
   // Smoothing differentiation when hall sensor resolution is insufficient
-  bool smooth_diff;
-  nh.param<bool>("servo/enable_smooth_diff", smooth_diff, true);
+  bool smooth_diff = info.hardware_parameters["servo/enable_smooth_diff"] == "true";
   if (smooth_diff)
   {
-    double smooth_diff_max_sampling_time;
-    int counter_td_vw_max_step;
-    nh.param<double>("servo/smooth_diff/max_sample_sec", smooth_diff_max_sampling_time, 1.0);
-    nh.param<int>("servo/smooth_diff/max_smooth_step", counter_td_vw_max_step, 10);
+    double smooth_diff_max_sampling_time = std::stod(info.hardware_parameters["servo/smooth_diff/max_sample_sec"]);
+    int counter_td_vw_max_step = std::stoi(info.hardware_parameters["servo/smooth_diff/max_smooth_step"]);
     vesc_step_difference_.enableSmooth(control_rate_, smooth_diff_max_sampling_time, counter_td_vw_max_step);
-    ROS_INFO("[Servo Control] Smooth differentiation enabled, max_sample_sec: %f, max_smooth_step: %d",
-             smooth_diff_max_sampling_time, counter_td_vw_max_step);
+    RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"),
+                "[Servo Control] Smooth differentiation enabled, max_sample_sec: %f, max_smooth_step: %d",
+                smooth_diff_max_sampling_time, counter_td_vw_max_step);
   }
   // Create timer callback for PID servo control
-  control_timer_ = nh.createTimer(ros::Duration(1.0 / control_rate_), &VescServoController::controlTimerCallback, this);
+  // control_timer_ = nh.createTimer(ros::Duration(1.0 / control_rate_), &VescServoController::controlTimerCallback,
+  // this);
   return;
 }
 
-void VescServoController::control()
+void VescServoController::control(const double control_rate)
 {
   // executes calibration
   if (calibration_flag_)
@@ -108,13 +110,13 @@ void VescServoController::control()
 
   // PID control
   double step_diff = vesc_step_difference_.getStepDifference(position_steps_);
-  double current_vel = step_diff * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_) * control_rate_ * gear_ratio_;
-  double target_vel = (target_position_ - target_position_previous_) * control_rate_;
+  double current_vel = step_diff * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_) * control_rate * gear_ratio_;
+  double target_vel = (target_position_ - target_position_previous_) * control_rate;
 
   double error = target_position_ - sens_position_;
   double error_dt = target_vel - current_vel;
   double error_integ_prev = error_integ_;
-  error_integ_ += (error / control_rate_);
+  error_integ_ += (error / control_rate);
   error_integ_ = std::clamp(error_integ_, -i_clamp_ / ki_, i_clamp_ / ki_);
 
   const double u_p = kp_ * error;
@@ -154,25 +156,28 @@ void VescServoController::setTargetPosition(const double position)
 void VescServoController::setGearRatio(const double gear_ratio)
 {
   gear_ratio_ = gear_ratio;
-  ROS_INFO("[VescServoController]Gear ratio is set to %f", gear_ratio_);
+  RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "[VescServoController]Gear ratio is set to %f", gear_ratio_);
 }
 
 void VescServoController::setTorqueConst(const double torque_const)
 {
   torque_const_ = torque_const;
-  ROS_INFO("[VescServoController]Torque constant is set to %f", torque_const_);
+  RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "[VescServoController]Torque constant is set to %f",
+              torque_const_);
 }
 
 void VescServoController::setRotorPoles(const int rotor_poles)
 {
   num_rotor_poles_ = rotor_poles;
-  ROS_INFO("[VescServoController]The number of rotor pole is set to %d", num_rotor_poles_);
+  RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "[VescServoController]The number of rotor pole is set to %d",
+              num_rotor_poles_);
 }
 
 void VescServoController::setHallSensors(const int hall_sensors)
 {
   num_hall_sensors_ = hall_sensors;
-  ROS_INFO("[VescServoController]The number of hall sensors is set to %d", num_hall_sensors_);
+  RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "[VescServoController]The number of hall sensors is set to %d",
+              num_hall_sensors_);
 }
 
 void VescServoController::setJointType(const int joint_type)
@@ -183,7 +188,7 @@ void VescServoController::setJointType(const int joint_type)
 void VescServoController::setScrewLead(const double screw_lead)
 {
   screw_lead_ = screw_lead;
-  ROS_INFO("[VescServoController]Screw lead is set to %f", screw_lead_);
+  RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "[VescServoController]Screw lead is set to %f", screw_lead_);
 }
 
 double VescServoController::getZeroPosition() const
@@ -219,17 +224,17 @@ void VescServoController::executeCalibration()
 bool VescServoController::calibrate()
 {
   // sends a command for calibration
-  if (calibration_mode_ == CURRENT)
+  if (calibration_mode_ == CURRENT_)
   {
     interface_ptr_->setCurrent(calibration_current_);
   }
-  else if (calibration_mode_ == DUTY)
+  else if (calibration_mode_ == DUTY_)
   {
     interface_ptr_->setDutyCycle(calibration_duty_);
   }
   else
   {
-    ROS_ERROR("Please set the calibration mode surely");
+    RCLCPP_ERROR(rclcpp::get_logger("VescHwInterface"), "Please set the calibration mode surely");
     return false;
   }
 
@@ -243,7 +248,7 @@ bool VescServoController::calibrate()
       calibration_steps_ = 0;
       zero_position_ = sens_position_ - calibration_position_;
       target_position_ = calibration_position_;
-      ROS_INFO("Calibration Finished");
+      RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "Calibration Finished");
       calibration_flag_ = false;
       return true;
     }
@@ -260,11 +265,11 @@ bool VescServoController::calibrate()
   }
 }
 
-void VescServoController::controlTimerCallback(const ros::TimerEvent& e)
-{
-  control();
-  interface_ptr_->requestState();
-}
+// void VescServoController::controlTimerCallback(const ros::TimerEvent& e)
+// {
+//   control();
+//   interface_ptr_->requestState();
+// }
 
 void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& packet)
 {
@@ -287,17 +292,15 @@ void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& 
     sens_velocity_ = velocity_rpm * gear_ratio_;                                              // unit: rpm
     sens_effort_ = current * torque_const_ / gear_ratio_;
 
-    switch (joint_type_)
+    if (joint_type_ == 0 || joint_type_ == 1)
     {
-      case urdf::Joint::REVOLUTE:
-      case urdf::Joint::CONTINUOUS:
-        sens_position_ = sens_position_ * 2.0 * M_PI;         // unit: rad
-        sens_velocity_ = sens_velocity_ / 60.0 * 2.0 * M_PI;  // unit: rad/s
-        break;
-      case urdf::Joint::PRISMATIC:
-        sens_position_ = sens_position_ * screw_lead_;         // unit: m
-        sens_velocity_ = sens_velocity_ / 60.0 * screw_lead_;  // unit: m/s
-        break;
+      sens_position_ = sens_position_ * 2.0 * M_PI;         // unit: rad
+      sens_velocity_ = sens_velocity_ / 60.0 * 2.0 * M_PI;  // unit: rad/s
+    }
+    else if (joint_type_ == 2)
+    {
+      sens_position_ = sens_position_ * screw_lead_;         // unit: m
+      sens_velocity_ = sens_velocity_ / 60.0 * screw_lead_;  // unit: m/s
     }
 
     sens_position_ -= getZeroPosition();

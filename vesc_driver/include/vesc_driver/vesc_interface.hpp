@@ -33,8 +33,8 @@
  * Corp. takes over development as new packages.
  ********************************************************************/
 
-#ifndef VESC_DRIVER_VESC_INTERFACE_H_
-#define VESC_DRIVER_VESC_INTERFACE_H_
+#ifndef VESC_DRIVER_VESC_INTERFACE_HPP_
+#define VESC_DRIVER_VESC_INTERFACE_HPP_
 
 #include <exception>
 #include <functional>
@@ -46,19 +46,16 @@
 #include <string>
 
 #include <pthread.h>
-#include <serial/serial.h>
-#include <boost/crc.hpp>
-#include <boost/noncopyable.hpp>
 
-#include "vesc_driver/vesc_packet.h"
-#include "vesc_driver/vesc_packet_factory.h"
+#include "vesc_driver/vesc_packet.hpp"
+#include "vesc_driver/vesc_packet_factory.hpp"
 
 namespace vesc_driver
 {
 /**
  * Class providing an interface to the Vedder VESC motor controller via a serial port interface.
  */
-class VescInterface : private boost::noncopyable
+class VescInterface
 {
 public:
   typedef std::function<void(const VescPacketConstPtr&)> PacketHandlerFunction;
@@ -168,4 +165,4 @@ public:
 
 }  // namespace vesc_driver
 
-#endif  // VESC_DRIVER_VESC_INTERFACE_H_
+#endif  // VESC_DRIVER_VESC_INTERFACE_HPP_

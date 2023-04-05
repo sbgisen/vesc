@@ -1,4 +1,5 @@
 <!-- -*- mode: XML -*- -->
+<!-- TODO: Migrate to ROS2 -->
 <launch>
 
   <arg name="node_name" default="vesc_driver_node" />

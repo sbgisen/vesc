@@ -14,8 +14,8 @@
  * limitations under the License.
  ********************************************************************/
 
-#ifndef VESC_DRIVER_DATA_MAP_H_
-#define VESC_DRIVER_DATA_MAP_H_
+#ifndef VESC_DRIVER_DATA_MAP_HPP_
+#define VESC_DRIVER_DATA_MAP_HPP_
 
 /**
  * @brief ID of communication commands
@@ -85,4 +85,4 @@ enum PACKET_MAP
   FAULT_CODE = 53,
 };
 
-#endif  // VESC_DRIVER_DATA_MAP_H_
+#endif  // VESC_DRIVER_DATA_MAP_HPP_

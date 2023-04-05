@@ -1,0 +1,18 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 100 # Hz
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+    joint_velocity_controller:
+      type: velocity_controllers/JointGroupVelocityController
+
+# Publish all joint states -----------------------------------
+joint_state_broadcaster:
+  ros__parameters:
+    publish_rate: 100
+
+joint_velocity_controller:
+  ros__parameters:
+    joints:
+      - vesc_joint
+    publish_rate: 100

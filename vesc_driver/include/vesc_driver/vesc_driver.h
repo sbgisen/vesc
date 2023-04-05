@@ -33,6 +33,8 @@
  * Corp. takes over development as new packages.
  ********************************************************************/
 
+// TODO: Migrate to ROS2
+
 #ifndef VESC_DRIVER_VESC_DRIVER_H_
 #define VESC_DRIVER_VESC_DRIVER_H_
 

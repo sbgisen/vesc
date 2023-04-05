@@ -1,24 +1,30 @@
 <?xml version="1.0"?>
-<package format="2">
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>vesc_hw_interface</name>
   <version>1.0.0</version>
   <description>VESC hardware interfaces</description>
   <maintainer email="SBGRP-git@g.softbank.co.jp">SoftBank Corp.</maintainer>
-  <author email="yuki.st16@gmail.com">Yuki Onishi</author>
   <license>Apache 2.0</license>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <author email="boulet@ll.mit.edu">Michael T. Boulet</author>
+  <author email="yuki.st16@gmail.com">Yuki Onishi</author>
 
-  <depend>roscpp</depend>
-  <depend>serial</depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>rclcpp_lifecycle</depend>
+  <depend>angles</depend>
   <depend>hardware_interface</depend>
-  <depend>joint_limits_interface</depend>
   <depend>controller_manager</depend>
+  <depend>velocity_controllers</depend>
+  <depend>joint_state_broadcaster</depend>
+  <depend>joint_limits</depend>
   <depend>pluginlib</depend>
   <depend>urdf</depend>
   <depend>vesc_driver</depend>
 
   <export>
-    <hardware_interface plugin="${prefix}/vesc_hw_interface_plugin.xml"/>
+    <build_type>ament_cmake</build_type>
   </export>
 </package>

@@ -33,8 +33,8 @@
  * Corp. takes over development as new packages.
  ********************************************************************/
 
-#ifndef VESC_DRIVER_VESC_PACKET_FACTORY_H_
-#define VESC_DRIVER_VESC_PACKET_FACTORY_H_
+#ifndef VESC_DRIVER_VESC_PACKET_FACTORY_HPP_
+#define VESC_DRIVER_VESC_PACKET_FACTORY_HPP_
 
 #include <cassert>
 #include <cstdint>
@@ -50,8 +50,8 @@
 #include <boost/range/distance.hpp>
 #include <boost/range/end.hpp>
 
-#include "vesc_driver/data_map.h"
-#include "vesc_driver/vesc_packet.h"
+#include "vesc_driver/data_map.hpp"
+#include "vesc_driver/vesc_packet.hpp"
 
 namespace vesc_driver
 {
@@ -94,4 +94,4 @@ private:
 
 }  // namespace vesc_driver
 
-#endif  // VESC_DRIVER_VESC_PACKET_FACTORY_H_
+#endif  // VESC_DRIVER_VESC_PACKET_FACTORY_HPP_

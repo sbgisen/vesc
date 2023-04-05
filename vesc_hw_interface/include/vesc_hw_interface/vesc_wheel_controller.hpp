@@ -15,12 +15,13 @@
  *
  ********************************************************************/
 
-#ifndef VESC_HW_INTERFACE_VESC_WHEEL_CONTROLLER_H_
-#define VESC_HW_INTERFACE_VESC_WHEEL_CONTROLLER_H_
+#ifndef VESC_HW_INTERFACE_VESC_WHEEL_CONTROLLER_HPP_
+#define VESC_HW_INTERFACE_VESC_WHEEL_CONTROLLER_HPP_
 
-#include <ros/ros.h>
-#include <vesc_driver/vesc_interface.h>
-#include <vesc_hw_interface/vesc_step_difference.h>
+#include <rclcpp/rclcpp.hpp>
+#include <hardware_interface/hardware_info.hpp>
+#include <vesc_driver/vesc_interface.hpp>
+#include "vesc_hw_interface/vesc_step_difference.hpp"
 
 namespace vesc_hw_interface
 {
@@ -32,8 +33,8 @@ using vesc_step_difference::VescStepDifference;
 class VescWheelController
 {
 public:
-  void init(ros::NodeHandle nh, VescInterface* vesc_interface);
-  void control();
+  void init(hardware_interface::HardwareInfo& info, const std::shared_ptr<VescInterface>& interface);
+  void control(const double control_rate);
   void setTargetVelocity(const double velocity);
   void setGearRatio(const double gear_ratio);
   void setTorqueConst(const double torque_const);
@@ -45,7 +46,7 @@ public:
   void updateSensor(const std::shared_ptr<const VescPacket>& packet);
 
 private:
-  VescInterface* interface_ptr_;
+  std::shared_ptr<VescInterface> interface_ptr_;
   VescStepDifference vesc_step_difference_;
 
   double kp_, ki_, kd_;
@@ -69,9 +70,9 @@ private:
   bool sensor_initialize_;
 
   double control_rate_;
-  ros::Timer control_timer_;
-  void controlTimerCallback(const ros::TimerEvent& e);
+  // rclcpp::Timer control_timer_;
+  // void controlTimerCallback(const ros::TimerEvent& e);
 };
 }  // namespace vesc_hw_interface
 
-#endif
+#endif  // VESC_HW_INTERFACE_VESC_WHEEL_CONTROLLER_HPP_

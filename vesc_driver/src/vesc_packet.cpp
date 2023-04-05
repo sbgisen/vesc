@@ -33,7 +33,7 @@
  * Corp. takes over development as new packages.
  ********************************************************************/
 
-#include "vesc_driver/vesc_packet.h"
+#include "vesc_driver/vesc_packet.hpp"
 
 namespace vesc_driver
 {

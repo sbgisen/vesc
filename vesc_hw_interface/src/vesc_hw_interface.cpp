@@ -56,7 +56,6 @@ CallbackReturn VescHwInterface::on_init(const hardware_interface::HardwareInfo& 
   gear_ratio_ = std::stod(info_.hardware_parameters["gear_ratio"]);
   torque_const_ = std::stod(info_.hardware_parameters["torque_const"]);
   num_hall_sensors_ = std::stoi(info_.hardware_parameters["num_hall_sensors"]);
-  screw_lead_ = std::stod(info_.hardware_parameters["screw_lead"]);
 
   RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "Gear ratio is set to %f", gear_ratio_);
   RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "Torque constant is set to %f", torque_const_);
@@ -156,6 +155,7 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
     servo_controller_.setRotorPoles(num_rotor_poles_);
     servo_controller_.setHallSensors(num_hall_sensors_);
     servo_controller_.setJointType(joint_type_ == "revolute" ? 0 : joint_type_ == "continuous" ? 1 : 2);
+    screw_lead_ = std::stod(info_.hardware_parameters["screw_lead"]);
     servo_controller_.setScrewLead(screw_lead_);
   }
 

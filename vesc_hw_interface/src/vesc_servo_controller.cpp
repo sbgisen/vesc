@@ -28,7 +28,9 @@ VescServoController::~VescServoController()
   interface_ptr_->setDutyCycle(0.0);
 }
 
-void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
+void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr, const double gear_ratio,
+                               const double torque_const, const int rotor_poles, const int hall_sensors,
+                               const int joint_type, const double screw_lead)
 {
   // initializes members
   if (interface_ptr == NULL)
@@ -39,6 +41,13 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
   {
     interface_ptr_ = interface_ptr;
   }
+
+  gear_ratio_ = gear_ratio;
+  torque_const_ = torque_const;
+  num_rotor_poles_ = rotor_poles;
+  num_hall_sensors_ = hall_sensors;
+  joint_type_ = joint_type;
+  screw_lead_ = screw_lead;
 
   calibration_flag_ = true;
   sensor_initialize_ = true;
@@ -105,6 +114,28 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
     ROS_INFO("[Servo Control] Smooth differentiation enabled, max_sample_sec: %f, max_smooth_step: %d",
              smooth_diff_max_sampling_time, counter_td_vw_max_step);
   }
+
+  // Restore last position
+  if (!calibration_flag_)
+  {
+    target_position_previous_ = target_position_;
+    sens_position_ = target_position_;
+
+    position_steps_ = sens_position_ * (num_hall_sensors_ * num_rotor_poles_) / gear_ratio_;
+
+    switch (joint_type_)
+    {
+      case urdf::Joint::REVOLUTE:
+      case urdf::Joint::CONTINUOUS:
+        position_steps_ /= 2.0 * M_PI;
+        break;
+      case urdf::Joint::PRISMATIC:
+        position_steps_ /= screw_lead_;
+        break;
+    }
+    vesc_step_difference_.resetStepDifference(position_steps_);
+  }
+
   // Create timer callback for PID servo control
   control_timer_ = nh.createTimer(ros::Duration(1.0 / control_rate_), &VescServoController::controlTimerCallback, this);
   return;
@@ -295,26 +326,6 @@ void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& 
     if (sensor_initialize_)
     {
       steps_previous_ = steps;
-      // Restore last position
-      if (!calibration_flag_)
-      {
-        target_position_previous_ = target_position_;
-        sens_position_ = target_position_;
-
-        position_steps_ = sens_position_ * (num_hall_sensors_ * num_rotor_poles_) / gear_ratio_;
-
-        switch (joint_type_)
-        {
-          case urdf::Joint::REVOLUTE:
-          case urdf::Joint::CONTINUOUS:
-            position_steps_ /= 2.0 * M_PI;
-            break;
-          case urdf::Joint::PRISMATIC:
-            position_steps_ /= screw_lead_;
-            break;
-        }
-        vesc_step_difference_.resetStepDifference(position_steps_);
-      }
       sensor_initialize_ = false;
     }
     const int32_t steps_diff = steps - steps_previous_;

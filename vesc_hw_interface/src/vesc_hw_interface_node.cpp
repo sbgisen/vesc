@@ -32,9 +32,6 @@ int main(int argc, char** argv)
 
   spinner.start();
 
-  // wait for receiving a vesc packet
-  ros::Duration(1.0).sleep();
-
   while (ros::ok())
   {
     // gets current states

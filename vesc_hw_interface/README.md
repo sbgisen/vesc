@@ -50,7 +50,7 @@ If your motor unit has other structures, you should implement your own controlle
 
 - If you set `calibration` is true, the servo will move to the limit position with `calibration_current` current. Please make sure that the servo is safe to move.
 - If you set `servo/calibration` is false, the servo will use `servo/last_position` as its current position. If you want to use the last position, you should save the last position in `servo/calibration_result_path` and set `servo/last_position` to the value.
-- If you move the servo manually or by other controllers, you should calibration the servo again.
+- If you move the servo manually or use non hardware interface controller or didn't specify the `servo/calibration_result_path`, you should calibrate the servo again.
 
 ### Public Functions
 - `void read()` sends request to get current states, but DOES NOT update immediately. After a return packet comes, the callback function will update private variables.

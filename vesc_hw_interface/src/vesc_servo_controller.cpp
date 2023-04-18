@@ -15,6 +15,7 @@
  ********************************************************************/
 
 #include "vesc_hw_interface/vesc_servo_controller.h"
+#include <fstream>
 
 namespace vesc_hw_interface
 {
@@ -27,7 +28,9 @@ VescServoController::~VescServoController()
   interface_ptr_->setDutyCycle(0.0);
 }
 
-void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
+void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr, const double gear_ratio,
+                               const double torque_const, const int rotor_poles, const int hall_sensors,
+                               const int joint_type, const double screw_lead)
 {
   // initializes members
   if (interface_ptr == NULL)
@@ -38,6 +41,13 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
   {
     interface_ptr_ = interface_ptr;
   }
+
+  gear_ratio_ = gear_ratio;
+  torque_const_ = torque_const;
+  num_rotor_poles_ = rotor_poles;
+  num_hall_sensors_ = hall_sensors;
+  joint_type_ = joint_type;
+  screw_lead_ = screw_lead;
 
   calibration_flag_ = true;
   sensor_initialize_ = true;
@@ -60,6 +70,21 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
   nh.param<double>("servo/calibration_duty", calibration_duty_, 0.1);
   nh.param<std::string>("servo/calibration_mode", calibration_mode_, "current");
   nh.param<double>("servo/calibration_position", calibration_position_, 0.0);
+  nh.param<bool>("servo/calibration", calibration_flag_, true);
+  nh.param<std::string>("servo/calibration_result_path", calibration_result_path_, "");
+  if (!calibration_result_path_.empty())
+  {
+    ROS_INFO("[Servo Control] Latest position will be saved to %s", calibration_result_path_.data());
+  }
+  if (!calibration_flag_)
+  {
+    if (!nh.hasParam("servo/last_position"))
+    {
+      ROS_ERROR("[Servo Control] No last_position parameter found. Please calibrate servo first.");
+      ros::shutdown();
+    }
+    nh.param<double>("servo/last_position", target_position_, 0.0);
+  }
 
   // shows parameters
   ROS_INFO("[Servo Gains] P: %f, I: %f, D: %f", kp_, ki_, kd_);
@@ -89,6 +114,28 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
     ROS_INFO("[Servo Control] Smooth differentiation enabled, max_sample_sec: %f, max_smooth_step: %d",
              smooth_diff_max_sampling_time, counter_td_vw_max_step);
   }
+
+  // Restore last position
+  if (!calibration_flag_)
+  {
+    target_position_previous_ = target_position_;
+    sens_position_ = target_position_;
+
+    position_steps_ = sens_position_ * (num_hall_sensors_ * num_rotor_poles_) / gear_ratio_;
+
+    switch (joint_type_)
+    {
+      case urdf::Joint::REVOLUTE:
+      case urdf::Joint::CONTINUOUS:
+        position_steps_ /= 2.0 * M_PI;
+        break;
+      case urdf::Joint::PRISMATIC:
+        position_steps_ /= screw_lead_;
+        break;
+    }
+    vesc_step_difference_.resetStepDifference(position_steps_);
+  }
+
   // Create timer callback for PID servo control
   control_timer_ = nh.createTimer(ros::Duration(1.0 / control_rate_), &VescServoController::controlTimerCallback, this);
   return;
@@ -96,6 +143,8 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr)
 
 void VescServoController::control()
 {
+  if (sensor_initialize_)
+    return;
   // executes calibration
   if (calibration_flag_)
   {
@@ -301,6 +350,14 @@ void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& 
     }
 
     sens_position_ -= getZeroPosition();
+
+    if (!calibration_result_path_.empty())
+    {
+      std::ofstream file;
+      file.open(calibration_result_path_, std::ios::out);
+      file << "servo/last_position: " << sens_position_ << std::endl;
+      file.close();
+    }
   }
   return;
 }

@@ -40,7 +40,9 @@ public:
   VescServoController();
   ~VescServoController();
 
-  void init(ros::NodeHandle nh, VescInterface* interface_ptr);
+  void init(ros::NodeHandle nh, VescInterface* interface_ptr, const double gear_ratio = 0.0,
+            const double torque_const = 0.0, const int rotor_poles = 0, const int hall_sensors = 0,
+            const int joint_type = 0, const double screw_lead = 0.0);
   void control();
   void setTargetPosition(const double position);
   void setGearRatio(const double gear_ratio);
@@ -90,6 +92,7 @@ private:
   bool sensor_initialize_;
   int calibration_steps_;
   double calibration_previous_position_;
+  std::string calibration_result_path_;
 
   bool calibrate();
   void controlTimerCallback(const ros::TimerEvent& e);

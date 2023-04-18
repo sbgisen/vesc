@@ -155,13 +155,11 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
     limit_position_interface_.registerHandle(limit_handle);
 
     // initializes the servo controller
-    servo_controller_.init(nh, &vesc_interface_);
-    servo_controller_.setGearRatio(gear_ratio_);
-    servo_controller_.setTorqueConst(torque_const_);
-    servo_controller_.setRotorPoles(num_rotor_poles_);
-    servo_controller_.setHallSensors(num_hall_sensors_);
-    servo_controller_.setJointType(joint_type_);
-    servo_controller_.setScrewLead(screw_lead_);
+    servo_controller_.init(nh, &vesc_interface_, gear_ratio_, torque_const_, num_rotor_poles_, num_hall_sensors_,
+                           joint_type_, screw_lead_);
+    position_ = servo_controller_.getPositionSens();
+    velocity_ = servo_controller_.getVelocitySens();
+    effort_ = servo_controller_.getEffortSens();
   }
   else if (command_mode_ == "velocity" || command_mode_ == "velocity_duty")
   {

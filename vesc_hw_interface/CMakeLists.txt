@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(vesc_hw_interface)
 
 add_compile_options(-std=c++17)
@@ -13,6 +13,8 @@ find_package(
              pluginlib
              urdf
              vesc_driver
+             rosserial_arduino
+             rosserial_client
 )
 
 catkin_package(
@@ -67,3 +69,24 @@ install(
   DIRECTORY launch/
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
 )
+
+rosserial_generate_ros_lib(
+  PACKAGE
+  rosserial_arduino
+  SCRIPT
+  make_libraries.py
+)
+
+rosserial_configure_client(
+  DIRECTORY
+  firmware
+  TOOLCHAIN_FILE
+  ${ROSSERIAL_ARDUINO_TOOLCHAIN}
+)
+
+rosserial_add_client_target(
+  firmware
+  serial_calibration
+  ALL
+)
+rosserial_add_client_target(firmware serial_calibration-upload)

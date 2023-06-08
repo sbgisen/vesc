@@ -15,7 +15,9 @@
  ********************************************************************/
 
 #include "vesc_hw_interface/vesc_servo_controller.h"
+#include <exception>
 #include <fstream>
+#include "serial/serial.h"
 
 namespace vesc_hw_interface
 {
@@ -26,6 +28,7 @@ VescServoController::VescServoController() : gear_ratio_(1.0), torque_const_(1.0
 VescServoController::~VescServoController()
 {
   interface_ptr_->setDutyCycle(0.0);
+  serial_.close();
 }
 
 void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr, const double gear_ratio,
@@ -72,6 +75,10 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr,
   nh.param<double>("servo/calibration_position", calibration_position_, 0.0);
   nh.param<bool>("servo/calibration", calibration_flag_, true);
   nh.param<std::string>("servo/calibration_result_path", calibration_result_path_, "");
+  nh.param<bool>("servo/enable_sensor_calibration", enable_sensor_calibration_, false);
+  nh.param<std::string>("servo/calibration_port", calibration_port_, "/dev/ttyUSB0");
+  nh.param<int>("servo/calibration_baudrate", calibration_baudrate_, 9600);
+
   if (!calibration_result_path_.empty())
   {
     ROS_INFO("[Servo Control] Latest position will be saved to %s", calibration_result_path_.data());
@@ -138,6 +145,30 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr,
 
   // Create timer callback for PID servo control
   control_timer_ = nh.createTimer(ros::Duration(1.0 / control_rate_), &VescServoController::controlTimerCallback, this);
+
+  // Open port to calibration sensor
+  if (enable_sensor_calibration_)
+  {
+    try
+    {
+      serial_.setPort(calibration_port_);
+      serial_.setBaudrate(calibration_baudrate_);
+      serial::Timeout to = serial::Timeout::simpleTimeout(1000);
+      serial_.setTimeout(to);
+      serial_.open();
+      if (!serial_.isOpen())
+      {
+        throw serial::SerialException("Unable to open serial port");
+      }
+    }
+    catch (std::exception& e)
+    {
+      ROS_ERROR("[Servo Control] Failed to open serial port %s, use manual calibration instead",
+                calibration_port_.data());
+      enable_sensor_calibration_ = false;
+    }
+    ROS_INFO("[Servo Control] Serial port %s opened", calibration_port_.data());
+  }
   return;
 }
 
@@ -284,7 +315,26 @@ bool VescServoController::calibrate()
 
   calibration_steps_++;
 
-  if (calibration_steps_ % 20 == 0)
+  if (enable_sensor_calibration_)
+  {
+    std::string data = serial_.read(serial_.available());
+    for (auto detected : data)
+    {
+      if (static_cast<bool>(detected))
+      {
+        // finishes calibrating
+        calibration_steps_ = 0;
+        zero_position_ = sens_position_ - calibration_position_;
+        target_position_ = calibration_position_;
+        ROS_INFO("Calibration Finished");
+        calibration_flag_ = false;
+        serial_.close();
+        return true;
+      }
+    }
+    return false;
+  }
+  else if (calibration_steps_ % 20 == 0)
   {
     if (std::abs(sens_position_ - calibration_previous_position_) <= std::numeric_limits<double>::epsilon())
     {

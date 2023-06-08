@@ -23,6 +23,7 @@
 
 #include <angles/angles.h>
 #include <ros/ros.h>
+#include <serial/serial.h>
 #include <urdf_model/joint.h>
 #include <vesc_driver/vesc_interface.h>
 #include <vesc_hw_interface/vesc_step_difference.h>
@@ -66,11 +67,14 @@ private:
   const std::string CURRENT = "current";
 
   bool calibration_flag_;
-  double calibration_current_;    // unit: A
-  double calibration_duty_;       // 0.0 ~ 1.0
-  std::string calibration_mode_;  // "duty" or "current" (default: "current")
-  double calibration_position_;   // unit: rad or m
-  double zero_position_;          // unit: rad or m
+  double calibration_current_;      // unit: A
+  double calibration_duty_;         // 0.0 ~ 1.0
+  std::string calibration_mode_;    // "duty" or "current" (default: "current")
+  bool enable_sensor_calibration_;  // flag to enable calibration using sensor
+  std::string calibration_port_;    // device port to calibration sensor
+  int calibration_baudrate_;        // device baudrate to calibration sensor
+  double calibration_position_;     // unit: rad or m
+  double zero_position_;            // unit: rad or m
   double kp_, ki_, kd_;
   double i_clamp_, duty_limiter_;
   bool antiwindup_;
@@ -96,6 +100,8 @@ private:
 
   bool calibrate();
   void controlTimerCallback(const ros::TimerEvent& e);
+
+  serial::Serial serial_;
 };
 
 }  // namespace vesc_hw_interface

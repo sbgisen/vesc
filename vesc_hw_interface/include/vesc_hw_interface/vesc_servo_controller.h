@@ -86,6 +86,7 @@ private:
   double target_position_previous_;
   double sens_position_, sens_velocity_, sens_effort_;
   double position_steps_;
+  double position_resolution_;
   int32_t steps_previous_;
   double error_integ_;
   // Internal variables for initialization

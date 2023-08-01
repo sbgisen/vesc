@@ -153,10 +153,17 @@ bool VescHwInterface::init(ros::NodeHandle& nh_root, ros::NodeHandle& nh)
 
     joint_limits_interface::PositionJointSaturationHandle limit_handle(position_handle, joint_limits_);
     limit_position_interface_.registerHandle(limit_handle);
+    auto upper_limit = 0.0;
+    auto lower_limit = 0.0;
+    if (joint_limits_.has_position_limits)
+    {
+      upper_limit = joint_limits_.max_position;
+      lower_limit = joint_limits_.min_position;
+    }
 
     // initializes the servo controller
     servo_controller_.init(nh, &vesc_interface_, gear_ratio_, torque_const_, num_rotor_poles_, num_hall_sensors_,
-                           joint_type_, screw_lead_);
+                           joint_type_, screw_lead_, upper_limit, lower_limit);
     position_ = servo_controller_.getPositionSens();
     velocity_ = servo_controller_.getVelocitySens();
     effort_ = servo_controller_.getEffortSens();

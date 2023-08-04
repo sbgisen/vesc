@@ -196,13 +196,9 @@ void VescServoController::control()
     error = 0.0;
     target_vel = 0.0;
     // Wait for target position convergence
-    if (std::fabs(target_position_ - target_position_previous_) < std::numeric_limits<double>::epsilon())
+    if (std::fabs(target_position_ - target_position_previous_) < std::numeric_limits<double>::epsilon() &&
+        std::fabs(target_position_ - upper_limit_position_) < limit_margin_)
     {
-      if (std::fabs(target_position_ - upper_limit_position_) > limit_margin_)
-      {
-        ROS_ERROR("Servo reached upper limit. Please recalibrate the servo.");
-        exit(1);
-      }
       zero_position_ = sens_position_ + zero_position_ - upper_limit_position_;
       sens_position_ = upper_limit_position_;
       ROS_INFO_THROTTLE(10, "[Servo Control] Reset position to %f.", upper_limit_position_);
@@ -215,13 +211,9 @@ void VescServoController::control()
     error = 0.0;
     target_vel = 0.0;
     // Wait for target position convergence
-    if (std::fabs(target_position_ - target_position_previous_) < std::numeric_limits<double>::epsilon())
+    if (std::fabs(target_position_ - target_position_previous_) < std::numeric_limits<double>::epsilon() &&
+        std::fabs(target_position_ - lower_limit_position_) < limit_margin_)
     {
-      if (std::fabs(target_position_ - lower_limit_position_) > limit_margin_)
-      {
-        ROS_ERROR("Servo reached lower limit. Please recalibrate the servo.");
-        exit(1);
-      }
       zero_position_ = sens_position_ + zero_position_ - lower_limit_position_;
       sens_position_ = lower_limit_position_;
       ROS_INFO_THROTTLE(10, "[Servo Control] Reset position to %f.", lower_limit_position_);

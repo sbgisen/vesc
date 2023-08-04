@@ -68,11 +68,14 @@ private:
   const std::string CURRENT = "current";
 
   bool calibration_flag_;
-  double calibration_current_;    // unit: A
-  double calibration_duty_;       // 0.0 ~ 1.0
-  std::string calibration_mode_;  // "duty" or "current" (default: "current")
-  double calibration_position_;   // unit: rad or m
-  double zero_position_;          // unit: rad or m
+  bool calibration_rewind_;
+  double calibration_current_;         // unit: A
+  double calibration_strict_current_;  // unit: A
+  double calibration_duty_;            // 0.0 ~ 1.0
+  double calibration_strict_duty_;     // 0.0 ~ 1.0
+  std::string calibration_mode_;       // "duty" or "current" (default: "current")
+  double calibration_position_;        // unit: rad or m
+  double zero_position_;               // unit: rad or m
   double kp_, ki_, kd_;
   double i_clamp_, duty_limiter_;
   bool antiwindup_;

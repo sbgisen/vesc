@@ -62,6 +62,7 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr,
   position_steps_ = 0;
   calibration_steps_ = 0;
   calibration_previous_position_ = 0.0;
+  calibration_rewind_ = false;
 
   // reads parameters
   nh.param<double>("servo/Kp", kp_, 50.0);
@@ -72,7 +73,9 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr,
   nh.param<bool>("servo/antiwindup", antiwindup_, true);
   nh.param<double>("servo/control_rate", control_rate_, 100.0);
   nh.param<double>("servo/calibration_current", calibration_current_, 6.0);
+  nh.param<double>("servo/calibration_strict_current", calibration_strict_current_, calibration_current_);
   nh.param<double>("servo/calibration_duty", calibration_duty_, 0.1);
+  nh.param<double>("servo/calibration_strict_duty", calibration_strict_duty_, calibration_duty_);
   nh.param<std::string>("servo/calibration_mode", calibration_mode_, "current");
   nh.param<double>("servo/calibration_position", calibration_position_, 0.0);
   nh.param<bool>("servo/calibration", calibration_flag_, true);
@@ -338,11 +341,13 @@ bool VescServoController::calibrate()
   // sends a command for calibration
   if (calibration_mode_ == CURRENT)
   {
-    interface_ptr_->setCurrent(calibration_current_);
+    auto sign = calibration_rewind_ ? -1.0 : 1.0;
+    interface_ptr_->setCurrent(sign * calibration_current_);
   }
   else if (calibration_mode_ == DUTY)
   {
-    interface_ptr_->setDutyCycle(calibration_duty_);
+    auto sign = calibration_rewind_ ? -1.0 : 1.0;
+    interface_ptr_->setDutyCycle(sign * calibration_duty_);
   }
   else
   {
@@ -350,13 +355,36 @@ bool VescServoController::calibrate()
     return false;
   }
 
+  if (calibration_rewind_)
+  {
+    if (std::fabs(calibration_position_ - sens_position_) > (upper_limit_position_ - lower_limit_position_) / 10.0)
+    {
+      calibration_current_ = calibration_strict_current_;
+      calibration_duty_ = calibration_strict_duty_;
+      calibration_rewind_ = false;
+    }
+    return false;
+  }
+
   if (std::accumulate(limit_deque_.begin(), limit_deque_.end(), 0.0) != 0.0)
   {
     zero_position_ = sens_position_ - calibration_position_;
-    target_position_ = calibration_position_;
-    ROS_INFO("Calibration Finished");
-    calibration_flag_ = false;
-    return true;
+    if ((calibration_mode_ == CURRENT &&
+         std::fabs(calibration_current_ - calibration_strict_current_) < std::numeric_limits<double>::epsilon()) ||
+        (calibration_mode_ == DUTY &&
+         std::fabs(calibration_duty_ - calibration_strict_duty_) < std::numeric_limits<double>::epsilon()))
+    {
+      target_position_ = calibration_position_;
+      ROS_INFO("Calibration Finished");
+      calibration_flag_ = false;
+      return true;
+    }
+    else
+    {
+      ROS_INFO("Calibrate with strict current/duty.");
+      calibration_rewind_ = true;
+      return false;
+    }
   }
 
   calibration_steps_++;

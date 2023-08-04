@@ -156,6 +156,7 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr,
   }
 
   limit_sub_ = nh.subscribe("limit", 1, &VescServoController::limit, this);
+  ros::topic::waitForMessage<std_msgs::Bool>("limit", ros::Duration(1.0));
   nh.param<double>("servo/limit_margin", limit_margin_, 0.02);
   nh.param<double>("servo/limit_threshold", limit_ratio_, 0.8);
   nh.param<int>("servo/limit_window", limit_window_, 1);

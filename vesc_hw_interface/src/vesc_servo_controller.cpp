@@ -155,8 +155,17 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr,
     vesc_step_difference_.resetStepDifference(position_steps_);
   }
 
-  limit_sub_ = nh.subscribe("limit", 1, &VescServoController::limit, this);
-  ros::topic::waitForMessage<std_msgs::Bool>("limit", ros::Duration(1.0));
+  bool use_limit = false;
+  nh.param<bool>("servo/use_limit_sensor", use_limit, false);
+  if (use_limit)
+  {
+    limit_sub_ = nh.subscribe("limit", 1, &VescServoController::limit, this);
+    while (limit_sub_.getNumPublishers() == 0)
+    {
+      ROS_INFO_THROTTLE(1, "[Servo Control] Waiting for limit sensor publisher...");
+      ros::Duration(0.1).sleep();
+    }
+  }
   nh.param<double>("servo/limit_margin", limit_margin_, 0.02);
   nh.param<double>("servo/limit_threshold", limit_ratio_, 0.8);
   nh.param<int>("servo/limit_window", limit_window_, 1);

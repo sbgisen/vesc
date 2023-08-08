@@ -198,8 +198,8 @@ void VescServoController::control()
 
   double safety_target_position = target_position_;
 
-  auto rate = std::accumulate(endstop_deque_.begin(), endstop_deque_.end(), 0.0) / endstop_deque_.size();
-  if (error > 0 && rate >= endstop_threshold_)
+  auto average = std::accumulate(endstop_deque_.begin(), endstop_deque_.end(), 0.0) / endstop_deque_.size();
+  if (error > 0 && average >= endstop_threshold_)
   {
     ROS_WARN_THROTTLE(10, "[Servo Control] Upper endstop signal received. Stop servo.");
     safety_target_position = sens_position_;
@@ -214,7 +214,7 @@ void VescServoController::control()
       ROS_INFO_THROTTLE(10, "[Servo Control] Reset position to %f.", upper_endstop_position_);
     }
   }
-  else if (error < 0 && rate <= -endstop_threshold_)
+  else if (error < 0 && average <= -endstop_threshold_)
   {
     ROS_WARN_THROTTLE(10, "[Servo Control] Lower endstop signal received. Stop servo.");
     safety_target_position = sens_position_;

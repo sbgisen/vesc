@@ -32,8 +32,8 @@ VescServoController::~VescServoController()
 
 void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr, const double gear_ratio,
                                const double torque_const, const int rotor_poles, const int hall_sensors,
-                               const int joint_type, const double screw_lead, const double upper_limit_position,
-                               const double lower_limit_position)
+                               const int joint_type, const double screw_lead, const double upper_endstop_position,
+                               const double lower_endstop_position)
 {
   // initializes members
   if (interface_ptr == NULL)
@@ -51,8 +51,8 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr,
   num_hall_sensors_ = hall_sensors;
   joint_type_ = joint_type;
   screw_lead_ = screw_lead;
-  upper_limit_position_ = upper_limit_position;
-  lower_limit_position_ = lower_limit_position;
+  upper_endstop_position_ = upper_endstop_position;
+  lower_endstop_position_ = lower_endstop_position;
 
   calibration_flag_ = true;
   sensor_initialize_ = true;
@@ -155,21 +155,21 @@ void VescServoController::init(ros::NodeHandle nh, VescInterface* interface_ptr,
     vesc_step_difference_.resetStepDifference(position_steps_);
   }
 
-  bool use_limit = false;
-  nh.param<bool>("servo/use_limit_sensor", use_limit, false);
-  if (use_limit)
+  bool use_endstop = false;
+  nh.param<bool>("servo/use_endstop", use_endstop, false);
+  if (use_endstop)
   {
-    limit_sub_ = nh.subscribe("limit", 1, &VescServoController::limit, this);
-    while (limit_sub_.getNumPublishers() == 0)
+    endstop_sub_ = nh.subscribe("endstop", 1, &VescServoController::endstopCallback, this);
+    while (endstop_sub_.getNumPublishers() == 0)
     {
-      ROS_INFO_THROTTLE(1, "[Servo Control] Waiting for limit sensor publisher...");
+      ROS_INFO_THROTTLE(1, "[Servo Control] Waiting for endstop sensor publisher...");
       ros::Duration(0.1).sleep();
     }
   }
-  nh.param<double>("servo/limit_margin", limit_margin_, 0.02);
-  nh.param<double>("servo/limit_threshold", limit_ratio_, 0.8);
-  nh.param<int>("servo/limit_window", limit_window_, 1);
-  limit_deque_ = std::deque<int>(limit_window_, 0);
+  nh.param<double>("servo/endstop_margin", endstop_margin_, 0.02);
+  nh.param<double>("servo/endstop_threshold", endstop_threshold_, 0.8);
+  nh.param<int>("servo/endstop_window", endstop_window_, 1);
+  endstop_deque_ = std::deque<int>(endstop_window_, 0);
 
   // Create timer callback for PID servo control
   control_timer_ = nh.createTimer(ros::Duration(1.0 / control_rate_), &VescServoController::controlTimerCallback, this);
@@ -198,35 +198,35 @@ void VescServoController::control()
 
   double safety_target_position = target_position_;
 
-  auto rate = std::accumulate(limit_deque_.begin(), limit_deque_.end(), 0.0) / limit_deque_.size();
-  if (error > 0 && rate >= limit_ratio_)
+  auto rate = std::accumulate(endstop_deque_.begin(), endstop_deque_.end(), 0.0) / endstop_deque_.size();
+  if (error > 0 && rate >= endstop_threshold_)
   {
-    ROS_WARN_THROTTLE(10, "[Servo Control] Upper limit signal received. Stop servo.");
+    ROS_WARN_THROTTLE(10, "[Servo Control] Upper endstop signal received. Stop servo.");
     safety_target_position = sens_position_;
     error = 0.0;
     target_vel = 0.0;
     // Wait for target position convergence
     if (std::fabs(target_position_ - target_position_previous_) < std::numeric_limits<double>::epsilon() &&
-        std::fabs(target_position_ - upper_limit_position_) < limit_margin_)
+        std::fabs(target_position_ - upper_endstop_position_) < endstop_margin_)
     {
-      zero_position_ = sens_position_ + zero_position_ - upper_limit_position_;
-      sens_position_ = upper_limit_position_;
-      ROS_INFO_THROTTLE(10, "[Servo Control] Reset position to %f.", upper_limit_position_);
+      zero_position_ = sens_position_ + zero_position_ - upper_endstop_position_;
+      sens_position_ = upper_endstop_position_;
+      ROS_INFO_THROTTLE(10, "[Servo Control] Reset position to %f.", upper_endstop_position_);
     }
   }
-  else if (error < 0 && rate <= -limit_ratio_)
+  else if (error < 0 && rate <= -endstop_threshold_)
   {
-    ROS_WARN_THROTTLE(10, "[Servo Control] Lower limit signal received. Stop servo.");
+    ROS_WARN_THROTTLE(10, "[Servo Control] Lower endstop signal received. Stop servo.");
     safety_target_position = sens_position_;
     error = 0.0;
     target_vel = 0.0;
     // Wait for target position convergence
     if (std::fabs(target_position_ - target_position_previous_) < std::numeric_limits<double>::epsilon() &&
-        std::fabs(target_position_ - lower_limit_position_) < limit_margin_)
+        std::fabs(target_position_ - lower_endstop_position_) < endstop_margin_)
     {
-      zero_position_ = sens_position_ + zero_position_ - lower_limit_position_;
-      sens_position_ = lower_limit_position_;
-      ROS_INFO_THROTTLE(10, "[Servo Control] Reset position to %f.", lower_limit_position_);
+      zero_position_ = sens_position_ + zero_position_ - lower_endstop_position_;
+      sens_position_ = lower_endstop_position_;
+      ROS_INFO_THROTTLE(10, "[Servo Control] Reset position to %f.", lower_endstop_position_);
     }
   }
 
@@ -359,7 +359,7 @@ bool VescServoController::calibrate()
 
   if (calibration_rewind_)
   {
-    if (std::fabs(calibration_position_ - sens_position_) > (upper_limit_position_ - lower_limit_position_) / 10.0)
+    if (std::fabs(calibration_position_ - sens_position_) > (upper_endstop_position_ - lower_endstop_position_) / 10.0)
     {
       calibration_current_ = calibration_strict_current_;
       calibration_duty_ = calibration_strict_duty_;
@@ -368,7 +368,7 @@ bool VescServoController::calibrate()
     return false;
   }
 
-  if (std::accumulate(limit_deque_.begin(), limit_deque_.end(), 0.0) != 0.0)
+  if (std::accumulate(endstop_deque_.begin(), endstop_deque_.end(), 0.0) != 0.0)
   {
     zero_position_ = sens_position_ + zero_position_ - calibration_position_;
     if ((calibration_mode_ == CURRENT &&
@@ -469,12 +469,12 @@ void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& 
   return;
 }
 
-void VescServoController::limit(const std_msgs::Bool::ConstPtr& msg)
+void VescServoController::endstopCallback(const std_msgs::Bool::ConstPtr& msg)
 {
-  limit_deque_.pop_front();
+  endstop_deque_.pop_front();
   if (!msg->data)
   {
-    limit_deque_.push_back(0);
+    endstop_deque_.push_back(0);
   }
   else
   {
@@ -484,32 +484,32 @@ void VescServoController::limit(const std_msgs::Bool::ConstPtr& msg)
       {
         if (std::signbit(calibration_current_))
         {
-          limit_deque_.push_back(-1);
+          endstop_deque_.push_back(-1);
         }
         else
         {
-          limit_deque_.push_back(1);
+          endstop_deque_.push_back(1);
         }
       }
       else if (calibration_mode_ == DUTY)
       {
         if (std::signbit(calibration_duty_))
         {
-          limit_deque_.push_back(-1);
+          endstop_deque_.push_back(-1);
         }
         else
         {
-          limit_deque_.push_back(1);
+          endstop_deque_.push_back(1);
         }
       }
     }
-    else if (std::fabs(sens_position_ - upper_limit_position_) < std::fabs(sens_position_ - lower_limit_position_))
+    else if (std::fabs(sens_position_ - upper_endstop_position_) < std::fabs(sens_position_ - lower_endstop_position_))
     {
-      limit_deque_.push_back(1);
+      endstop_deque_.push_back(1);
     }
     else
     {
-      limit_deque_.push_back(-1);
+      endstop_deque_.push_back(-1);
     }
   }
 }

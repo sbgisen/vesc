@@ -43,8 +43,8 @@ public:
 
   void init(ros::NodeHandle nh, VescInterface* interface_ptr, const double gear_ratio = 0.0,
             const double torque_const = 0.0, const int rotor_poles = 0, const int hall_sensors = 0,
-            const int joint_type = 0, const double screw_lead = 0.0, const double upper_limit_position = 0.0,
-            const double lower_limit_position = 0.0);
+            const int joint_type = 0, const double screw_lead = 0.0, const double upper_endstop_position = 0.0,
+            const double lower_endstop_position = 0.0);
   void control();
   void setTargetPosition(const double position);
   void setGearRatio(const double gear_ratio);
@@ -99,16 +99,16 @@ private:
   int calibration_steps_;
   double calibration_previous_position_;
   std::string calibration_result_path_;
-  double upper_limit_position_, lower_limit_position_;
-  ros::Subscriber limit_sub_;
-  std::deque<int> limit_deque_;
-  int limit_window_;
-  double limit_ratio_;
-  double limit_margin_;
+  double upper_endstop_position_, lower_endstop_position_;
+  ros::Subscriber endstop_sub_;
+  std::deque<int> endstop_deque_;
+  int endstop_window_;
+  double endstop_threshold_;
+  double endstop_margin_;
 
   bool calibrate();
   void controlTimerCallback(const ros::TimerEvent& e);
-  void limit(const std_msgs::Bool::ConstPtr& msg);
+  void endstopCallback(const std_msgs::Bool::ConstPtr& msg);
 };
 
 }  // namespace vesc_hw_interface

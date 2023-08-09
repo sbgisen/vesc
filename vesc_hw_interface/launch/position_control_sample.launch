@@ -29,6 +29,9 @@
         smooth_diff:
           max_sample_sec: 0.2
           max_smooth_step: 10
+        endstop_window: 1
+        endstop_threshold: 0.8
+        endstop_margin: 0.02
     </rosparam>
   </node>
 

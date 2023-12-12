@@ -41,6 +41,7 @@ add_library(
   src/vesc_servo_controller.cpp
   src/vesc_wheel_controller.cpp
   src/vesc_step_difference.cpp
+  src/roamer_vesc_hw_interface.cpp
 )
 add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
@@ -49,6 +50,14 @@ add_executable(${PROJECT_NAME}_node src/vesc_hw_interface_node.cpp)
 add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS})
 target_link_libraries(
   ${PROJECT_NAME}_node
+  ${catkin_LIBRARIES}
+  ${PROJECT_NAME}
+)
+
+add_executable(xr1_hw_interface_node src/xr1_hw_interface_node.cpp)
+add_dependencies(xr1_hw_interface_node ${catkin_EXPORTED_TARGETS})
+target_link_libraries(
+  xr1_hw_interface_node
   ${catkin_LIBRARIES}
   ${PROJECT_NAME}
 )

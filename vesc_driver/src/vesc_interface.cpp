@@ -229,7 +229,7 @@ bool VescInterface::isRxDataUpdated() const
   return output;
 }
 
-void VescInterface::send(const VescPacket& packet)
+void VescInterface::send_no_fwd(const VescPacket& packet)
 {
   size_t written = impl_->serial_.write(packet.getFrame());
   if (written != packet.getFrame().size())
@@ -237,6 +237,21 @@ void VescInterface::send(const VescPacket& packet)
     std::stringstream ss;
     ss << "Wrote " << written << " bytes, expected " << packet.getFrame().size() << ".";
     throw SerialException(ss.str().c_str());
+  }
+}
+
+void VescInterface::send(const VescPacket& packet, int fwd_address)
+{
+  // -1 is assumed as local uart
+  if(fwd_address == -1){
+    send_no_fwd(packet);
+  } else if (fwd_address < -1 || fwd_address > 255 ){
+    // Check if fwd address is within range (one byte 0~255)
+    fprintf(stderr, "[VESC ERROR] Can't forward packet to specified address (%d)", fwd_address);
+    return;
+  } else {
+    // Create a new packet by adding CAN forward to the existing packet
+    send_no_fwd(VescPacketFwdToCAN(packet, uint8_t(fwd_address)));
   }
 }
 

@@ -4,4 +4,11 @@
         plugin of VESC hardware interface
     </description>
   </class>
+
+  <class name="vesc_hw_interface/XR1VescHwInterface" type="vesc_hw_interface::XR1VescHwInterface" base_class_type="hardware_interface::RobotHW">
+    <description>
+        XR1 plugin of VESC hardware interface
+    </description>
+  </class>
+  
 </library>

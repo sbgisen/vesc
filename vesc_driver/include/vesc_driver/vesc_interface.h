@@ -123,7 +123,10 @@ public:
   /**
    * Send a VESC packet.
    */
-  void send(const VescPacket& packet);
+  void send_no_fwd(const VescPacket& packet);
+
+  // RANDEL:: overload for forwarding created packets to can bus address
+  void send(const VescPacket& packet, int fwd_address=-1);
 
   void requestFWVersion();
   void requestState();

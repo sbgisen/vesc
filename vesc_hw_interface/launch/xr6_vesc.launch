@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- -*- mode: XML -*- -->
+<launch>
+  <!-- Controller -->
+  <!-- <arg name="model" default="$(find vesc_hw_interface)/launch/test.xacro"/>
+  <param name="robot_description" command="$(find xacro)/xacro $(arg model)"/> -->
+  <!-- Boot hardware interfaces -->
+
+  <!-- FOR RIGHT FRONT (MOCK) -->
+  <!-- <node name="mock_hw_interface_node" pkg="vesc_hw_interface" type="mock_hw_interface_node" output="screen" /> -->
+
+
+  <node name="vesc_hw_interface_node" pkg="vesc_hw_interface" type="xr1_hw_interface_node" output="screen">
+    <rosparam>
+      joint_name: wheel_front_left_joint
+      command_mode: velocity
+      joint_type: continuous
+      port: /dev/ttyACM0
+      num_rotor_poles: 14
+      gear_ratio: 1.0
+      torque_const: 1
+    </rosparam>
+  </node>
+
+</launch>

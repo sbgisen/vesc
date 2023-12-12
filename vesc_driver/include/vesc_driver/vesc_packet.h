@@ -43,6 +43,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <iostream>
 
 #include <boost/crc.hpp>
 #include <boost/range/begin.hpp>
@@ -62,6 +63,7 @@ typedef std::pair<Buffer::const_iterator, Buffer::const_iterator> BufferRangeCon
  **/
 class VescFrame
 {
+  friend class VescPacketFwdToCAN;
 public:
   /**
    * @brief Destructor
@@ -78,6 +80,8 @@ public:
   {
     return frame_;
   }
+
+  uint16_t payload_size() const;
 
   /* packet properties */
   static const int16_t VESC_MAX_PAYLOAD_SIZE = 1024;                     // Maximum payload size (bytes)
@@ -273,6 +277,16 @@ class VescPacketSetServoPos : public VescPacket
 {
 public:
   explicit VescPacketSetServoPos(double servo_pos);
+};
+
+/**
+ * @brief packet for forwarding an already constructed packet to a CAN address
+ * 
+ */
+class VescPacketFwdToCAN : public VescPacket
+{
+public:
+  explicit VescPacketFwdToCAN(const VescPacket &packet, uint8_t can_addr);
 };
 
 }  // namespace vesc_driver

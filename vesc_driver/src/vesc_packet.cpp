@@ -87,6 +87,11 @@ VescFrame::VescFrame(const BufferRangeConst& frame, const BufferRangeConst& payl
   payload_end_.second = frame_.begin() + std::distance(frame.first, payload.second);
 }
 
+
+uint16_t VescFrame::payload_size() const{
+  return std::distance(payload_end_.first, payload_end_.second);
+}
+
 /*------------------------------------------------------------------*/
 
 /**
@@ -477,6 +482,43 @@ VescPacketSetServoPos::VescPacketSetServoPos(double servo_pos) : VescPacket("Set
   uint16_t crc = crc_calc.checksum();
   *(frame_.end() - 3) = static_cast<uint8_t>(crc >> 8);
   *(frame_.end() - 2) = static_cast<uint8_t>(crc & 0xFF);
+}
+
+
+VescPacketFwdToCAN::VescPacketFwdToCAN(const VescPacket &packet, uint8_t can_addr) : 
+  VescPacket("ForwardCAN", packet.payload_size() + 2, COMM_FORWARD_CAN)
+{
+  uint16_t orig_pl_size = boost::distance(packet.payload_end_);
+
+  // add can address, then copy contents from original payload
+  *(payload_end_.first + 1) = static_cast<uint8_t>(can_addr);
+
+  Buffer::iterator new_payload_start = payload_end_.first + 2;    // location in new payload to place the old payload in
+
+  for (uint i = 0; i < orig_pl_size ; i++){
+    *(new_payload_start + i) = *(packet.payload_end_.first + i);
+  }
+
+
+  VescFrame::CRC crc_calc;
+  crc_calc.process_bytes(&(*payload_end_.first), boost::distance(payload_end_));
+  uint16_t crc = crc_calc.checksum();
+  *(frame_.end() - 3) = static_cast<uint8_t>(crc >> 8);
+  *(frame_.end() - 2) = static_cast<uint8_t>(crc & 0xFF);
+
+  std::cout << "************** OLD:\n";
+  for(auto it = packet.payload_end_.first; it != packet.payload_end_.second;  ++it){
+    std::cout << unsigned(*it) << ", ";
+  }
+  std::cout << std::endl;
+  std::cout << "**** NEW:\n";
+  for(auto it = payload_end_.first; it != payload_end_.second;  ++it){
+    std::cout << unsigned(*it) << ", ";
+  }
+  std::cout << "\n\n" << std::endl;
+
+  
+
 }
 
 /*------------------------------------------------------------------*/

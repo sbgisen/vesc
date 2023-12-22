@@ -155,6 +155,9 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
                            joint_type_ == "continuous" ? 1 :
                                                          2,
                            screw_lead_);
+    position_ = servo_controller_.getPositionSens();
+    velocity_ = servo_controller_.getVelocitySens();
+    effort_ = servo_controller_.getEffortSens();
   }
 
   if (command_mode_ == "velocity_duty")

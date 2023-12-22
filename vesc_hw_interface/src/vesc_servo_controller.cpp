@@ -20,6 +20,7 @@
 #include <memory>
 #include <numeric>
 #include <rclcpp/logging.hpp>
+#include <rclcpp/utilities.hpp>
 
 namespace vesc_hw_interface
 {
@@ -115,6 +116,10 @@ void VescServoController::init(hardware_interface::HardwareInfo& info,
     vesc_step_difference_.resetStepDifference(position_steps_);
   }
 
+  while (limit_deque_.empty())
+  {
+    rclcpp::sleep_for(std::chrono::milliseconds(100));
+  }
   limit_margin_ = std::stod(info.hardware_parameters["servo/limit_margin"]);
   limit_ratio_ = std::stod(info.hardware_parameters["servo/limit_threshold"]);
   limit_window_ = std::stoi(info.hardware_parameters["servo/limit_window"]);

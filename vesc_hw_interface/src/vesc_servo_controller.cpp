@@ -64,6 +64,11 @@ void VescServoController::init(hardware_interface::HardwareInfo& info,
   calibration_position_ = std::stod(info.hardware_parameters["servo/calibration_position"]);
   calibration_flag_ = info.hardware_parameters["servo/calibration"] == "true";
   calibration_result_path_ = info.hardware_parameters["servo/calibration_result_path"];
+  if (!calibration_result_path_.empty())
+  {
+    RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "[Servo Control] Latest position will be saved to %s",
+                calibration_result_path_.data());
+  }
   if (!calibration_flag_)
   {
     // TODO: read last position from param
@@ -331,10 +336,13 @@ void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& 
 
     sens_position_ -= getZeroPosition();
 
-    std::ofstream file;
-    file.open(calibration_result_path_, std::ios::out);
-    file << "servo/last_position: " << sens_position_ << std::endl;
-    file.close();
+    if (!calibration_result_path_.empty())
+    {
+      std::ofstream file;
+      file.open(calibration_result_path_, std::ios::out);
+      file << "servo/last_position: " << sens_position_ << std::endl;
+      file.close();
+    }
   }
   return;
 }

@@ -192,8 +192,8 @@ void VescServoController::control(const double control_rate)
   double current_vel = step_diff * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_) * control_rate * gear_ratio_;
   double target_vel = (target_position_ - target_position_previous_) * control_rate;
 
-  auto rate = std::accumulate(endstop_deque_.begin(), endstop_deque_.end(), 0.0) / endstop_deque_.size();
-  if (error > 0 && rate >= endstop_threshold_)
+  auto average = std::accumulate(endstop_deque_.begin(), endstop_deque_.end(), 0.0) / endstop_deque_.size();
+  if (error > 0 && average >= endstop_threshold_)
   {
     RCLCPP_WARN(rclcpp::get_logger("VescHwInterface"), "[Servo Control] Upper endstop signal received. Stop servo.");
     error = 0.0;
@@ -208,7 +208,7 @@ void VescServoController::control(const double control_rate)
                   upper_endstop_position_);
     }
   }
-  else if (error < 0 && rate <= -endstop_threshold_)
+  else if (error < 0 && average <= -endstop_threshold_)
   {
     RCLCPP_WARN(rclcpp::get_logger("VescHwInterface"), "[Servo Control] Lower endstop signal received. Stop servo.");
     error = 0.0;

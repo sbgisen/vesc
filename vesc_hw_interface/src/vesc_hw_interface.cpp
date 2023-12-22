@@ -164,6 +164,7 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
                            joint_type_ == "continuous" ? 1 :
                                                          2,
                            screw_lead_, upper_limit, lower_limit);
+    servo_controller_.spinSensorData();
     position_ = servo_controller_.getPositionSens();
     velocity_ = servo_controller_.getVelocitySens();
     effort_ = servo_controller_.getEffortSens();
@@ -254,6 +255,7 @@ hardware_interface::return_type VescHwInterface::read(const rclcpp::Time& /*time
     // For PID control, request packets are automatically sent in the control cycle.
     // The latest data is read in this function.
     vesc_interface_->requestState();
+    servo_controller_.spinSensorData();
     position_ = servo_controller_.getPositionSens();
     velocity_ = servo_controller_.getVelocitySens();
     effort_ = servo_controller_.getEffortSens();

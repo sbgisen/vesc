@@ -31,19 +31,6 @@ using vesc_driver::VescPacket;
 using vesc_driver::VescPacketValues;
 using vesc_step_difference::VescStepDifference;
 
-class LimitReceiver : public rclcpp::Node
-{
-public:
-  LimitReceiver(const std::function<void(const std_msgs::msg::Bool::SharedPtr)>& callback);
-  ~LimitReceiver() override;
-  void subscribe(const std::string& topic_name);
-  int getNumPublishers() const;
-
-private:
-  std::function<void(const std_msgs::msg::Bool::SharedPtr)> callback_;
-  rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr limit_sub_;
-};
-
 class VescServoController
 {
 public:
@@ -53,7 +40,7 @@ public:
   void init(hardware_interface::HardwareInfo& info, const std::shared_ptr<VescInterface>& interface,
             const double gear_ratio = 0.0, const double torque_const = 0.0, const int rotor_poles = 0,
             const int hall_sensors = 0, const int joint_type = 0, const double screw_lead = 0.0,
-            const double upper_limit_position = 0.0, const double lower_limit_position = 0.0);
+            const double upper_endstop_position = 0.0, const double lower_endstop_position = 0.0);
   void control(const double control_rate);
   void setTargetPosition(const double position);
   void setGearRatio(const double gear_ratio);
@@ -63,6 +50,7 @@ public:
   void setJointType(const int joint_type);
   void setScrewLead(const double screw_lead);
   double getZeroPosition() const;
+  void spinSensorData();
   double getPositionSens();
   double getVelocitySens();
   double getEffortSens();
@@ -70,6 +58,7 @@ public:
   void updateSensor(const std::shared_ptr<VescPacket const>& packet);
 
 private:
+  rclcpp::Node::SharedPtr node_;
   std::shared_ptr<VescInterface> interface_ptr_;
   VescStepDifference vesc_step_difference_;
 
@@ -108,16 +97,16 @@ private:
   int calibration_steps_;
   double calibration_previous_position_;
   std::string calibration_result_path_;
-  double upper_limit_position_, lower_limit_position_;
-  std::unique_ptr<LimitReceiver> limit_receiver_;
-  std::deque<int> limit_deque_;
-  int limit_window_;
-  double limit_ratio_;
-  double limit_margin_;
+  double upper_endstop_position_, lower_endstop_position_;
+  rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr endstop_sub_;
+  std::deque<int> endstop_deque_;
+  int endstop_window_;
+  double endstop_threshold_;
+  double endstop_margin_;
 
   bool calibrate();
   // void controlTimerCallback(const ros::TimerEvent& e);
-  void limit(const std_msgs::msg::Bool::SharedPtr& msg);
+  void endstopCallback(std_msgs::msg::Bool::SharedPtr msg);
 };
 
 }  // namespace vesc_hw_interface

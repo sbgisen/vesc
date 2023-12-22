@@ -36,8 +36,11 @@ class LimitReceiver : public rclcpp::Node
 public:
   LimitReceiver(const std::function<void(const std_msgs::msg::Bool::SharedPtr)>& callback);
   ~LimitReceiver() override;
+  void subscribe(const std::string& topic_name);
+  int getNumPublishers() const;
 
 private:
+  std::function<void(const std_msgs::msg::Bool::SharedPtr)> callback_;
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr limit_sub_;
 };
 

@@ -26,9 +26,18 @@ namespace vesc_hw_interface
 {
 
 LimitReceiver::LimitReceiver(const std::function<void(const std_msgs::msg::Bool::SharedPtr)>& callback)
-  : Node("limit_receiver")
+  : Node("limit_receiver"), callback_(callback)
 {
-  limit_sub_ = this->create_subscription<std_msgs::msg::Bool>("limit", 1, callback);
+}
+
+void LimitReceiver::subscribe(const std::string& topic_name)
+{
+  limit_sub_ = create_subscription<std_msgs::msg::Bool>(topic_name, 1, callback_);
+}
+
+int LimitReceiver::getNumPublishers() const
+{
+  return limit_sub_->get_publisher_count();
 }
 
 VescServoController::VescServoController() : num_rotor_poles_(1), gear_ratio_(1.0), torque_const_(1.0)
@@ -116,9 +125,16 @@ void VescServoController::init(hardware_interface::HardwareInfo& info,
     vesc_step_difference_.resetStepDifference(position_steps_);
   }
 
-  while (limit_deque_.empty())
+  bool use_limit = false;
+  use_limit = info.hardware_parameters["servo/use_limit_sensor"] == "true";
+  if (use_limit)
   {
-    rclcpp::sleep_for(std::chrono::milliseconds(100));
+    limit_receiver_->subscribe("limit");
+    while (limit_receiver_->getNumPublishers() == 0)
+    {
+      RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "[Servo Control] Waiting for limit sensor publisher...");
+      rclcpp::sleep_for(std::chrono::milliseconds(100));
+    }
   }
   limit_margin_ = std::stod(info.hardware_parameters["servo/limit_margin"]);
   limit_ratio_ = std::stod(info.hardware_parameters["servo/limit_threshold"]);

@@ -148,13 +148,22 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
 
   if (command_mode_ == hardware_interface::HW_IF_POSITION)
   {
+    auto upper_limit = 0.0;
+    auto lower_limit = 0.0;
+    upper_limit = std::stod(info_.hardware_parameters["upper_limit"]);
+    lower_limit = std::stod(info_.hardware_parameters["lower_limit"]);
+    // if (joint_limits_.has_position_limits)
+    // {
+    //   upper_limit = joint_limits_.max_position;
+    //   lower_limit = joint_limits_.min_position;
+    // }
     // initializes the servo controller
     screw_lead_ = std::stod(info_.hardware_parameters["screw_lead"]);
     servo_controller_.init(info_, vesc_interface_, gear_ratio_, torque_const_, num_rotor_poles_, num_hall_sensors_,
                            joint_type_ == "revolute"   ? 0 :
                            joint_type_ == "continuous" ? 1 :
                                                          2,
-                           screw_lead_);
+                           screw_lead_, upper_limit, lower_limit);
     position_ = servo_controller_.getPositionSens();
     velocity_ = servo_controller_.getVelocitySens();
     effort_ = servo_controller_.getEffortSens();

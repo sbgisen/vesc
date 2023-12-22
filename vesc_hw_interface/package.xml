@@ -21,6 +21,7 @@
   <depend>joint_state_broadcaster</depend>
   <depend>joint_limits</depend>
   <depend>pluginlib</depend>
+  <depend>std_msgs</depend>
   <depend>urdf</depend>
   <depend>vesc_driver</depend>
 

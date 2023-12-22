@@ -17,12 +17,23 @@
 #include "vesc_hw_interface/vesc_servo_controller.hpp"
 #include <fstream>
 #include <limits>
+#include <memory>
 #include <numeric>
+#include <rclcpp/logging.hpp>
 
 namespace vesc_hw_interface
 {
+
+LimitReceiver::LimitReceiver(const std::function<void(const std_msgs::msg::Bool::SharedPtr)>& callback)
+  : Node("limit_receiver")
+{
+  limit_sub_ = this->create_subscription<std_msgs::msg::Bool>("limit", 1, callback);
+}
+
 VescServoController::VescServoController() : num_rotor_poles_(1), gear_ratio_(1.0), torque_const_(1.0)
 {
+  limit_receiver_ =
+      std::make_unique<LimitReceiver>(std::bind(&VescServoController::limit, this, std::placeholders::_1));
 }
 
 VescServoController::~VescServoController()
@@ -33,7 +44,8 @@ VescServoController::~VescServoController()
 void VescServoController::init(hardware_interface::HardwareInfo& info,
                                const std::shared_ptr<VescInterface>& interface_ptr, const double gear_ratio,
                                const double torque_const, const int rotor_poles, const int hall_sensors,
-                               const int joint_type, const double screw_lead)
+                               const int joint_type, const double screw_lead, const double upper_limit_position,
+                               const double lower_limit_position)
 {
   // initializes members
   if (!interface_ptr)
@@ -51,6 +63,8 @@ void VescServoController::init(hardware_interface::HardwareInfo& info,
   num_hall_sensors_ = hall_sensors;
   joint_type_ = joint_type;
   screw_lead_ = screw_lead;
+  upper_limit_position_ = upper_limit_position;
+  lower_limit_position_ = lower_limit_position;
 
   calibration_flag_ = true;
   sensor_initialize_ = true;
@@ -97,6 +111,11 @@ void VescServoController::init(hardware_interface::HardwareInfo& info,
     }
     vesc_step_difference_.resetStepDifference(position_steps_);
   }
+
+  limit_margin_ = std::stod(info.hardware_parameters["servo/limit_margin"]);
+  limit_ratio_ = std::stod(info.hardware_parameters["servo/limit_threshold"]);
+  limit_window_ = std::stoi(info.hardware_parameters["servo/limit_window"]);
+  limit_deque_ = std::deque<int>(limit_window_, 0);
   position_resolution_ = 1.0 / (num_hall_sensors_ * num_rotor_poles_) * gear_ratio_;
   if (joint_type_ == 0 || joint_type_ == 1)
   {
@@ -155,12 +174,52 @@ void VescServoController::control(const double control_rate)
     return;
   }
 
+  double error = target_position_ - sens_position_;
   // PID control
   double step_diff = vesc_step_difference_.getStepDifference(position_steps_);
   double current_vel = step_diff * 2.0 * M_PI / (num_rotor_poles_ * num_hall_sensors_) * control_rate * gear_ratio_;
   double target_vel = (target_position_ - target_position_previous_) * control_rate;
 
-  double error = target_position_ - sens_position_;
+  auto rate = std::accumulate(limit_deque_.begin(), limit_deque_.end(), 0.0) / limit_deque_.size();
+  if (error > 0 && rate >= limit_ratio_)
+  {
+    RCLCPP_WARN(rclcpp::get_logger("VescHwInterface"), "[Servo Control] Upper limit signal received. Stop servo.");
+    error = 0.0;
+    target_vel = 0.0;
+    // Wait for target position convergence
+    if (std::fabs(target_position_ - target_position_previous_) < std::numeric_limits<double>::epsilon())
+    {
+      if (std::fabs(target_position_ - upper_limit_position_) > limit_margin_)
+      {
+        RCLCPP_ERROR(rclcpp::get_logger("VescHwInterface"), "Servo reached upper limit. Please recalibrate the servo.");
+        exit(1);
+      }
+      zero_position_ = sens_position_ + zero_position_ - upper_limit_position_;
+      sens_position_ = upper_limit_position_;
+      RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "[Servo Control] Reset position to %f.",
+                  upper_limit_position_);
+    }
+  }
+  else if (error < 0 && rate <= -limit_ratio_)
+  {
+    RCLCPP_WARN(rclcpp::get_logger("VescHwInterface"), "[Servo Control] Lower limit signal received. Stop servo.");
+    error = 0.0;
+    target_vel = 0.0;
+    // Wait for target position convergence
+    if (std::fabs(target_position_ - target_position_previous_) < std::numeric_limits<double>::epsilon())
+    {
+      if (std::fabs(target_position_ - lower_limit_position_) > limit_margin_)
+      {
+        RCLCPP_ERROR(rclcpp::get_logger("VescHwInterface"), "Servo reached lower limit. Please recalibrate the servo.");
+        exit(1);
+      }
+      zero_position_ = sens_position_ + zero_position_ - lower_limit_position_;
+      sens_position_ = lower_limit_position_;
+      RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "[Servo Control] Reset position to %f.",
+                  lower_limit_position_);
+    }
+  }
+
   if (std::fabs(error) < position_resolution_)
   {
     error = 0.0;
@@ -365,4 +424,50 @@ void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& 
   }
   return;
 }
+
+void VescServoController::limit(const std_msgs::msg::Bool::SharedPtr& msg)
+{
+  limit_deque_.pop_front();
+  if (!msg->data)
+  {
+    limit_deque_.push_back(0);
+  }
+  else
+  {
+    if (calibration_flag_)
+    {
+      if (calibration_mode_ == CURRENT_)
+      {
+        if (std::signbit(calibration_current_))
+        {
+          limit_deque_.push_back(-1);
+        }
+        else
+        {
+          limit_deque_.push_back(1);
+        }
+      }
+      else if (calibration_mode_ == DUTY_)
+      {
+        if (std::signbit(calibration_duty_))
+        {
+          limit_deque_.push_back(-1);
+        }
+        else
+        {
+          limit_deque_.push_back(1);
+        }
+      }
+    }
+    else if (std::fabs(sens_position_ - upper_limit_position_) < std::fabs(sens_position_ - lower_limit_position_))
+    {
+      limit_deque_.push_back(1);
+    }
+    else
+    {
+      limit_deque_.push_back(-1);
+    }
+  }
+}
+
 }  // namespace vesc_hw_interface

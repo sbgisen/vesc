@@ -347,6 +347,15 @@ bool VescServoController::calibrate()
     return false;
   }
 
+  if (std::accumulate(limit_deque_.begin(), limit_deque_.end(), 0.0) != 0.0)
+  {
+    zero_position_ = sens_position_ - calibration_position_;
+    target_position_ = calibration_position_;
+    RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "Calibration Finished");
+    calibration_flag_ = false;
+    return true;
+  }
+
   calibration_steps_++;
 
   if (calibration_steps_ % 20 == 0)

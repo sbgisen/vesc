@@ -15,10 +15,11 @@
  ********************************************************************/
 
 #include "vesc_hw_interface/vesc_servo_controller.hpp"
+#include <fstream>
 
 namespace vesc_hw_interface
 {
-VescServoController::VescServoController() : gear_ratio_(1.0), torque_const_(1.0), num_rotor_poles_(1)
+VescServoController::VescServoController() : num_rotor_poles_(1), gear_ratio_(1.0), torque_const_(1.0)
 {
 }
 
@@ -61,6 +62,12 @@ void VescServoController::init(hardware_interface::HardwareInfo& info,
   calibration_duty_ = std::stod(info.hardware_parameters["servo/calibration_duty"]);
   calibration_mode_ = info.hardware_parameters["servo/calibration_mode"];
   calibration_position_ = std::stod(info.hardware_parameters["servo/calibration_position"]);
+  calibration_flag_ = info.hardware_parameters["servo/calibration"] == "true";
+  calibration_result_path_ = info.hardware_parameters["servo/calibration_result_path"];
+  if (!calibration_flag_)
+  {
+    // TODO: read last position from param
+  }
 
   // shows parameters
   RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "[Servo Gains] P: %f, I: %f, D: %f", kp_, ki_, kd_);
@@ -98,6 +105,8 @@ void VescServoController::init(hardware_interface::HardwareInfo& info,
 
 void VescServoController::control(const double control_rate)
 {
+  if (sensor_initialize_)
+    return;
   // executes calibration
   if (calibration_flag_)
   {
@@ -115,7 +124,6 @@ void VescServoController::control(const double control_rate)
 
   double error = target_position_ - sens_position_;
   double error_dt = target_vel - current_vel;
-  double error_integ_prev = error_integ_;
   error_integ_ += (error / control_rate);
   error_integ_ = std::clamp(error_integ_, -i_clamp_ / ki_, i_clamp_ / ki_);
 
@@ -282,6 +290,24 @@ void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& 
     if (sensor_initialize_)
     {
       steps_previous_ = steps;
+      // Restore last position
+      if (!calibration_flag_)
+      {
+        target_position_previous_ = target_position_;
+        sens_position_ = target_position_;
+
+        position_steps_ = sens_position_ * (num_hall_sensors_ * num_rotor_poles_) / gear_ratio_;
+
+        if (joint_type_ == 0 || joint_type_ == 1)
+        {
+          position_steps_ /= 2.0 * M_PI;
+        }
+        else if (joint_type_ == 2)
+        {
+          position_steps_ /= screw_lead_;
+        }
+        vesc_step_difference_.resetStepDifference(position_steps_);
+      }
       sensor_initialize_ = false;
     }
     const int32_t steps_diff = steps - steps_previous_;
@@ -304,6 +330,11 @@ void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& 
     }
 
     sens_position_ -= getZeroPosition();
+
+    std::ofstream file;
+    file.open(calibration_result_path_, std::ios::out);
+    file << "servo/last_position: " << sens_position_ << std::endl;
+    file.close();
   }
   return;
 }

@@ -29,7 +29,9 @@ VescServoController::~VescServoController()
 }
 
 void VescServoController::init(hardware_interface::HardwareInfo& info,
-                               const std::shared_ptr<VescInterface>& interface_ptr)
+                               const std::shared_ptr<VescInterface>& interface_ptr, const double gear_ratio,
+                               const double torque_const, const int rotor_poles, const int hall_sensors,
+                               const int joint_type, const double screw_lead)
 {
   // initializes members
   if (!interface_ptr)
@@ -40,6 +42,13 @@ void VescServoController::init(hardware_interface::HardwareInfo& info,
   {
     interface_ptr_ = interface_ptr;
   }
+
+  gear_ratio_ = gear_ratio;
+  torque_const_ = torque_const;
+  num_rotor_poles_ = rotor_poles;
+  num_hall_sensors_ = hall_sensors;
+  joint_type_ = joint_type;
+  screw_lead_ = screw_lead;
 
   calibration_flag_ = true;
   sensor_initialize_ = true;
@@ -71,7 +80,20 @@ void VescServoController::init(hardware_interface::HardwareInfo& info,
   }
   if (!calibration_flag_)
   {
-    // TODO: read last position from param
+    target_position_previous_ = target_position_;
+    sens_position_ = target_position_;
+
+    position_steps_ = sens_position_ * (num_hall_sensors_ * num_rotor_poles_) / gear_ratio_;
+
+    if (joint_type_ == 0 || joint_type_ == 1)
+    {
+      position_steps_ /= 2.0 * M_PI;
+    }
+    else if (joint_type_ == 2)
+    {
+      position_steps_ /= screw_lead_;
+    }
+    vesc_step_difference_.resetStepDifference(position_steps_);
   }
 
   // shows parameters
@@ -295,24 +317,6 @@ void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& 
     if (sensor_initialize_)
     {
       steps_previous_ = steps;
-      // Restore last position
-      if (!calibration_flag_)
-      {
-        target_position_previous_ = target_position_;
-        sens_position_ = target_position_;
-
-        position_steps_ = sens_position_ * (num_hall_sensors_ * num_rotor_poles_) / gear_ratio_;
-
-        if (joint_type_ == 0 || joint_type_ == 1)
-        {
-          position_steps_ /= 2.0 * M_PI;
-        }
-        else if (joint_type_ == 2)
-        {
-          position_steps_ /= screw_lead_;
-        }
-        vesc_step_difference_.resetStepDifference(position_steps_);
-      }
       sensor_initialize_ = false;
     }
     const int32_t steps_diff = steps - steps_previous_;

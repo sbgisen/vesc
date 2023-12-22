@@ -149,14 +149,12 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
   if (command_mode_ == hardware_interface::HW_IF_POSITION)
   {
     // initializes the servo controller
-    servo_controller_.init(info_, vesc_interface_);
-    servo_controller_.setGearRatio(gear_ratio_);
-    servo_controller_.setTorqueConst(torque_const_);
-    servo_controller_.setRotorPoles(num_rotor_poles_);
-    servo_controller_.setHallSensors(num_hall_sensors_);
-    servo_controller_.setJointType(joint_type_ == "revolute" ? 0 : joint_type_ == "continuous" ? 1 : 2);
     screw_lead_ = std::stod(info_.hardware_parameters["screw_lead"]);
-    servo_controller_.setScrewLead(screw_lead_);
+    servo_controller_.init(info_, vesc_interface_, gear_ratio_, torque_const_, num_rotor_poles_, num_hall_sensors_,
+                           joint_type_ == "revolute"   ? 0 :
+                           joint_type_ == "continuous" ? 1 :
+                                                         2,
+                           screw_lead_);
   }
 
   if (command_mode_ == "velocity_duty")

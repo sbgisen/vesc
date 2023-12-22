@@ -36,7 +36,9 @@ public:
   VescServoController();
   ~VescServoController();
 
-  void init(hardware_interface::HardwareInfo& info, const std::shared_ptr<VescInterface>& interface);
+  void init(hardware_interface::HardwareInfo& info, const std::shared_ptr<VescInterface>& interface,
+            const double gear_ratio = 0.0, const double torque_const = 0.0, const int rotor_poles = 0,
+            const int hall_sensors = 0, const int joint_type = 0, const double screw_lead = 0.0);
   void control(const double control_rate);
   void setTargetPosition(const double position);
   void setGearRatio(const double gear_ratio);

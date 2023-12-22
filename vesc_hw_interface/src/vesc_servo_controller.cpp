@@ -379,7 +379,7 @@ bool VescServoController::calibrate()
 
   if (std::accumulate(limit_deque_.begin(), limit_deque_.end(), 0.0) != 0.0)
   {
-    zero_position_ = sens_position_ - calibration_position_;
+    zero_position_ = sens_position_ + zero_position_ - calibration_position_;
     if ((calibration_mode_ == CURRENT_ &&
          std::fabs(calibration_current_ - calibration_strict_current_) < std::numeric_limits<double>::epsilon()) ||
         (calibration_mode_ == DUTY_ &&

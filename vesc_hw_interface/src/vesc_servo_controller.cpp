@@ -74,6 +74,7 @@ void VescServoController::init(hardware_interface::HardwareInfo& info,
   position_steps_ = 0;
   calibration_steps_ = 0;
   calibration_previous_position_ = 0.0;
+  calibration_rewind_ = false;
 
   // reads parameters
   kp_ = std::stod(info.hardware_parameters["servo/Kp"]);
@@ -84,7 +85,9 @@ void VescServoController::init(hardware_interface::HardwareInfo& info,
   antiwindup_ = info.hardware_parameters["servo/antiwindup"] == "true";
   control_rate_ = std::stod(info.hardware_parameters["servo/control_rate"]);
   calibration_current_ = std::stod(info.hardware_parameters["servo/calibration_current"]);
+  calibration_strict_current_ = std::stod(info.hardware_parameters["servo/calibration_strict_current"]);
   calibration_duty_ = std::stod(info.hardware_parameters["servo/calibration_duty"]);
+  calibration_strict_duty_ = std::stod(info.hardware_parameters["servo/calibration_strict_duty"]);
   calibration_mode_ = info.hardware_parameters["servo/calibration_mode"];
   calibration_position_ = std::stod(info.hardware_parameters["servo/calibration_position"]);
   calibration_flag_ = info.hardware_parameters["servo/calibration"] == "true";
@@ -335,11 +338,13 @@ bool VescServoController::calibrate()
   // sends a command for calibration
   if (calibration_mode_ == CURRENT_)
   {
-    interface_ptr_->setCurrent(calibration_current_);
+    auto sign = calibration_rewind_ ? -1.0 : 1.0;
+    interface_ptr_->setCurrent(sign * calibration_current_);
   }
   else if (calibration_mode_ == DUTY_)
   {
-    interface_ptr_->setDutyCycle(calibration_duty_);
+    auto sign = calibration_rewind_ ? -1.0 : 1.0;
+    interface_ptr_->setDutyCycle(sign * calibration_duty_);
   }
   else
   {
@@ -347,13 +352,36 @@ bool VescServoController::calibrate()
     return false;
   }
 
+  if (calibration_rewind_)
+  {
+    if (std::fabs(calibration_position_ - sens_position_) > (upper_limit_position_ - lower_limit_position_) / 10.0)
+    {
+      calibration_current_ = calibration_strict_current_;
+      calibration_duty_ = calibration_strict_duty_;
+      calibration_rewind_ = false;
+    }
+    return false;
+  }
+
   if (std::accumulate(limit_deque_.begin(), limit_deque_.end(), 0.0) != 0.0)
   {
     zero_position_ = sens_position_ - calibration_position_;
-    target_position_ = calibration_position_;
-    RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "Calibration Finished");
-    calibration_flag_ = false;
-    return true;
+    if ((calibration_mode_ == CURRENT_ &&
+         std::fabs(calibration_current_ - calibration_strict_current_) < std::numeric_limits<double>::epsilon()) ||
+        (calibration_mode_ == DUTY_ &&
+         std::fabs(calibration_duty_ - calibration_strict_duty_) < std::numeric_limits<double>::epsilon()))
+    {
+      target_position_ = calibration_position_;
+      RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "Calibration Finished");
+      calibration_flag_ = false;
+      return true;
+    }
+    else
+    {
+      RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "Calibrate with strict current/duty.");
+      calibration_rewind_ = true;
+      return false;
+    }
   }
 
   calibration_steps_++;

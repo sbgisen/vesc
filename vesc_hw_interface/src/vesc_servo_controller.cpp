@@ -16,6 +16,8 @@
 
 #include "vesc_hw_interface/vesc_servo_controller.hpp"
 #include <fstream>
+#include <limits>
+#include <numeric>
 
 namespace vesc_hw_interface
 {
@@ -95,6 +97,15 @@ void VescServoController::init(hardware_interface::HardwareInfo& info,
     }
     vesc_step_difference_.resetStepDifference(position_steps_);
   }
+  position_resolution_ = 1.0 / (num_hall_sensors_ * num_rotor_poles_) * gear_ratio_;
+  if (joint_type_ == 0 || joint_type_ == 1)
+  {
+    position_resolution_ = position_resolution_ * 2.0 * M_PI;  // unit: rad
+  }
+  else if (joint_type_ == 2)
+  {
+    position_resolution_ = position_resolution_ * screw_lead_;  // unit: m
+  }
 
   // shows parameters
   RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "[Servo Gains] P: %f, I: %f, D: %f", kp_, ki_, kd_);
@@ -150,6 +161,10 @@ void VescServoController::control(const double control_rate)
   double target_vel = (target_position_ - target_position_previous_) * control_rate;
 
   double error = target_position_ - sens_position_;
+  if (std::fabs(error) < position_resolution_)
+  {
+    error = 0.0;
+  }
   double error_dt = target_vel - current_vel;
   error_integ_ += (error / control_rate);
   error_integ_ = std::clamp(error_integ_, -i_clamp_ / ki_, i_clamp_ / ki_);

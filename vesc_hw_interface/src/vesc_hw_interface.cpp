@@ -53,9 +53,21 @@ CallbackReturn VescHwInterface::on_init(const hardware_interface::HardwareInfo& 
 
   // reads system parameters
   port_ = info_.hardware_parameters["port"];
-  gear_ratio_ = std::stod(info_.hardware_parameters["gear_ratio"]);
-  torque_const_ = std::stod(info_.hardware_parameters["torque_const"]);
-  num_hall_sensors_ = std::stoi(info_.hardware_parameters["num_hall_sensors"]);
+  gear_ratio_ = 1.0;
+  if (info_.hardware_parameters.find("gear_ratio") != info_.hardware_parameters.end())
+  {
+    gear_ratio_ = std::stod(info_.hardware_parameters["gear_ratio"]);
+  }
+  torque_const_ = 1.0;
+  if (info_.hardware_parameters.find("torque_const") != info_.hardware_parameters.end())
+  {
+    torque_const_ = std::stod(info_.hardware_parameters["torque_const"]);
+  }
+  num_hall_sensors_ = 3;
+  if (info_.hardware_parameters.find("num_hall_sensors") != info_.hardware_parameters.end())
+  {
+    num_hall_sensors_ = std::stoi(info_.hardware_parameters["num_hall_sensors"]);
+  }
 
   RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "Gear ratio is set to %f", gear_ratio_);
   RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "Torque constant is set to %f", torque_const_);
@@ -63,7 +75,11 @@ CallbackReturn VescHwInterface::on_init(const hardware_interface::HardwareInfo& 
   // reads driving mode setting
   // - assigns an empty string if param. is not found
 
-  num_rotor_poles_ = std::stoi(info_.hardware_parameters["num_rotor_poles"]);
+  num_rotor_poles_ = 2;
+  if (info_.hardware_parameters.find("num_rotor_poles") != info_.hardware_parameters.end())
+  {
+    num_rotor_poles_ = std::stoi(info_.hardware_parameters["num_rotor_poles"]);
+  }
 
   if (num_rotor_poles_ % 2 != 0)
   {
@@ -149,7 +165,15 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
   if (command_mode_ == hardware_interface::HW_IF_POSITION)
   {
     auto upper_limit = 0.0;
+    if (info_.hardware_parameters.find("upper_limit") != info_.hardware_parameters.end())
+    {
+      upper_limit = std::stod(info_.hardware_parameters["upper_limit"]);
+    }
     auto lower_limit = 0.0;
+    if (info_.hardware_parameters.find("lower_limit") != info_.hardware_parameters.end())
+    {
+      lower_limit = std::stod(info_.hardware_parameters["lower_limit"]);
+    }
     upper_limit = std::stod(info_.hardware_parameters["upper_limit"]);
     lower_limit = std::stod(info_.hardware_parameters["lower_limit"]);
     // if (joint_limits_.has_position_limits)
@@ -158,7 +182,11 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
     //   lower_limit = joint_limits_.min_position;
     // }
     // initializes the servo controller
-    screw_lead_ = std::stod(info_.hardware_parameters["screw_lead"]);
+    screw_lead_ = 1.0;
+    if (info_.hardware_parameters.find("screw_lead") != info_.hardware_parameters.end())
+    {
+      screw_lead_ = std::stod(info_.hardware_parameters["screw_lead"]);
+    }
     servo_controller_.init(info_, vesc_interface_, gear_ratio_, torque_const_, num_rotor_poles_, num_hall_sensors_,
                            joint_type_ == "revolute"   ? 0 :
                            joint_type_ == "continuous" ? 1 :

@@ -70,21 +70,81 @@ void VescServoController::init(hardware_interface::HardwareInfo& info,
   calibration_rewind_ = false;
 
   // reads parameters
-  kp_ = std::stod(info.hardware_parameters["servo/Kp"]);
-  ki_ = std::stod(info.hardware_parameters["servo/Ki"]);
-  kd_ = std::stod(info.hardware_parameters["servo/Kd"]);
-  i_clamp_ = std::stod(info.hardware_parameters["servo/i_clamp"]);
-  duty_limiter_ = std::stod(info.hardware_parameters["servo/duty_limiter"]);
-  antiwindup_ = info.hardware_parameters["servo/antiwindup"] == "true";
-  control_rate_ = std::stod(info.hardware_parameters["servo/control_rate"]);
-  calibration_current_ = std::stod(info.hardware_parameters["servo/calibration_current"]);
-  calibration_strict_current_ = std::stod(info.hardware_parameters["servo/calibration_strict_current"]);
-  calibration_duty_ = std::stod(info.hardware_parameters["servo/calibration_duty"]);
-  calibration_strict_duty_ = std::stod(info.hardware_parameters["servo/calibration_strict_duty"]);
-  calibration_mode_ = info.hardware_parameters["servo/calibration_mode"];
-  calibration_position_ = std::stod(info.hardware_parameters["servo/calibration_position"]);
-  calibration_flag_ = info.hardware_parameters["servo/calibration"] == "true";
-  calibration_result_path_ = info.hardware_parameters["servo/calibration_result_path"];
+  kp_ = 50.0;
+  if (info.hardware_parameters.find("servo/Kp") != info.hardware_parameters.end())
+  {
+    kp_ = std::stod(info.hardware_parameters["servo/Kp"]);
+  }
+  ki_ = 0.0;
+  if (info.hardware_parameters.find("servo/Ki") != info.hardware_parameters.end())
+  {
+    ki_ = std::stod(info.hardware_parameters["servo/Ki"]);
+  }
+  kd_ = 1.0;
+  if (info.hardware_parameters.find("servo/Kd") != info.hardware_parameters.end())
+  {
+    kd_ = std::stod(info.hardware_parameters["servo/Kd"]);
+  }
+  i_clamp_ = 1.0;
+  if (info.hardware_parameters.find("servo/i_clamp") != info.hardware_parameters.end())
+  {
+    i_clamp_ = std::stod(info.hardware_parameters["servo/i_clamp"]);
+  }
+  duty_limiter_ = 1.0;
+  if (info.hardware_parameters.find("servo/duty_limiter") != info.hardware_parameters.end())
+  {
+    duty_limiter_ = std::stod(info.hardware_parameters["servo/duty_limiter"]);
+  }
+  antiwindup_ = true;
+  if (info.hardware_parameters.find("servo/antiwindup") != info.hardware_parameters.end())
+  {
+    antiwindup_ = info.hardware_parameters["servo/antiwindup"] == "true";
+  }
+  control_rate_ = 100.0;
+  if (info.hardware_parameters.find("servo/control_rate") != info.hardware_parameters.end())
+  {
+    control_rate_ = std::stod(info.hardware_parameters["servo/control_rate"]);
+  }
+  calibration_current_ = 0.0;
+  if (info.hardware_parameters.find("servo/calibration_current") != info.hardware_parameters.end())
+  {
+    calibration_current_ = std::stod(info.hardware_parameters["servo/calibration_current"]);
+  }
+  calibration_strict_current_ = calibration_current_;
+  if (info.hardware_parameters.find("servo/calibration_strict_current") != info.hardware_parameters.end())
+  {
+    calibration_strict_current_ = std::stod(info.hardware_parameters["servo/calibration_strict_current"]);
+  }
+  calibration_duty_ = 0.1;
+  if (info.hardware_parameters.find("servo/calibration_duty") != info.hardware_parameters.end())
+  {
+    calibration_duty_ = std::stod(info.hardware_parameters["servo/calibration_duty"]);
+  }
+  calibration_strict_duty_ = calibration_duty_;
+  if (info.hardware_parameters.find("servo/calibration_strict_duty") != info.hardware_parameters.end())
+  {
+    calibration_strict_duty_ = std::stod(info.hardware_parameters["servo/calibration_strict_duty"]);
+  }
+  calibration_mode_ = CURRENT_;
+  if (info.hardware_parameters.find("servo/calibration_mode") != info.hardware_parameters.end())
+  {
+    calibration_mode_ = info.hardware_parameters["servo/calibration_mode"];
+  }
+  calibration_position_ = 0.0;
+  if (info.hardware_parameters.find("servo/calibration_position") != info.hardware_parameters.end())
+  {
+    calibration_position_ = std::stod(info.hardware_parameters["servo/calibration_position"]);
+  }
+  calibration_flag_ = true;
+  if (info.hardware_parameters.find("servo/calibration") != info.hardware_parameters.end())
+  {
+    calibration_flag_ = info.hardware_parameters["servo/calibration"] == "true";
+  }
+  calibration_result_path_ = "";
+  if (info.hardware_parameters.find("servo/calibration_result_path") != info.hardware_parameters.end())
+  {
+    calibration_result_path_ = info.hardware_parameters["servo/calibration_result_path"];
+  }
   if (!calibration_result_path_.empty())
   {
     RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "[Servo Control] Latest position will be saved to %s",
@@ -109,7 +169,10 @@ void VescServoController::init(hardware_interface::HardwareInfo& info,
   }
 
   bool use_endstop = false;
-  use_endstop = info.hardware_parameters["servo/use_endstop"] == "true";
+  if (info.hardware_parameters.find("servo/use_endstop") != info.hardware_parameters.end())
+  {
+    use_endstop = info.hardware_parameters["servo/use_endstop"] == "true";
+  }
   if (use_endstop)
   {
     rclcpp::NodeOptions options;
@@ -124,9 +187,21 @@ void VescServoController::init(hardware_interface::HardwareInfo& info,
       rclcpp::sleep_for(std::chrono::milliseconds(100));
     }
   }
-  endstop_margin_ = std::stod(info.hardware_parameters["servo/endstop_margin"]);
-  endstop_threshold_ = std::stod(info.hardware_parameters["servo/endstop_threshold"]);
-  endstop_window_ = std::stoi(info.hardware_parameters["servo/endstop_window"]);
+  endstop_margin_ = 0.02;
+  if (info.hardware_parameters.find("servo/endstop_margin") != info.hardware_parameters.end())
+  {
+    endstop_margin_ = std::stod(info.hardware_parameters["servo/endstop_margin"]);
+  }
+  endstop_threshold_ = 0.8;
+  if (info.hardware_parameters.find("servo/endstop_threshold") != info.hardware_parameters.end())
+  {
+    endstop_threshold_ = std::stod(info.hardware_parameters["servo/endstop_threshold"]);
+  }
+  endstop_window_ = 1;
+  if (info.hardware_parameters.find("servo/endstop_window") != info.hardware_parameters.end())
+  {
+    endstop_window_ = std::stoi(info.hardware_parameters["servo/endstop_window"]);
+  }
   endstop_deque_ = std::deque<int>(endstop_window_, 0);
   position_resolution_ = 1.0 / (num_hall_sensors_ * num_rotor_poles_) * gear_ratio_;
   if (joint_type_ == 0 || joint_type_ == 1)
@@ -156,11 +231,23 @@ void VescServoController::init(hardware_interface::HardwareInfo& info,
   }
 
   // Smoothing differentiation when hall sensor resolution is insufficient
-  bool smooth_diff = info.hardware_parameters["servo/enable_smooth_diff"] == "true";
+  bool smooth_diff = true;
+  if (info.hardware_parameters.find("servo/enable_smooth_diff") != info.hardware_parameters.end())
+  {
+    smooth_diff = info.hardware_parameters["servo/enable_smooth_diff"] == "true";
+  }
   if (smooth_diff)
   {
-    double smooth_diff_max_sampling_time = std::stod(info.hardware_parameters["servo/smooth_diff/max_sample_sec"]);
-    int counter_td_vw_max_step = std::stoi(info.hardware_parameters["servo/smooth_diff/max_smooth_step"]);
+    double smooth_diff_max_sampling_time = 1.0;
+    if (info.hardware_parameters.find("servo/smooth_diff/max_sample_sec") != info.hardware_parameters.end())
+    {
+      smooth_diff_max_sampling_time = std::stod(info.hardware_parameters["servo/smooth_diff/max_sample_sec"]);
+    }
+    int counter_td_vw_max_step = 10;
+    if (info.hardware_parameters.find("servo/smooth_diff/max_smooth_step") != info.hardware_parameters.end())
+    {
+      counter_td_vw_max_step = std::stoi(info.hardware_parameters["servo/smooth_diff/max_smooth_step"]);
+    }
     vesc_step_difference_.enableSmooth(control_rate_, smooth_diff_max_sampling_time, counter_td_vw_max_step);
     RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"),
                 "[Servo Control] Smooth differentiation enabled, max_sample_sec: %f, max_smooth_step: %d",

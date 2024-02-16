@@ -34,13 +34,41 @@ void VescWheelController::init(hardware_interface::HardwareInfo& info,
     interface_ptr_ = interface_ptr;
   }
 
-  kp_ = std::stod(info.hardware_parameters["motor/Kp"]);
-  ki_ = std::stod(info.hardware_parameters["motor/Ki"]);
-  kd_ = std::stod(info.hardware_parameters["motor/Kd"]);
-  i_clamp_ = std::stod(info.hardware_parameters["motor/i_clamp"]);
-  duty_limiter_ = std::stod(info.hardware_parameters["motor/duty_limiter"]);
-  antiwindup_ = info.hardware_parameters["motor/antiwindup"] == "true";
-  control_rate_ = std::stod(info.hardware_parameters["motor/control_rate"]);
+  kp_ = 0.005;
+  if (info.hardware_parameters.find("motor/Kp") != info.hardware_parameters.end())
+  {
+    kp_ = std::stod(info.hardware_parameters["motor/Kp"]);
+  }
+  ki_ = 0.005;
+  if (info.hardware_parameters.find("motor/Ki") != info.hardware_parameters.end())
+  {
+    ki_ = std::stod(info.hardware_parameters["motor/Ki"]);
+  }
+  kd_ = 0.0025;
+  if (info.hardware_parameters.find("motor/Kd") != info.hardware_parameters.end())
+  {
+    kd_ = std::stod(info.hardware_parameters["motor/Kd"]);
+  }
+  i_clamp_ = 0.2;
+  if (info.hardware_parameters.find("motor/i_clamp") != info.hardware_parameters.end())
+  {
+    i_clamp_ = std::stod(info.hardware_parameters["motor/i_clamp"]);
+  }
+  duty_limiter_ = 1.0;
+  if (info.hardware_parameters.find("motor/duty_limiter") != info.hardware_parameters.end())
+  {
+    duty_limiter_ = std::stod(info.hardware_parameters["motor/duty_limiter"]);
+  }
+  antiwindup_ = true;
+  if (info.hardware_parameters.find("motor/antiwindup") != info.hardware_parameters.end())
+  {
+    antiwindup_ = info.hardware_parameters["motor/antiwindup"] == "true";
+  }
+  control_rate_ = 100.0;
+  if (info.hardware_parameters.find("motor/control_rate") != info.hardware_parameters.end())
+  {
+    control_rate_ = std::stod(info.hardware_parameters["motor/control_rate"]);
+  }
 
   RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "[Motor Gains] P: %f, I: %f, D: %f", kp_, ki_, kd_);
   RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "[Motor Gains] I clamp: %f, Antiwindup: %s", i_clamp_,
@@ -48,11 +76,23 @@ void VescWheelController::init(hardware_interface::HardwareInfo& info,
   RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "[Motor Control] control_rate: %f", control_rate_);
 
   // Smoothing differentiation when hall sensor resolution is insufficient
-  bool smooth_diff = info.hardware_parameters["motor/enable_smooth_diff"] == "true";
+  bool smooth_diff = true;
+  if (info.hardware_parameters.find("motor/enable_smooth_diff") != info.hardware_parameters.end())
+  {
+    smooth_diff = info.hardware_parameters["motor/enable_smooth_diff"] == "true";
+  }
   if (smooth_diff)
   {
-    double smooth_diff_max_sampling_time = std::stod(info.hardware_parameters["motor/smooth_diff/max_sample_sec"]);
-    int counter_td_vw_max_step = std::stoi(info.hardware_parameters["motor/smooth_diff/max_smooth_step"]);
+    double smooth_diff_max_sampling_time = 1.0;
+    if (info.hardware_parameters.find("motor/smooth_diff/max_sample_sec") != info.hardware_parameters.end())
+    {
+      smooth_diff_max_sampling_time = std::stod(info.hardware_parameters["motor/smooth_diff/max_sample_sec"]);
+    }
+    int counter_td_vw_max_step = 10;
+    if (info.hardware_parameters.find("motor/smooth_diff/max_smooth_step") != info.hardware_parameters.end())
+    {
+      counter_td_vw_max_step = std::stoi(info.hardware_parameters["motor/smooth_diff/max_smooth_step"]);
+    }
     vesc_step_difference_.enableSmooth(control_rate_, smooth_diff_max_sampling_time, counter_td_vw_max_step);
     RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"),
                 "[Motor Control] Smooth differentiation enabled, max_sample_sec: %f, max_smooth_step: %d",

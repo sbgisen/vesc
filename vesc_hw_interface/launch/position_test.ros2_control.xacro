@@ -32,16 +32,6 @@
       <param name="servo/endstop_window">1</param>
       <param name="servo/endstop_threshold">0.8</param>
       <param name="servo/endstop_margin">0.02</param>
-      <param name="motor/Kp">0.1</param>
-      <param name="motor/Ki">0.01</param>
-      <param name="motor/Kd">0.02</param>
-      <param name="motor/i_clamp">1.0</param>
-      <param name="motor/duty_limiter">1.0</param>
-      <param name="motor/antiwindup">true</param>
-      <param name="motor/control_rate">100.0</param>
-      <param name="motor/enable_smooth_diff">true</param>
-      <param name="motor/smooth_diff/max_sample_sec">0.2</param>
-      <param name="motor/smooth_diff/max_smooth_step">10</param>
       <param name="command_mode">position</param>
       <param name="joint_type">prismatic</param>
     </hardware>

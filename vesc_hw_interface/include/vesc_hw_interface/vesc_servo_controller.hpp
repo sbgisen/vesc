@@ -106,7 +106,7 @@ private:
 
   bool calibrate();
   // void controlTimerCallback(const ros::TimerEvent& e);
-  void endstopCallback(std_msgs::msg::Bool::SharedPtr msg);
+  void endstopCallback(const std_msgs::msg::Bool::ConstSharedPtr& msg);
 };
 
 }  // namespace vesc_hw_interface

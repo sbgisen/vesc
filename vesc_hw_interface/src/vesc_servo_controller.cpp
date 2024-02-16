@@ -559,7 +559,7 @@ void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& 
   return;
 }
 
-void VescServoController::endstopCallback(std_msgs::msg::Bool::SharedPtr msg)
+void VescServoController::endstopCallback(const std_msgs::msg::Bool::ConstSharedPtr& msg)
 {
   endstop_deque_.pop_front();
   if (!msg->data)

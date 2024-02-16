@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <ros2_control name="vesc" type="actuator">
+    <hardware>
+      <plugin>vesc_hw_interface/VescHwInterface</plugin>
+      <param name="port">/dev/ttyACM0</param>
+      <param name="gear_ratio">0.230769</param>
+      <param name="torque_const">1.0</param>
+      <param name="num_hall_sensors">3</param>
+      <param name="screw_lead">1.0</param>
+      <param name="num_rotor_poles">20</param>
+      <param name="upper_limit">0.42</param>
+      <param name="lower_limit">0.0</param>
+      <param name="servo/Kp">0.005</param>
+      <param name="servo/Ki">0.005</param>
+      <param name="servo/Kd">0.0025</param>
+      <param name="servo/i_clamp">1.0</param>
+      <param name="servo/duty_limiter">1.0</param>
+      <param name="servo/antiwindup">true</param>
+      <param name="servo/control_rate">100.0</param>
+      <param name="servo/calibration">false</param>
+      <param name="servo/calibration_current">1.0</param>
+      <param name="servo/calibration_strict_current">-0.08</param>
+      <param name="servo/calibration_duty">0.01</param>
+      <param name="servo/calibration_strict_duty">-0.08</param>
+      <param name="servo/calibration_mode">duty</param>
+      <param name="servo/calibration_position">0.0</param>
+      <param name="servo/enable_smooth_diff">true</param>
+      <param name="servo/smooth_diff/max_sample_sec">1.0</param>
+      <param name="servo/smooth_diff/max_smooth_step">10</param>
+      <param name="servo/use_endstop">false</param>
+      <param name="servo/endstop_window">1</param>
+      <param name="servo/endstop_threshold">0.8</param>
+      <param name="servo/endstop_margin">0.02</param>
+      <param name="command_mode">position</param>
+      <param name="joint_type">prismatic</param>
+    </hardware>
+    <joint name="vesc_joint">
+      <command_interface name="position">
+        <param name="min">-1</param>
+        <param name="max">1</param>
+      </command_interface>
+      <command_interface name="velocity">
+        <param name="min">-1</param>
+        <param name="max">1</param>
+      </command_interface>
+      <command_interface name="effort">
+        <param name="min">-1</param>
+        <param name="max">1</param>
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+      <state_interface name="effort"/>
+    </joint>
+  </ros2_control>
+</robot>

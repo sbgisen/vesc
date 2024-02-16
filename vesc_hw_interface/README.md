@@ -40,8 +40,25 @@ If your motor unit has other structures, you should implement your own controlle
 - `servo/Kp` (double, *default*: 50.0): proportional gain of the controller.
 - `servo/Ki` (double, *default*: 0.0): integral gain of the controller.
 - `servo/Kd` (double, *default*: 1.0): derivative gain of the controller.
+- `servo/calibration` (bool, *default*: true): if true, the servo will calibrate its origin position.
+- `servo/calibration_mode` (string, *default*: "current"): the mode of calibration. Enter one of following parameters: `current`, `duty`. If you set `current`, the servo will calibrate its origin position with `calibration_current` and `calibration_strict_current`. If you set `duty`, the servo will calibrate its origin position with `calibration_duty` and `calibration_strict_duty`.
 - `servo/calibration_current` (double, *default*: 6.0): maximum current used in origin calibration.
+- `servo/calibration_strict_current` (double, *default*: same as `calibration_current`): maximum current used in strict origin calibration. If the servo reached the origin position with `calibration_current`, the servo moves slightly away from the origin position and then recalibrates the origin position with `calibration_strict_current`. If `calibration_strict_current` is same as `calibration_current`, the servo will not recalibrate the origin position.
+- `servo/calibration_duty` (double, *default*: 0.1): maximum duty used in origin calibration.
+- `servo/calibration_strict_duty` (double, *default*: same as `calibration_duty`): maximum duty used in strict origin calibration. If the servo reached the origin position with `calibration_duty`, the servo moves slightly away from the origin position and then recalibrates the origin position with `calibration_strict_duty`. If `calibration_strict_duty` is same as `calibration_duty`, the servo will not recalibrate the origin position.
 - `servo/calibration_position` (double, *default*: 0.0): the position on which the robot calibrates.
+- `servo/calibration_result_path` (string, *default*: ""): if not empty, the last position will be saved in this path.
+- `servo/last_position` (double, *default*: 0.0): if `calibration` is false, the servo uses this value as its current position.
+- `servo/use_endstop` (bool, *default*: false): if true, the servo will use the endstop sensor to check the position limit, and the servo subscribes `endstop` topic. You should publish `std_msgs/Bool` message to `endstop` topic. If the message is true, the servo will consider that the servo has reached the endstop.
+- `servo/endstop_margin` (double, *default*: 0.02): the error margin for considering the target_position to have reached the endstop.
+- `servo/endstop_window` (int, *default*: 1): the window size for considering the servo to have reached the endstop.
+- `servo/endstop_threshold` (double, *default*: 0.8): the threshold for considering the servo to have reached the endstop. If the average of most recent `endstop_window` sensor values is greater than `endstop_threshold`, the servo will consider that the servo has reached the endstop.
+
+**Warning**
+
+- If you set `calibration` is true, the servo will move to the limit position with `calibration_current` current. Please make sure that the servo is safe to move.
+- If you set `servo/calibration` is false, the servo will use `servo/last_position` as its current position. If you want to use the last position, you should save the last position in `servo/calibration_result_path` and set `servo/last_position` to the value.
+- If you move the servo manually or use non hardware interface controller or didn't specify the `servo/calibration_result_path`, you should calibrate the servo again.
 
 ### Public Functions
 - `void read()` sends request to get current states, but DOES NOT update immediately. After a return packet comes, the callback function will update private variables.

@@ -18,9 +18,11 @@
   <depend>hardware_interface</depend>
   <depend>controller_manager</depend>
   <depend>velocity_controllers</depend>
+  <depend>position_controllers</depend>
   <depend>joint_state_broadcaster</depend>
   <depend>joint_limits</depend>
   <depend>pluginlib</depend>
+  <depend>std_msgs</depend>
   <depend>urdf</depend>
   <depend>vesc_driver</depend>
 

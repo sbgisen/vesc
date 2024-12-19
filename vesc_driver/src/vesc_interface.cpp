@@ -109,10 +109,10 @@ void* VescInterface::Impl::canThread(void) {
 
     CAN_PACKET_ID cmd = static_cast<CAN_PACKET_ID>(eid >> 8);  // command
 
-    std::vector<uint8_t> data(0);
+    Buffer buffer(0);
 
     switch (cmd) {
-      case CAN_PACKET_ID::CAN_PACKET_PROCESS_SHORT_BUFFER: {
+      case CAN_PACKET_ID::CAN_PACKET_PROCESS_SHORT_BUFFER: {  // end of packet
         uint32_t ind = 0;
         const uint32_t controller_id = rxmsg.data[ind++];
         const int rx_buffer_response_type = rxmsg.data[ind++];
@@ -123,15 +123,24 @@ void* VescInterface::Impl::canThread(void) {
               "got " +
               std::to_string(len));
         }
-        data =
-            std::vector<uint8_t>(rxmsg.data + ind, rxmsg.data + rxmsg.can_dlc);
+        buffer.insert(buffer.end(), rxmsg.data + ind,
+                      rxmsg.data + rxmsg.can_dlc);
+        
+        std::string error;
+        int bytes_needed = VESC_MIN_FRAME_SIZE;
+        VescPacketConstPtr packet = VescPacketFactory::createCanPacket(buffer.begin(), buffer.end(),&bytes_needed, &error); 
+        if(packet){
+          data_updated_ = true;
+          packet_handler_(packet);
+        }
+        buffer.erase(buffer.begin(), buffer.end());
 
       } break;
       case CAN_PACKET_ID::CAN_PACKET_FILL_RX_BUFFER: {
         uint32_t ind = 0;
         const unsigned int packet_number = rxmsg.data[ind++];
-        data =
-            std::vector<uint8_t>(rxmsg.data + ind, rxmsg.data + rxmsg.can_dlc);
+        buffer.insert(buffer.end(), rxmsg.data + ind,
+                      rxmsg.data + rxmsg.can_dlc);
 
       }
 
@@ -140,12 +149,12 @@ void* VescInterface::Impl::canThread(void) {
         uint32_t ind = 0;
         unsigned int packet_number = rxmsg.data[0] + rxmsg.data[1] << 8;
         ind += 2;
-        data =
-            std::vector<uint8_t>(rxmsg.data + ind, rxmsg.data + rxmsg.can_dlc);
+        buffer.insert(buffer.end(), rxmsg.data + ind,
+                      rxmsg.data + rxmsg.can_dlc);
 
       } break;
 
-      case CAN_PACKET_ID::CAN_PACKET_PROCESS_RX_BUFFER: {
+      case CAN_PACKET_ID::CAN_PACKET_PROCESS_RX_BUFFER: {  // end of packet
         if (rxmsg.can_dlc != 6) {
           error_handler_(
               "CAN_PCAKET_PROCESS_RX_BUFFER should be equal 6 but we got " +
@@ -157,6 +166,18 @@ void* VescInterface::Impl::canThread(void) {
         const unsigned int full_data_len = rxmsg.data[ind++]
                                            << 8 + rxmsg.data[ind++];
         const unsigned short crc = rxmsg.data[ind++] << 8 + rxmsg.data[ind++];
+        // TODO: check crc and length
+
+        std::string error;
+        int bytes_needed = VESC_MIN_FRAME_SIZE;
+        VescPacketConstPtr packet = VescPacketFactory::createCanPacket(buffer.begin(), buffer.end(),&bytes_needed, &error); 
+        if(packet){
+          data_updated_ = true;
+          packet_handler_(packet);
+        }
+        buffer.erase(buffer.begin(), buffer.end());
+      
+
       }
       default:
         break;

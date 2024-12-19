@@ -70,7 +70,7 @@ public:
   std::unique_ptr<IoContext> owned_ctx{};
   std::unique_ptr<drivers::serial_driver::SerialPortConfig> device_config_;
   std::unique_ptr<drivers::can_driver::CanPortConfig> can_config_;
-  VescFrame::CRC send_crc_;
+  CRC send_crc_;
   bool data_updated_;
   std::unique_ptr<drivers::serial_driver::SerialDriver> serial_driver_;
 };
@@ -186,7 +186,7 @@ void* VescInterface::Impl::rxThread(void)
 
   while (rx_thread_run_)
   {
-    int bytes_needed = VescFrame::VESC_MIN_FRAME_SIZE;
+    int bytes_needed = VESC_MIN_FRAME_SIZE;
     // attempt to read at least bytes_needed bytes from the serial port
     const auto bytes_read = serial_driver_->port()->receive(temp_buffer);
     buffer.reserve(buffer.size() + bytes_read);
@@ -204,7 +204,7 @@ void* VescInterface::Impl::rxThread(void)
       while (iter != buffer.end())
       {
         // check if valid start-of-frame character
-        if (VescFrame::VESC_SOF_VAL_SMALL_FRAME == *iter || VescFrame::VESC_SOF_VAL_LARGE_FRAME == *iter)
+        if (VESC_SOF_VAL_SMALL_FRAME == *iter || VESC_SOF_VAL_LARGE_FRAME == *iter)
         {
           // good start, now attempt to create packet
           std::string error;
@@ -248,7 +248,7 @@ void* VescInterface::Impl::rxThread(void)
 
       // if iter is at the end of the buffer, more bytes are needed
       if (iter == buffer.end())
-        bytes_needed = VescFrame::VESC_MIN_FRAME_SIZE;
+        bytes_needed = VESC_MIN_FRAME_SIZE;
 
       // erase "used" buffer
       if (std::distance(iter_begin, iter) > 0)
@@ -399,14 +399,14 @@ void VescInterface::send(const VescData& data)
   if (payload_size < 256)
   {
     // single byte payload size
-    frame.push_back(static_cast<uint8_t>(VescFrame::VESC_SOF_VAL_SMALL_FRAME));
+    frame.push_back(static_cast<uint8_t>(VESC_SOF_VAL_SMALL_FRAME));
     frame.push_back(static_cast<uint8_t>(payload_size));
     
   }
   else
   {
     // two byte payload size
-    frame.push_back(static_cast<uint8_t>(VescFrame::VESC_SOF_VAL_LARGE_FRAME));
+    frame.push_back(static_cast<uint8_t>(VESC_SOF_VAL_LARGE_FRAME));
     frame.push_back(static_cast<uint8_t>(payload_size >> 8));
     frame.push_back(static_cast<uint8_t>(payload_size & 0xFF));
   }
@@ -416,12 +416,12 @@ void VescInterface::send(const VescData& data)
   // payload
   frame.insert(frame.end(), data.getPayload().begin(), data.getPayload().end());
   // calculate CRC
-  VescFrame::CRC crc_calc;
+  CRC crc_calc;
   crc_calc.process_bytes(&(*(data.getPayload().begin())), boost::distance(data.getPayload()));
   uint16_t crc = crc_calc.checksum();
   frame.push_back(static_cast<uint8_t>(crc >> 8));
   frame.push_back(static_cast<uint8_t>(crc & 0xFF));
-  frame.push_back(static_cast<uint8_t>(VescFrame::VESC_EOF_VAL));
+  frame.push_back(static_cast<uint8_t>(VESC_EOF_VAL));
 
   std::size_t written = impl_->serial_driver_->port()->send(frame);
   if (written != frame.size())

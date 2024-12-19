@@ -58,16 +58,16 @@ typedef std::pair<Buffer::const_iterator, Buffer::const_iterator> BufferRangeCon
 
 class VescPayload {
  public:
-  virtual ~VescPayload() {}
+  virtual ~VescPayload() {}  // segmenation fault
 
   virtual const Buffer& getPayload() const final { return payload_; }
   explicit VescPayload(const int16_t payload_size);
   explicit VescPayload(const BufferRangeConst& payload);
-  virtual const Buffer& setPayloadId(const int16_t payload_id) final {
+  virtual void setPayloadId(const int16_t payload_id) final {
     *payload_.begin() = payload_id;
   }
-  virtual const Buffer& setPayloadValue(const int16_t payload_value,
-                                        const uint8_t position) final {
+  virtual void setPayloadValue(const int16_t payload_value,
+                               const uint8_t position) final {
     *(payload_.begin() + position) = payload_value;
   }
 

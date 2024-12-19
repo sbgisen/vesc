@@ -59,12 +59,14 @@ namespace vesc_driver {
 class VescPacketFactory : private boost::noncopyable
 {
 public:
-  static VescPacketPtr createPacket(const Buffer::const_iterator&, const Buffer::const_iterator&, int*, std::string*);
+ static VescPacketPtr createPacket(const Buffer::const_iterator&,
+                                   const Buffer::const_iterator&, int*, int*,
+                                   std::string*);
 
-  typedef std::function<VescPacketPtr(std::shared_ptr<VescPayload>)> CreateFn;
+ typedef std::function<VescPacketPtr(std::shared_ptr<VescPayload>)> CreateFn;
 
-  /** Register a packet type with the factory. */
-  static void registerPacketType(COMM_PACKET_ID, CreateFn);
+ /** Register a packet type with the factory. */
+ static void registerPacketType(COMM_PACKET_ID, CreateFn);
 
 private:
   typedef std::map<COMM_PACKET_ID, CreateFn> FactoryMap;

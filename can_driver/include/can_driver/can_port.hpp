@@ -18,9 +18,9 @@ namespace can_driver {
 class CanPortConfig {
  public:
   /// \brief Default constructor
-  CanPortConfig(const std::string& port,const std::string& controller_id,
+  CanPortConfig(const std::string& port, const std::string& controller_id,
                 const std::string& vesct_id)
-      : port(port),controller_id(controller_id), vesct_id(vesct_id) {
+      : port(port), controller_id(controller_id), vesct_id(vesct_id) {
     socket_ = socket(PF_CAN, SOCK_RAW, CAN_RAW);
     strncpy(ifr_.ifr_name, port.c_str(), IFNAMSIZ);
     ioctl(socket_, SIOCGIFINDEX, &ifr_);
@@ -40,12 +40,13 @@ class CanPortConfig {
   }
 
   int get_socket() const { return socket_; }
+  struct sockaddr_can send_addr_, recv_addr_;
 
  private:
   const std::string& port;
   int socket_;
   struct ifreq ifr_;
-  struct sockaddr_can send_addr_, recv_addr_;
+
   const std::string &controller_id, &vesct_id;
 };
 

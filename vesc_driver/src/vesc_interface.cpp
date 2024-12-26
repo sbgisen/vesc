@@ -76,10 +76,6 @@ public:
 };
 
 void* VescInterface::Impl::canThread(void) {
-  // Buffer buffer;
-  // buffer.reserve(4096);
-  // auto temp_buffer = Buffer(4096);
-
   struct can_frame rxmsg;
   int socket = can_config_->get_socket();
 
@@ -125,11 +121,12 @@ void* VescInterface::Impl::canThread(void) {
         }
         buffer.insert(buffer.end(), rxmsg.data + ind,
                       rxmsg.data + rxmsg.can_dlc);
-        
+
         std::string error;
         int bytes_needed = VESC_MIN_FRAME_SIZE;
-        VescPacketConstPtr packet = VescPacketFactory::createCanPacket(buffer.begin(), buffer.end(),&bytes_needed, &error); 
-        if(packet){
+        VescPacketConstPtr packet = VescPacketFactory::createCanPacket(
+            buffer.begin(), buffer.end(), &bytes_needed, &error);
+        if (packet) {
           data_updated_ = true;
           packet_handler_(packet);
         }
@@ -165,8 +162,15 @@ void* VescInterface::Impl::canThread(void) {
         const unsigned int rx_buffer_response_type = rxmsg.data[ind++];
         const unsigned int full_data_len = rxmsg.data[ind++]
                                            << 8 + rxmsg.data[ind++];
-        const unsigned short crc = rxmsg.data[ind++] << 8 + rxmsg.data[ind++];
-        // TODO: check crc and length
+        const uint16_t crc = static_cast<uint16_t>(rxmsg.data[ind++]) << 8 + rxmsg.data[ind++];
+        // TODO: check crc
+        // if (crc != crc_calc.checksum()) {
+        //   error_handler_("Invalid checksum");
+        // }
+
+        if (full_data_len != buffer.size()) {
+          error_handler_("Invalid data length");
+        }
 
         std::string error;
         int bytes_needed = VESC_MIN_FRAME_SIZE;
@@ -176,8 +180,6 @@ void* VescInterface::Impl::canThread(void) {
           packet_handler_(packet);
         }
         buffer.erase(buffer.begin(), buffer.end());
-      
-
       }
       default:
         break;
@@ -185,17 +187,6 @@ void* VescInterface::Impl::canThread(void) {
     if (cmd == CAN_PACKET_ID::CAN_PACKET_PROCESS_SHORT_BUFFER) {
     } else if (cmd == CAN_PACKET_ID::CAN_PACKET_FILL_RX_BUFFER) {
     }
-
-    // print can_id in hex
-    std::cout << "can_id = 0x" << std::hex << rxmsg.can_id << std::dec
-              << std::endl;
-    std::cout << "can_dlc = " << int(rxmsg.can_dlc) << std::endl;
-    std::cout << "data = ";
-    for (int i = 0; i < rxmsg.can_dlc; i++) {
-      // print data in hex
-      std::cout << "0x" << std::hex << (int)rxmsg.data[i] << " " << std::dec;
-    }
-    std::cout << std::endl;
   }
 }
 
@@ -554,9 +545,7 @@ void VescInterface::requestState()
   send(VescPacketRequestValues());
 }
 
-void VescInterface::setDutyCycle(double duty_cycle)
-{
-  RCLCPP_INFO(rclcpp::get_logger("VescDriver"), "Set duty: %f", duty_cycle);
+void VescInterface::setDutyCycle(double duty_cycle) {
   send(VescPacketSetDuty(duty_cycle));
 }
 
@@ -575,15 +564,11 @@ void VescInterface::setSpeed(double speed)
   send(VescPacketSetVelocityERPM(speed));
 }
 
-void VescInterface::setPosition(double position)
-{
-  RCLCPP_DEBUG(rclcpp::get_logger("VescDriver"), "Set position: %f", position);
+void VescInterface::setPosition(double position) {
   send(VescPacketSetPos(position));
 }
 
-void VescInterface::setServo(double servo)
-{
-  RCLCPP_DEBUG(rclcpp::get_logger("VescDriver"), "Set servoPosition: %f", servo);
+void VescInterface::setServo(double servo) {
   send(VescPacketSetServoPos(servo));
 }
 

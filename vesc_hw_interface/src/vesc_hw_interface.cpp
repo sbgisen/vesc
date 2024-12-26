@@ -327,11 +327,9 @@ hardware_interface::return_type VescHwInterface::write(const rclcpp::Time& /*tim
   }
   else if (command_mode_ == "velocity_duty")
   {
-    // limit_velocity_interface_.enforceLimits(period);
 
-    // executes PID control
-    wheel_controller_.setTargetVelocity(command_);
-    wheel_controller_.control(1.0 / period.seconds());
+    const double target_duty = command_;
+    vesc_interface_->setDutyCycle(target_duty);
   }
   else if (command_mode_ == "effort")
   {

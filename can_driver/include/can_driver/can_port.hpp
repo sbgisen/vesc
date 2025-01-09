@@ -35,10 +35,6 @@ class CanPortConfig {
     }
     addr_.can_family = AF_CAN;
     addr_.can_ifindex = ifr_.ifr_ifindex;
-    // if (bind(socket_, (struct sockaddr*)&recv_addr_, sizeof(recv_addr_)) < 0)
-    // {
-    //   throw std::exception();
-    // }
   }
 
   int get_socket() const { return socket_; }

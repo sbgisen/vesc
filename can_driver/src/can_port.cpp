@@ -14,7 +14,6 @@ CanPort::CanPort(const IoContext& ctx, const std::string& device_name,
       device_name_(device_name),
       can_port_(ctx.ios()),
       port_config_(can_port_config) {
-  // recv_frame_.resize(recv_buffer_size_);
   can_port_.assign(port_config_.get_socket());
 }
 
@@ -31,18 +30,34 @@ size_t CanPort::send(const std::vector<uint8_t>& buff, const uint32_t& header) {
 }
 
 size_t CanPort::receive(std::vector<uint8_t>& buff, uint32_t& header) {
+  buff.erase(buff.begin(), buff.end());
   struct can_frame frame;
-  can_port_.read_some(asio::mutable_buffer(&frame, sizeof(frame)));
+  const int nbytes =
+      can_port_.read_some(asio::mutable_buffer(&frame, sizeof(frame)));
+
+  if (nbytes < 0) {
+    std::error_code err = std::make_error_code(std::errc::io_error);
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger("CAN Data Length < 0"),
+                        err.message());
+    return nbytes;
+  }
+
+  /* paranoid check ... */
+  if (nbytes < static_cast<int>(sizeof(struct can_frame))) {
+    std::error_code err = std::make_error_code(std::errc::io_error);
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger("Read: Incomplete CAN Frame"),
+                        err.message());
+    return nbytes;
+  }
   uint32_t eid = frame.can_id & CAN_EFF_MASK;
   uint8_t id = eid & 0xFF;
   header = eid >> 8;
   if (id != port_config_.get_controller_id()) {
     return 0;
   }
-  buff.erase(buff.begin(), buff.end());
   buff.insert(buff.end(), frame.data, frame.data + frame.can_dlc);
 
-  return frame.can_dlc;
+  return nbytes;
 }
 
 void CanPort::async_send(const std::vector<uint8_t>& buff) {

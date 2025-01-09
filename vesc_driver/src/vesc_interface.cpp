@@ -77,16 +77,6 @@ class VescInterface::Impl {
 
 void* VescInterface::Impl::canThread(void) {
   while (1) {
-    // int nbytes = read(socket, &rxmsg, sizeof(rxmsg));
-
-    // if (nbytes < 0) {
-    //   error_handler_("can data length < 0");
-    // }
-
-    // /* paranoid check ... */
-    // if (nbytes < static_cast<int>(sizeof(struct can_frame))) {
-    //   error_handler_("read: incomplete CAN frame");
-    // }
     Buffer tmp_buffer;
     uint32_t header = 0;
 

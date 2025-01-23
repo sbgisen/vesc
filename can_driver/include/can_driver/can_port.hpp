@@ -25,8 +25,9 @@ class CanPortConfig {
  public:
   /// \brief Default constructor
   CanPortConfig(const std::string& port, const int& controller_id,
-                const int& vesct_id)
-      : port_(port), controller_id_(controller_id), vesct_id_(vesct_id) {
+                const int& vesc_id)
+      : port_(port), controller_id_(controller_id), vesct_id_(vesc_id) {
+
     socket_ = socket(PF_CAN, SOCK_RAW, CAN_RAW);
     strncpy(ifr_.ifr_name, port.c_str(), IFNAMSIZ);
     ioctl(socket_, SIOCGIFINDEX, &ifr_);
@@ -35,6 +36,9 @@ class CanPortConfig {
     }
     addr_.can_family = AF_CAN;
     addr_.can_ifindex = ifr_.ifr_ifindex;
+    if (bind(socket_, (struct sockaddr*)&addr_, sizeof(addr_)) < 0) {
+      throw std::exception();
+    }
   }
 
   int get_socket() const { return socket_; }

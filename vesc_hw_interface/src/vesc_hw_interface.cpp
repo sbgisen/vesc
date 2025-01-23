@@ -72,9 +72,9 @@ CallbackReturn VescHwInterface::on_init(const hardware_interface::HardwareInfo& 
   {
     controller_id_ = std::stoi(info_.hardware_parameters["controller_id"]);
   }
-  if (info_.hardware_parameters.find("vesct_id") != info_.hardware_parameters.end())
+  if (info_.hardware_parameters.find("vesc_id") != info_.hardware_parameters.end())
   {
-    vesct_id_ = std::stoi(info_.hardware_parameters["vesct_id"]);
+    vesct_id_ = std::stoi(info_.hardware_parameters["vesc_id"]);
   }
 
   RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "Gear ratio is set to %f", gear_ratio_);

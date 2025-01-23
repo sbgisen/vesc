@@ -21,8 +21,7 @@ CanPort::~CanPort() {}
 
 size_t CanPort::send(const std::vector<uint8_t>& buff, const uint32_t& header) {
   struct can_frame frame;
-  frame.can_id = port_config_.get_vesct_id() | CAN_EFF_FLAG |
-                 (static_cast<uint32_t>(header) << 8);
+  frame.can_id = port_config_.get_vesct_id() | CAN_EFF_FLAG | static_cast<uint32_t>(header);
   frame.can_dlc = buff.size();
   frame.len = buff.size();
   std::copy(buff.begin(), buff.end(), frame.data);

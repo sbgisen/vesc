@@ -551,7 +551,7 @@ void VescInterface::setBrake(double brake) {
 void VescInterface::setSpeed(double speed) {
   const std::string can_port = "can";
   if (std::equal(can_port.begin(), can_port.end(), port_.begin())) {
-    canSend(VescCanPacketSetCurrentBrake(speed));
+    canSend(VescCanPacketSetVelocityERPM(speed));
   } else {
     send(VescPacketSetVelocityERPM(speed));
   }
@@ -560,7 +560,7 @@ void VescInterface::setSpeed(double speed) {
 void VescInterface::setPosition(double position) {
   const std::string can_port = "can";
   if (std::equal(can_port.begin(), can_port.end(), port_.begin())) {
-    canSend(VescCanPacketSetCurrentBrake(position));
+    canSend(VescCanPacketSetPos(position));
   } else {
     send(VescPacketSetPos(position));
   }

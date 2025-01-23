@@ -64,7 +64,7 @@ VescPacket::VescPacket(const std::string& name, const int16_t payload_size,
   int16_t packet_id = static_cast<int16_t>(cmd);
   assert(packet_id >= 0 && packet_id < 256);
   // assert(boost::distance(payload_end_) > 0);
-  assert(payload_.size() == payload_size);
+  assert(static_cast<int16_t>(payload_.size()) == payload_size);
   setPayloadId(packet_id);
 }
 
@@ -92,7 +92,8 @@ VescCanPacket::VescCanPacket(const std::string& name, const int16_t payload_size
     : VescPayload(payload_size), name_(name), can_packet_id_(cmd) {
   int16_t packet_id = static_cast<int16_t>(cmd);
   assert(packet_id >= 0 && packet_id < 256);
-  assert(payload_.size() == payload_size);
+  assert(static_cast<int16_t>(payload_.size()) == payload_size);
+
 }
 
 /**

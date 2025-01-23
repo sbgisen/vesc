@@ -404,7 +404,7 @@ bool VescServoController::calibrate()
 //   interface_ptr_->requestState();
 // }
 
-void VescServoController::updateSensor(const std::shared_ptr<VescData const>& packet)
+void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& packet)
 {
   if (packet->getName() == "Values")
   {

@@ -79,12 +79,12 @@ class VescPayload {
                                    // constructor
 };
 
-class VescData : public VescPayload {
+class VescPacket : public VescPayload {
  public:
   /**
    * @brief Destructor
    **/
-  virtual ~VescData() {}
+  virtual ~VescPacket() {}
 
   /**
    * @brief Gets the packet name
@@ -93,9 +93,9 @@ class VescData : public VescPayload {
   virtual const std::string& getName() const final { return name_; }
 
  protected:
-  VescData(const std::string& name, const int16_t payload_size,
+  VescPacket(const std::string& name, const int16_t payload_size,
            const COMM_PACKET_ID payload);
-  VescData(const std::string& name, std::shared_ptr<VescPayload> raw);
+  VescPacket(const std::string& name, std::shared_ptr<VescPayload> raw);
 
  private:
   std::string name_;
@@ -108,15 +108,15 @@ class VescData : public VescPayload {
  **/
 
 
-typedef std::shared_ptr<VescData> VescPacketPtr;
-typedef std::shared_ptr<VescData const> VescPacketConstPtr;
+typedef std::shared_ptr<VescPacket> VescPacketPtr;
+typedef std::shared_ptr<VescPacket const> VescPacketConstPtr;
 
 /*------------------------------------------------------------------*/
 
 /**
  * @brief Farmware version
  **/
-class VescPacketFWVersion : public VescData
+class VescPacketFWVersion : public VescPacket
 {
 public:
   explicit VescPacketFWVersion(std::shared_ptr<VescPayload> raw);
@@ -130,7 +130,7 @@ public:
 /**
  * @brief Requests farmware version
  **/
-class VescPacketRequestFWVersion : public VescData
+class VescPacketRequestFWVersion : public VescPacket
 {
 public:
   VescPacketRequestFWVersion();
@@ -141,7 +141,7 @@ public:
 /**
  * @brief Gets values in return packets
  **/
-class VescPacketValues : public VescData
+class VescPacketValues : public VescPacket
 {
 public:
   explicit VescPacketValues(std::shared_ptr<VescPayload> raw);
@@ -170,7 +170,7 @@ private:
 /**
  * @brief Packet for requesting retrun packets
  **/
-class VescPacketRequestValues : public VescData
+class VescPacketRequestValues : public VescPacket
 {
 public:
   VescPacketRequestValues();
@@ -181,7 +181,7 @@ public:
 /**
  * @brief Packet for setting duty
  **/
-class VescPacketSetDuty : public VescData
+class VescPacketSetDuty : public VescPacket
 {
 public:
   explicit VescPacketSetDuty(double duty);
@@ -192,7 +192,7 @@ public:
 /**
  * @brief Packet for setting reference current
  **/
-class VescPacketSetCurrent : public VescData
+class VescPacketSetCurrent : public VescPacket
 {
 public:
   explicit VescPacketSetCurrent(double current);
@@ -203,7 +203,7 @@ public:
 /**
  * @brief Packet for setting current brake
  **/
-class VescPacketSetCurrentBrake : public VescData
+class VescPacketSetCurrentBrake : public VescPacket
 {
 public:
   explicit VescPacketSetCurrentBrake(double current_brake);
@@ -214,7 +214,7 @@ public:
 /**
  * @brief Packet for setting reference angular velocity
  **/
-class VescPacketSetVelocityERPM : public VescData
+class VescPacketSetVelocityERPM : public VescPacket
 {
 public:
   explicit VescPacketSetVelocityERPM(double vel_erpm);
@@ -225,7 +225,7 @@ public:
 /**
  * @brief Packet for setting a reference position
  **/
-class VescPacketSetPos : public VescData
+class VescPacketSetPos : public VescPacket
 {
 public:
   explicit VescPacketSetPos(double pos);
@@ -236,7 +236,7 @@ public:
 /**
  * @brief Packet for setting a servo position
  **/
-class VescPacketSetServoPos : public VescData
+class VescPacketSetServoPos : public VescPacket
 {
 public:
   explicit VescPacketSetServoPos(double servo_pos);

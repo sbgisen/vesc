@@ -96,20 +96,25 @@ CallbackReturn VescHwInterface::on_init(const hardware_interface::HardwareInfo& 
 
   // parse URDF for joint type
   auto urdf = info_.original_xml;
-  if (!urdf.empty()) {
+  if (!urdf.empty())
+  {
     tinyxml2::XMLDocument doc;
-    if (doc.Parse(urdf.c_str()) != tinyxml2::XML_SUCCESS) {
+    if (doc.Parse(urdf.c_str()) != tinyxml2::XML_SUCCESS)
+    {
       RCLCPP_ERROR_STREAM(get_logger(), "Failed to parse URDF XML");
       return hardware_interface::CallbackReturn::ERROR;
     }
-    const tinyxml2::XMLElement * joint_it = doc.RootElement()->FirstChildElement("joint");
-    while (joint_it) {
-      const tinyxml2::XMLAttribute * name_attr = joint_it->FindAttribute("name");
-      const tinyxml2::XMLAttribute * type_attr = joint_it->FindAttribute("type");
-      if (name_attr && type_attr) {
+    const tinyxml2::XMLElement* joint_it = doc.RootElement()->FirstChildElement("joint");
+    while (joint_it)
+    {
+      const tinyxml2::XMLAttribute* name_attr = joint_it->FindAttribute("name");
+      const tinyxml2::XMLAttribute* type_attr = joint_it->FindAttribute("type");
+      if (name_attr && type_attr)
+      {
         std::string name = joint_it->Attribute("name");
         std::string type = joint_it->Attribute("type");
-        if (name == joint_name_) {
+        if (name == joint_name_)
+        {
           joint_type_ = type;
           break;
         }
@@ -193,8 +198,11 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
     {
       upper_limit = joint_limit_itr->second.max_position;
       lower_limit = joint_limit_itr->second.min_position;
-    } else {
-      RCLCPP_WARN(rclcpp::get_logger("VescHwInterface"), "No joint position limits found in URDF, using default limits");
+    }
+    else
+    {
+      RCLCPP_WARN(rclcpp::get_logger("VescHwInterface"), "No joint position limits found in URDF, using default "
+                                                         "limits");
     }
 
     // initializes the servo controller
@@ -299,7 +307,8 @@ hardware_interface::return_type VescHwInterface::read(const rclcpp::Time& /*time
     position_ = servo_controller_.getPositionSens();
     velocity_ = servo_controller_.getVelocitySens();
     effort_ = servo_controller_.getEffortSens();
-  } else
+  }
+  else
   {
     vesc_interface_->requestState();
   }
@@ -317,7 +326,8 @@ hardware_interface::return_type VescHwInterface::write(const rclcpp::Time& /*tim
   // sends commands
 
   auto command = command_;
-  if (std::isnan(command) && command_mode_ != "position") {
+  if (std::isnan(command) && command_mode_ != "position")
+  {
     command = 0.0;
   }
   if (command_mode_ == "position")

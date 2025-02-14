@@ -277,7 +277,7 @@ void VescInterface::setErrorHandler(const ErrorHandlerFunction& handler) {
 }
 
 void VescInterface::connect(const std::string& port, const int& controller_id,
-                            const int& vesct_id) {
+                            const int& vesc_id) {
   // todo - mutex?
   port_ = port;
   std::string usb_port = "/dev/tty";
@@ -316,7 +316,7 @@ void VescInterface::connect(const std::string& port, const int& controller_id,
     // connect to can port
     try {
       impl_->can_config_ = std::make_unique<drivers::can_driver::CanPortConfig>(
-          port, controller_id, vesct_id);
+          port, controller_id, vesc_id);
 
       impl_->can_driver_->init_port(port, *impl_->can_config_);
 

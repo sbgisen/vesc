@@ -82,7 +82,7 @@ public:
    */
   VescInterface(
       const std::string& port = std::string(), const int& controller_id = int(),
-      const int& vesct_id = int(),
+      const int& vesc_id = int(),
       const PacketHandlerFunction& packet_handler = PacketHandlerFunction(),
       const ErrorHandlerFunction& error_handler = ErrorHandlerFunction());
 
@@ -108,7 +108,7 @@ public:
    * @throw SerialException
    */
   void connect(const std::string& port, const int& controller_id,
-               const int& vesct_id);
+               const int& vesc_id);
 
   /**
    * Closes the serial port interface to the VESC.

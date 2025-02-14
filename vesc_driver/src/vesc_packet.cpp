@@ -103,6 +103,36 @@ VescFrame::VescFrame(const BufferRangeConst& frame, const BufferRangeConst& payl
 
 /**
  * @brief Constructor
+ * @param name Data name
+ * @param payload_size Specified payload size
+ * @param payload_id ID of payload
+ **/
+VescData::VescData(const std::string& name, const int16_t payload_size,
+                   const COMM_PACKET_ID payload)
+    : VescPayload(payload_size), name_(name) {
+  int16_t payload_id = static_cast<int16_t>(payload);
+  assert(payload_id >= 0 && payload_id < 256);
+  assert(boost::distance(payload_end_) > 0);
+  setPayloadId(payload_id);
+}
+
+/**
+ * @brief Constructor
+ * @param name Data name
+ * @param raw Pointer of a frame
+ **/
+VescData::VescData(const std::string& name, std::shared_ptr<VescPayload> raw)
+    : VescPayload(*raw), name_(name) {
+  // not sure what this is for
+  // uint16_t original_payload_size = std::distance(payload_end_.first,
+  // payload_end_.second); payload_end_.first = frame_.begin() + 2;
+  // payload_end_.second = std::min(payload_end_.first + original_payload_size,
+  // frame_.end());
+}
+/*------------------------------------------------------------------*/
+
+/**
+ * @brief Constructor
  * @param raw Pointer of VescFrame
  **/
 VescPacketFWVersion::VescPacketFWVersion(std::shared_ptr<VescPayload> raw) : VescData("FWVersion", raw)

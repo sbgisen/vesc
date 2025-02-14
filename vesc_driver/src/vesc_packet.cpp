@@ -443,8 +443,7 @@ VescPacketSetVelocityERPM::VescPacketSetVelocityERPM(double vel_erpm) : VescPack
 VescPacketSetPos::VescPacketSetPos(double pos) : VescPacket("SetPos", 5, COMM_SET_POS)
 {
   /** @todo range check pos */
-
-  const int32_t v = static_cast<int32_t>(pos * 1000000.0);
+  const int32_t v = static_cast<int32_t>(pos * 100000.0);
 
   *(payload_end_.first + 1) = static_cast<uint8_t>((v >> 24) & 0xFF);
   *(payload_end_.first + 2) = static_cast<uint8_t>((v >> 16) & 0xFF);

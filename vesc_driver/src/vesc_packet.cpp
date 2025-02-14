@@ -165,11 +165,6 @@ int16_t VescPacketFWVersion::fwMinor() const
  **/
 VescPacketRequestFWVersion::VescPacketRequestFWVersion() : VescData("RequestFWVersion", 1, COMM_PACKET_ID::COMM_FW_VERSION)
 {
-  // VescFrame::CRC crc_calc;
-  // crc_calc.process_bytes(&(*(payload_.getPayload().begin())), boost::distance(boost::begin(payload_.getPayload()),boost::end(payload_.getPayload())));
-  // uint16_t crc = crc_calc.checksum();
-  // *(frame_footer_.end() - 3) = static_cast<uint8_t>(crc >> 8);
-  // *(frame_footer_.end() - 2) = static_cast<uint8_t>(crc & 0xFF);
 }
 
 /*------------------------------------------------------------------*/
@@ -347,13 +342,8 @@ double VescPacketValues::readBuffer(const PACKET_MAP  packet_map, const uint8_t 
 /**
  * @brief Constructor
  **/
-VescPacketRequestValues::VescPacketRequestValues() : VescPacket("RequestFWVersion", 1, COMM_PACKET_ID::COMM_GET_VALUES)
+VescPacketRequestValues::VescPacketRequestValues() : VescData("RequestFWVersion", 1, COMM_PACKET_ID::COMM_GET_VALUES)
 {
-  VescFrame::CRC crc_calc;
-  crc_calc.process_bytes(&(*(payload_.getPayload().begin())), boost::distance(payload_.getPayload()));
-  uint16_t crc = crc_calc.checksum();
-  *(frame_footer_.end() - 3) = static_cast<uint8_t>(crc >> 8);
-  *(frame_footer_.end() - 2) = static_cast<uint8_t>(crc & 0xFF);
 }
 
 /*------------------------------------------------------------------*/
@@ -361,7 +351,7 @@ VescPacketRequestValues::VescPacketRequestValues() : VescPacket("RequestFWVersio
 /**
  * @brief Constructor
  **/
-VescPacketSetDuty::VescPacketSetDuty(double duty) : VescPacket("SetDuty", 5, COMM_PACKET_ID::COMM_SET_DUTY)
+VescPacketSetDuty::VescPacketSetDuty(double duty) : VescData("SetDuty", 5, COMM_PACKET_ID::COMM_SET_DUTY)
 {
   // checks the range of duty
   if (duty > 1.0)
@@ -375,16 +365,11 @@ VescPacketSetDuty::VescPacketSetDuty(double duty) : VescPacket("SetDuty", 5, COM
 
   const int32_t v = static_cast<int32_t>(duty * 100000.0);
 
-  payload_.setPayloadValue(static_cast<uint8_t>((v >> 24) & 0xFF),1);
-  payload_.setPayloadValue(static_cast<uint8_t>((v >> 16) & 0xFF),2);
-  payload_.setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),3);
-  payload_.setPayloadValue(static_cast<uint8_t>(v & 0xFF),4);
+  setPayloadValue(static_cast<uint8_t>((v >> 24) & 0xFF),1);
+  setPayloadValue(static_cast<uint8_t>((v >> 16) & 0xFF),2);
+  setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),3);
+  setPayloadValue(static_cast<uint8_t>(v & 0xFF),4);
 
-  VescFrame::CRC crc_calc;
-  crc_calc.process_bytes(&(*(payload_.getPayload().begin())), boost::distance(payload_.getPayload()));
-  uint16_t crc = crc_calc.checksum();
-  *(frame_footer_.end() - 3) = static_cast<uint8_t>(crc >> 8);
-  *(frame_footer_.end() - 2) = static_cast<uint8_t>(crc & 0xFF);
 }
 
 /*------------------------------------------------------------------*/
@@ -392,20 +377,16 @@ VescPacketSetDuty::VescPacketSetDuty(double duty) : VescPacket("SetDuty", 5, COM
 /**
  * @brief Constructor
  **/
-VescPacketSetCurrent::VescPacketSetCurrent(double current) : VescPacket("SetCurrent", 5, COMM_PACKET_ID::COMM_SET_CURRENT)
+VescPacketSetCurrent::VescPacketSetCurrent(double current) : VescData("SetCurrent", 5, COMM_PACKET_ID::COMM_SET_CURRENT)
 {
   const int32_t v = static_cast<int32_t>(current * 1000.0);
 
-  payload_.setPayloadValue(static_cast<uint8_t>((v >> 24) & 0xFF),1);
-  payload_.setPayloadValue(static_cast<uint8_t>((v >> 16) & 0xFF),2);
-  payload_.setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),3);
-  payload_.setPayloadValue(static_cast<uint8_t>(v & 0xFF),4);
+  setPayloadValue(static_cast<uint8_t>((v >> 24) & 0xFF),1);
+  setPayloadValue(static_cast<uint8_t>((v >> 16) & 0xFF),2);
+  setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),3);
+  setPayloadValue(static_cast<uint8_t>(v & 0xFF),4);
 
-  VescFrame::CRC crc_calc;
-  crc_calc.process_bytes(&(*(payload_.getPayload().begin())), boost::distance(payload_.getPayload()));
-  uint16_t crc = crc_calc.checksum();
-  *(frame_footer_.end() - 3) = static_cast<uint8_t>(crc >> 8);
-  *(frame_footer_.end() - 2) = static_cast<uint8_t>(crc & 0xFF);
+
 }
 
 /*------------------------------------------------------------------*/
@@ -414,20 +395,15 @@ VescPacketSetCurrent::VescPacketSetCurrent(double current) : VescPacket("SetCurr
  * @brief Constructor
  **/
 VescPacketSetCurrentBrake::VescPacketSetCurrentBrake(double current_brake)
-  : VescPacket("SetCurrentBrake", 5, COMM_PACKET_ID::COMM_SET_CURRENT_BRAKE)
+  : VescData("SetCurrentBrake", 5, COMM_PACKET_ID::COMM_SET_CURRENT_BRAKE)
 {
   const int32_t v = static_cast<int32_t>(current_brake * 1000.0);
 
-  payload_.setPayloadValue(static_cast<uint8_t>((v >> 24) & 0xFF),1);
-  payload_.setPayloadValue(static_cast<uint8_t>((v >> 16) & 0xFF),2);
-  payload_.setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),3);
-  payload_.setPayloadValue(static_cast<uint8_t>(v & 0xFF),4);
+  setPayloadValue(static_cast<uint8_t>((v >> 24) & 0xFF),1);
+  setPayloadValue(static_cast<uint8_t>((v >> 16) & 0xFF),2);
+  setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),3);
+  setPayloadValue(static_cast<uint8_t>(v & 0xFF),4);
 
-  VescFrame::CRC crc_calc;
-  crc_calc.process_bytes(&(*payload_.getPayload().begin()), boost::distance(payload_.getPayload()));
-  uint16_t crc = crc_calc.checksum();
-  *(frame_footer_.end() - 3) = static_cast<uint8_t>(crc >> 8);
-  *(frame_footer_.end() - 2) = static_cast<uint8_t>(crc & 0xFF);
 }
 
 /*------------------------------------------------------------------*/
@@ -435,20 +411,16 @@ VescPacketSetCurrentBrake::VescPacketSetCurrentBrake(double current_brake)
 /**
  * @brief Constructor
  **/
-VescPacketSetVelocityERPM::VescPacketSetVelocityERPM(double vel_erpm) : VescPacket("SetERPM", 5, COMM_PACKET_ID::COMM_SET_ERPM)
+VescPacketSetVelocityERPM::VescPacketSetVelocityERPM(double vel_erpm) : VescData("SetERPM", 5, COMM_PACKET_ID::COMM_SET_ERPM)
 {
   const int32_t v = static_cast<int32_t>(vel_erpm);
 
-  payload_.setPayloadValue(static_cast<uint8_t>((v >> 24) & 0xFF),1);
-  payload_.setPayloadValue(static_cast<uint8_t>((v >> 16) & 0xFF),2);
-  payload_.setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),3);
-  payload_.setPayloadValue(static_cast<uint8_t>(v & 0xFF),4);
+  setPayloadValue(static_cast<uint8_t>((v >> 24) & 0xFF),1);
+  setPayloadValue(static_cast<uint8_t>((v >> 16) & 0xFF),2);
+  setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),3);
+  setPayloadValue(static_cast<uint8_t>(v & 0xFF),4);
 
-  VescFrame::CRC crc_calc;
-  crc_calc.process_bytes(&(*payload_.getPayload().begin()), boost::distance(payload_.getPayload()));
-  uint16_t crc = crc_calc.checksum();
-  *(frame_footer_.end() - 3) = static_cast<uint8_t>(crc >> 8);
-  *(frame_footer_.end() - 2) = static_cast<uint8_t>(crc & 0xFF);
+
 }
 
 /*------------------------------------------------------------------*/
@@ -456,21 +428,17 @@ VescPacketSetVelocityERPM::VescPacketSetVelocityERPM(double vel_erpm) : VescPack
 /**
  * @brief Constructor
  **/
-VescPacketSetPos::VescPacketSetPos(double pos) : VescPacket("SetPos", 5, COMM_PACKET_ID::COMM_SET_POS)
+VescPacketSetPos::VescPacketSetPos(double pos) : VescData("SetPos", 5, COMM_PACKET_ID::COMM_SET_POS)
 {
   /** @todo range check pos */
   const int32_t v = static_cast<int32_t>(pos * 100000.0);
 
-  payload_.setPayloadValue(static_cast<uint8_t>((v >> 24) & 0xFF),1);
-  payload_.setPayloadValue(static_cast<uint8_t>((v >> 16) & 0xFF),2);
-  payload_.setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),3);
-  payload_.setPayloadValue(static_cast<uint8_t>(v & 0xFF),4);
+  setPayloadValue(static_cast<uint8_t>((v >> 24) & 0xFF),1);
+  setPayloadValue(static_cast<uint8_t>((v >> 16) & 0xFF),2);
+  setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),3);
+  setPayloadValue(static_cast<uint8_t>(v & 0xFF),4);
 
-  VescFrame::CRC crc_calc;
-  crc_calc.process_bytes(&(*payload_.getPayload().begin()), boost::distance(payload_.getPayload()));
-  uint16_t crc = crc_calc.checksum();
-  *(frame_footer_.end() - 3) = static_cast<uint8_t>(crc >> 8);
-  *(frame_footer_.end() - 2) = static_cast<uint8_t>(crc & 0xFF);
+
 }
 
 /*------------------------------------------------------------------*/
@@ -478,20 +446,15 @@ VescPacketSetPos::VescPacketSetPos(double pos) : VescPacket("SetPos", 5, COMM_PA
 /**
  * @brief Constructor
  **/
-VescPacketSetServoPos::VescPacketSetServoPos(double servo_pos) : VescPacket("SetServoPos", 3, COMM_PACKET_ID::COMM_SET_SERVO_POS)
+VescPacketSetServoPos::VescPacketSetServoPos(double servo_pos) : VescData("SetServoPos", 3, COMM_PACKET_ID::COMM_SET_SERVO_POS)
 {
   /** @todo range check pos */
 
   uint16_t v = static_cast<uint16_t>(servo_pos * 1000.0);
 
-  payload_.setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),1);
-  payload_.setPayloadValue(static_cast<uint8_t>(v & 0xFF),2);
+  setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),1);
+  setPayloadValue(static_cast<uint8_t>(v & 0xFF),2);
 
-  VescFrame::CRC crc_calc;
-  crc_calc.process_bytes(&(*payload_.getPayload().begin()), boost::distance(payload_.getPayload()));
-  uint16_t crc = crc_calc.checksum();
-  *(frame_footer_.end() - 3) = static_cast<uint8_t>(crc >> 8);
-  *(frame_footer_.end() - 2) = static_cast<uint8_t>(crc & 0xFF);
 }
 
 /*------------------------------------------------------------------*/

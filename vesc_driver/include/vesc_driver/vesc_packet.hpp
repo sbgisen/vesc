@@ -252,7 +252,7 @@ private:
 /**
  * @brief Packet for requesting retrun packets
  **/
-class VescPacketRequestValues : public VescPacket
+class VescPacketRequestValues : public VescData
 {
 public:
   VescPacketRequestValues();
@@ -263,7 +263,7 @@ public:
 /**
  * @brief Packet for setting duty
  **/
-class VescPacketSetDuty : public VescPacket
+class VescPacketSetDuty : public VescData
 {
 public:
   explicit VescPacketSetDuty(double duty);
@@ -274,7 +274,7 @@ public:
 /**
  * @brief Packet for setting reference current
  **/
-class VescPacketSetCurrent : public VescPacket
+class VescPacketSetCurrent : public VescData
 {
 public:
   explicit VescPacketSetCurrent(double current);
@@ -285,7 +285,7 @@ public:
 /**
  * @brief Packet for setting current brake
  **/
-class VescPacketSetCurrentBrake : public VescPacket
+class VescPacketSetCurrentBrake : public VescData
 {
 public:
   explicit VescPacketSetCurrentBrake(double current_brake);
@@ -296,7 +296,7 @@ public:
 /**
  * @brief Packet for setting reference angular velocity
  **/
-class VescPacketSetVelocityERPM : public VescPacket
+class VescPacketSetVelocityERPM : public VescData
 {
 public:
   explicit VescPacketSetVelocityERPM(double vel_erpm);
@@ -307,7 +307,7 @@ public:
 /**
  * @brief Packet for setting a reference position
  **/
-class VescPacketSetPos : public VescPacket
+class VescPacketSetPos : public VescData
 {
 public:
   explicit VescPacketSetPos(double pos);
@@ -318,7 +318,7 @@ public:
 /**
  * @brief Packet for setting a servo position
  **/
-class VescPacketSetServoPos : public VescPacket
+class VescPacketSetServoPos : public VescData
 {
 public:
   explicit VescPacketSetServoPos(double servo_pos);

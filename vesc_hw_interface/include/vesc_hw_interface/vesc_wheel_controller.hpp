@@ -26,7 +26,7 @@
 namespace vesc_hw_interface
 {
 using vesc_driver::VescInterface;
-using vesc_driver::VescPacket;
+using vesc_driver::VescData;
 using vesc_driver::VescPacketValues;
 using vesc_step_difference::VescStepDifference;
 
@@ -43,7 +43,7 @@ public:
   double getPositionSens();
   double getVelocitySens();
   double getEffortSens();
-  void updateSensor(const std::shared_ptr<const VescPacket>& packet);
+  void updateSensor(const std::shared_ptr<const VescData>& packet);
 
 private:
   std::shared_ptr<VescInterface> interface_ptr_;

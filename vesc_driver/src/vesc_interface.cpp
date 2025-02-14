@@ -389,59 +389,92 @@ bool VescInterface::isRxDataUpdated() const
   return output;
 }
 
-void VescInterface::send(const VescPacket& packet)
+void VescInterface::send(const VescData& data)
 {
   RCLCPP_DEBUG(rclcpp::get_logger("VescDriver"), "send data");
-  std::size_t written = impl_->serial_driver_->port()->send(packet.getFrame());
-  if (written != packet.getFrame().size())
+  Buffer frame;
+  frame.clear();
+  int16_t payload_size = data.getPayload().size();
+  // header
+  assert(payload_size >= 0 && payload_size <= 1024);
+
+  if (payload_size < 256)
+  {
+    // single byte payload size
+    frame.push_back(static_cast<uint8_t>(VescFrame::VESC_SOF_VAL_SMALL_FRAME));
+    frame.push_back(static_cast<uint8_t>(payload_size));
+    
+  }
+  else
+  {
+    // two byte payload size
+    frame.push_back(static_cast<uint8_t>(VescFrame::VESC_SOF_VAL_LARGE_FRAME));
+    frame.push_back(static_cast<uint8_t>(payload_size >> 8));
+    frame.push_back(static_cast<uint8_t>(payload_size & 0xFF));
+  }
+
+
+
+  // payload
+  frame.insert(frame.end(), data.getPayload().begin(), data.getPayload().end());
+  // calculate CRC
+  VescFrame::CRC crc_calc;
+  crc_calc.process_bytes(&(*(data.getPayload().begin())), boost::distance(data.getPayload()));
+  uint16_t crc = crc_calc.checksum();
+  frame.push_back(static_cast<uint8_t>(crc >> 8));
+  frame.push_back(static_cast<uint8_t>(crc & 0xFF));
+  frame.push_back(static_cast<uint8_t>(VescFrame::VESC_EOF_VAL));
+
+  std::size_t written = impl_->serial_driver_->port()->send(frame);
+  if (written != frame.size())
   {
     std::stringstream ss;
-    ss << "Wrote " << written << " bytes, expected " << packet.getFrame().size() << ".";
+    ss << "Wrote " << written << " bytes, expected " << frame.size() << ".";
     throw SerialException(ss.str().c_str());
   }
 }
 
 void VescInterface::requestFWVersion()
 {
-  // send(VescPacketRequestFWVersion());
+  send(VescPacketRequestFWVersion());
 }
 
 void VescInterface::requestState()
 {
-  // send(VescPacketRequestValues());
+  send(VescPacketRequestValues());
 }
 
 void VescInterface::setDutyCycle(double duty_cycle)
 {
   RCLCPP_INFO(rclcpp::get_logger("VescDriver"), "Set duty: %f", duty_cycle);
-  // send(VescPacketSetDuty(duty_cycle));
+  send(VescPacketSetDuty(duty_cycle));
 }
 
 void VescInterface::setCurrent(double current)
 {
-  // send(VescPacketSetCurrent(current));
+  send(VescPacketSetCurrent(current));
 }
 
 void VescInterface::setBrake(double brake)
 {
-  // send(VescPacketSetCurrentBrake(brake));
+  send(VescPacketSetCurrentBrake(brake));
 }
 
 void VescInterface::setSpeed(double speed)
 {
-  // send(VescPacketSetVelocityERPM(speed));
+  send(VescPacketSetVelocityERPM(speed));
 }
 
 void VescInterface::setPosition(double position)
 {
   RCLCPP_DEBUG(rclcpp::get_logger("VescDriver"), "Set position: %f", position);
-  // send(VescPacketSetPos(position));
+  send(VescPacketSetPos(position));
 }
 
 void VescInterface::setServo(double servo)
 {
   RCLCPP_DEBUG(rclcpp::get_logger("VescDriver"), "Set servoPosition: %f", servo);
-  // send(VescPacketSetServoPos(servo));
+  send(VescPacketSetServoPos(servo));
 }
 
 }  // namespace vesc_driver

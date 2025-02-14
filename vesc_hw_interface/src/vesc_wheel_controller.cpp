@@ -146,7 +146,7 @@ double VescWheelController::getEffortSens()
 //   pid_initialize_ = std::fabs(target_velocity_) < 0.0001;  // disable PID control when command is 0
 // }
 
-void VescWheelController::updateSensor(const std::shared_ptr<const VescPacket>& packet)
+void VescWheelController::updateSensor(const std::shared_ptr<const VescData>& packet)
 {
   if (packet->getName() == "Values")
   {

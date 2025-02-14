@@ -128,7 +128,7 @@ public:
   /**
    * Send a VESC packet.
    */
-  void send(const VescPacket& packet);
+  void send(const VescData& data);
 
   void requestFWVersion();
   void requestState();

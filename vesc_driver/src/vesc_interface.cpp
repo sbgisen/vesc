@@ -39,13 +39,12 @@
 #include <rclcpp/rclcpp.hpp>
 #include <serial_driver/serial_driver.hpp>
 
-namespace vesc_driver
-{
-class VescInterface::Impl
-{
-public:
-  Impl() : owned_ctx(new IoContext(2)), serial_driver_(new drivers::serial_driver::SerialDriver(*owned_ctx))
-  {
+namespace vesc_driver {
+class VescInterface::Impl {
+ public:
+  Impl()
+      : owned_ctx(new IoContext(2)),
+        serial_driver_(new drivers::serial_driver::SerialDriver(*owned_ctx)) {
     data_updated_ = false;
   }
 
@@ -53,8 +52,7 @@ public:
 
   void* canThread(void);
 
-  static void* rxThreadHelper(void* context)
-  {
+  static void* rxThreadHelper(void* context) {
     return ((VescInterface::Impl*)context)->rxThread();
   }
 
@@ -87,7 +85,7 @@ void* VescInterface::Impl::canThread(void) {
     }
 
     /* paranoid check ... */
-    if (nbytes < sizeof(struct can_frame)) {
+    if (nbytes < static_cast<int>(sizeof(struct can_frame))) {
       error_handler_("read: incomplete CAN frame");
     }
 
@@ -165,7 +163,8 @@ void* VescInterface::Impl::canThread(void) {
         const unsigned int rx_buffer_response_type = rxmsg.data[ind++];
         const unsigned int full_data_len = rxmsg.data[ind++]
                                            << 8 + rxmsg.data[ind++];
-        const uint16_t crc = static_cast<uint16_t>(rxmsg.data[ind++]) << 8 + rxmsg.data[ind++];
+        const uint16_t crc = static_cast<uint16_t>(rxmsg.data[ind++])
+                             << 8 + rxmsg.data[ind++];
         // TODO: check crc
         // if (crc != crc_calc.checksum()) {
         //   error_handler_("Invalid checksum");
@@ -177,8 +176,9 @@ void* VescInterface::Impl::canThread(void) {
 
         std::string error;
         int bytes_needed = VESC_MIN_FRAME_SIZE;
-        VescPacketConstPtr packet = VescPacketFactory::createCanPacket(buffer.begin(), buffer.end(),&bytes_needed, &error); 
-        if(packet){
+        VescPacketConstPtr packet = VescPacketFactory::createCanPacket(
+            buffer.begin(), buffer.end(), &bytes_needed, &error);
+        if (packet) {
           data_updated_ = true;
           packet_handler_(packet);
         }
@@ -193,48 +193,45 @@ void* VescInterface::Impl::canThread(void) {
   }
 }
 
-void* VescInterface::Impl::rxThread(void)
-{
+void* VescInterface::Impl::rxThread(void) {
   Buffer buffer;
   buffer.reserve(4096);
   auto temp_buffer = Buffer(4096);
 
-  while (rx_thread_run_)
-  {
+  while (rx_thread_run_) {
     int bytes_needed = VESC_MIN_FRAME_SIZE;
     // attempt to read at least bytes_needed bytes from the serial port
     const auto bytes_read = serial_driver_->port()->receive(temp_buffer);
     buffer.reserve(buffer.size() + bytes_read);
-    buffer.insert(buffer.end(), temp_buffer.begin(), temp_buffer.begin() + bytes_read);
+    buffer.insert(buffer.end(), temp_buffer.begin(),
+                  temp_buffer.begin() + bytes_read);
 
-    if (bytes_needed > 0 && 0 == bytes_read && !buffer.empty())
-    {
-      error_handler_("Possibly out-of-sync with VESC, read timout in the middle of a frame.");
+    if (bytes_needed > 0 && 0 == bytes_read && !buffer.empty()) {
+      error_handler_(
+          "Possibly out-of-sync with VESC, read timout in the middle of a "
+          "frame.");
     }
-    if (!buffer.empty())
-    {
+    if (!buffer.empty()) {
       // search buffer for valid packet(s)
       Buffer::iterator iter(buffer.begin());
       Buffer::iterator iter_begin(buffer.begin());
-      while (iter != buffer.end())
-      {
+      while (iter != buffer.end()) {
         // check if valid start-of-frame character
-        if (VESC_SOF_VAL_SMALL_FRAME == *iter || VESC_SOF_VAL_LARGE_FRAME == *iter)
-        {
+        if (VESC_SOF_VAL_SMALL_FRAME == *iter ||
+            VESC_SOF_VAL_LARGE_FRAME == *iter) {
           // good start, now attempt to create packet
           std::string error;
           int frame_size = 0;
           VescPacketConstPtr packet = VescPacketFactory::createPacket(
               iter, buffer.end(), &bytes_needed, &frame_size, &error);
-          if (packet)
-          {
+          if (packet) {
             // Packet received;
             data_updated_ = true;
             // good packet, check if we skipped any data
-            if (std::distance(iter_begin, iter) > 0)
-            {
+            if (std::distance(iter_begin, iter) > 0) {
               std::ostringstream ss;
-              ss << "Out-of-sync with VESC, unknown data leading valid frame. Discarding "
+              ss << "Out-of-sync with VESC, unknown data leading valid frame. "
+                    "Discarding "
                  << std::distance(iter_begin, iter) << " bytes.";
               error_handler_(ss.str());
             }
@@ -245,14 +242,10 @@ void* VescInterface::Impl::rxThread(void)
             iter_begin = iter;
             // continue to look for another frame in buffer
             continue;
-          }
-          else if (bytes_needed > 0)
-          {
+          } else if (bytes_needed > 0) {
             // need more data, break out of while loop
             break;  // for (iter_sof...
-          }
-          else
-          {
+          } else {
             // else, this was not a packet, move on to next byte
             error_handler_(error);
           }
@@ -262,14 +255,13 @@ void* VescInterface::Impl::rxThread(void)
       }
 
       // if iter is at the end of the buffer, more bytes are needed
-      if (iter == buffer.end())
-        bytes_needed = VESC_MIN_FRAME_SIZE;
+      if (iter == buffer.end()) bytes_needed = VESC_MIN_FRAME_SIZE;
 
       // erase "used" buffer
-      if (std::distance(iter_begin, iter) > 0)
-      {
+      if (std::distance(iter_begin, iter) > 0) {
         std::ostringstream ss;
-        ss << "Out-of-sync with VESC, discarding " << std::distance(iter_begin, iter) << " bytes.";
+        ss << "Out-of-sync with VESC, discarding "
+           << std::distance(iter_begin, iter) << " bytes.";
         error_handler_(ss.str());
       }
       buffer.erase(buffer.begin(), iter);
@@ -277,8 +269,7 @@ void* VescInterface::Impl::rxThread(void)
   }
 }
 
-VescInterface::VescInterface(const std::string& port,
-                             const int& controller_id,
+VescInterface::VescInterface(const std::string& port, const int& controller_id,
                              const int& vesc_id,
                              const PacketHandlerFunction& packet_handler,
                              const ErrorHandlerFunction& error_handler)
@@ -286,32 +277,28 @@ VescInterface::VescInterface(const std::string& port,
   setPacketHandler(packet_handler);
   setErrorHandler(error_handler);
   // attempt to conect if the port is specified
-  if (!port.empty())
-    connect(port,controller_id,vesc_id);
+  if (!port.empty()) connect(port, controller_id, vesc_id);
 }
 
-VescInterface::~VescInterface()
-{
+VescInterface::~VescInterface() {
   // stops the motor
   setDutyCycle(0.0);
 
   disconnect();
 }
 
-void VescInterface::setPacketHandler(const PacketHandlerFunction& handler)
-{
+void VescInterface::setPacketHandler(const PacketHandlerFunction& handler) {
   // todo - definately need mutex
   impl_->packet_handler_ = handler;
 }
 
-void VescInterface::setErrorHandler(const ErrorHandlerFunction& handler)
-{
+void VescInterface::setErrorHandler(const ErrorHandlerFunction& handler) {
   // todo - definately need mutex
   impl_->error_handler_ = handler;
 }
 
-void VescInterface::connect(const std::string& port, const int& controller_id, const int& vesct_id)
-{
+void VescInterface::connect(const std::string& port, const int& controller_id,
+                            const int& vesct_id) {
   // todo - mutex?
   port_ = port;
   std::string usb_port = "/dev/tty";
@@ -349,8 +336,8 @@ void VescInterface::connect(const std::string& port, const int& controller_id, c
   } else if (std::equal(can_port.begin(), can_port.end(), port.begin())) {
     // connect to can port
     try {
-      impl_->can_config_ =
-          std::make_unique<drivers::can_driver::CanPortConfig>(port, controller_id, vesct_id);
+      impl_->can_config_ = std::make_unique<drivers::can_driver::CanPortConfig>(
+          port, controller_id, vesct_id);
 
       int result =
           pthread_create(&impl_->rx_thread_, NULL,
@@ -368,12 +355,10 @@ void VescInterface::connect(const std::string& port, const int& controller_id, c
   }
 }
 
-void VescInterface::disconnect()
-{
+void VescInterface::disconnect() {
   // todo - mutex?
 
-  if (isConnected())
-  {
+  if (isConnected()) {
     // bring down read thread
     impl_->rx_thread_run_ = false;
     int result = pthread_join(impl_->rx_thread_, NULL);
@@ -383,29 +368,23 @@ void VescInterface::disconnect()
   }
 }
 
-bool VescInterface::isConnected() const
-{
+bool VescInterface::isConnected() const {
   auto port = impl_->serial_driver_->port();
 
-  if (port)
-  {
+  if (port) {
     return port->is_open();
-  }
-  else
-  {
+  } else {
     return false;
   }
 }
 
-bool VescInterface::isRxDataUpdated() const
-{
+bool VescInterface::isRxDataUpdated() const {
   bool output = impl_->data_updated_;
   impl_->data_updated_ = false;
   return output;
 }
 
-void VescInterface::send(const VescData& data)
-{
+void VescInterface::send(const VescData& data) {
   std::string usb_port = "/dev/tty";
   std::string can_port = "can";
   if (std::equal(usb_port.begin(), usb_port.end(), port_.begin())) {
@@ -459,7 +438,9 @@ void VescInterface::send(const VescData& data)
       ind += len;
       int s = impl_->can_config_->get_socket();
 
-      frame.can_id |= (static_cast<uint32_t>(CAN_PACKET_ID::CAN_PACKET_PROCESS_SHORT_BUFFER)<<8);
+      frame.can_id |=
+          (static_cast<uint32_t>(CAN_PACKET_ID::CAN_PACKET_PROCESS_SHORT_BUFFER)
+           << 8);
       frame.can_dlc = ind;
       frame.len = ind;
       sendto(s, &frame, sizeof(struct can_frame), 0,
@@ -486,7 +467,9 @@ void VescInterface::send(const VescData& data)
         }
 
         int s = impl_->can_config_->get_socket();
-        frame.can_id |= (static_cast<uint32_t>(CAN_PACKET_ID::CAN_PACKET_FILL_RX_BUFFER)<<8);
+        frame.can_id |=
+            (static_cast<uint32_t>(CAN_PACKET_ID::CAN_PACKET_FILL_RX_BUFFER)
+             << 8);
         frame.can_dlc = send_len + 1;
         frame.len = send_len + 1;
         sendto(s, &frame, sizeof(struct can_frame), 0,
@@ -507,7 +490,9 @@ void VescInterface::send(const VescData& data)
         }
 
         int s = impl_->can_config_->get_socket();
-        frame.can_id |= (static_cast<uint32_t>(CAN_PACKET_ID::CAN_PACKET_FILL_RX_BUFFER_LONG)<<8);
+        frame.can_id |= (static_cast<uint32_t>(
+                             CAN_PACKET_ID::CAN_PACKET_FILL_RX_BUFFER_LONG)
+                         << 8);
         frame.can_dlc = send_len + 2;
         frame.len = send_len + 2;
         sendto(s, &frame, sizeof(struct can_frame), 0,
@@ -528,9 +513,11 @@ void VescInterface::send(const VescData& data)
       frame.data[ind++] = (uint8_t)(crc & 0xFF);
 
       int s = impl_->can_config_->get_socket();
-      frame.can_id |= (static_cast<uint32_t>(CAN_PACKET_ID::CAN_PACKET_PROCESS_RX_BUFFER)<<8);
-      frame.can_dlc = ind+1;
-      frame.len = ind+1;
+      frame.can_id |=
+          (static_cast<uint32_t>(CAN_PACKET_ID::CAN_PACKET_PROCESS_RX_BUFFER)
+           << 8);
+      frame.can_dlc = ind + 1;
+      frame.len = ind + 1;
       sendto(s, &frame, sizeof(struct can_frame), 0,
              (struct sockaddr*)&(impl_->can_config_->send_addr_),
              sizeof(impl_->can_config_->send_addr_));
@@ -538,32 +525,23 @@ void VescInterface::send(const VescData& data)
   }
 }
 
-void VescInterface::requestFWVersion()
-{
-  send(VescPacketRequestFWVersion());
-}
+void VescInterface::requestFWVersion() { send(VescPacketRequestFWVersion()); }
 
-void VescInterface::requestState()
-{
-  send(VescPacketRequestValues());
-}
+void VescInterface::requestState() { send(VescPacketRequestValues()); }
 
 void VescInterface::setDutyCycle(double duty_cycle) {
   send(VescPacketSetDuty(duty_cycle));
 }
 
-void VescInterface::setCurrent(double current)
-{
+void VescInterface::setCurrent(double current) {
   send(VescPacketSetCurrent(current));
 }
 
-void VescInterface::setBrake(double brake)
-{
+void VescInterface::setBrake(double brake) {
   send(VescPacketSetCurrentBrake(brake));
 }
 
-void VescInterface::setSpeed(double speed)
-{
+void VescInterface::setSpeed(double speed) {
   send(VescPacketSetVelocityERPM(speed));
 }
 

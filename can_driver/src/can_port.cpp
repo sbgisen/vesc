@@ -25,12 +25,11 @@ size_t CanPort::send(const std::vector<uint8_t>& buff, const uint32_t& header) {
                  (static_cast<uint32_t>(header) << 8);
   frame.can_dlc = buff.size();
   frame.len = buff.size();
-  std::memcpy(frame.data, buff.data(), buff.size());
+  std::copy(buff.begin(), buff.end(), frame.data);
   return can_port_.write_some(asio::buffer(&frame, sizeof(frame)));
 }
 
 size_t CanPort::receive(std::vector<uint8_t>& buff, uint32_t& header) {
-  buff.erase(buff.begin(), buff.end());
   struct can_frame frame;
   const int nbytes =
       can_port_.read_some(asio::mutable_buffer(&frame, sizeof(frame)));
@@ -55,7 +54,8 @@ size_t CanPort::receive(std::vector<uint8_t>& buff, uint32_t& header) {
   if (id != port_config_.get_controller_id()) {
     return 0;
   }
-  buff.insert(buff.end(), frame.data, frame.data + frame.can_dlc);
+  buff.resize(frame.can_dlc);
+  std::copy(frame.data, frame.data + frame.can_dlc, buff.begin());
 
   return nbytes;
 }
@@ -81,15 +81,6 @@ void CanPort::async_receive(Functor func) {
       });
 }
 
-// bool CanPort::send_break() {
-//   bool break_sent = false;
-//   if (is_open()) {
-//     m_can_port.send_break();
-//     break_sent = true;
-//   }
-//   return break_sent;
-// }
-
 void CanPort::async_send_handler(const asio::error_code& error,
                                  size_t bytes_transferred) {
   (void)bytes_transferred;
@@ -110,8 +101,8 @@ void CanPort::async_receive_handler(const asio::error_code& error,
 
   if (bytes_transferred > 0 && func_) {
     std::vector<uint8_t> recv_buffer(0);
-    std::copy(recv_frame_.data, recv_frame_.data + recv_frame_.can_dlc,
-              std::back_inserter(recv_buffer));
+    recv_buffer.insert(recv_buffer.end(), recv_frame_.data,
+                       recv_frame_.data + recv_frame_.can_dlc);
     func_(recv_buffer, bytes_transferred);
     can_port_.async_read_some(
         asio::buffer(&recv_frame_, sizeof(recv_frame_)),

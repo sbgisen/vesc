@@ -46,7 +46,7 @@ VescPayload::VescPayload(const BufferRangeConst& payload)
 
 VescPayload::VescPayload(const int16_t payload_size)
 {
-  assert(payload_size >= 0 && payload_size <= VESC_MAX_PAYLOAD_SIZE);
+  assert(payload_size >= 0 && payload_size <= 1024);
   payload_.resize(payload_size);
 }
 
@@ -112,7 +112,8 @@ VescData::VescData(const std::string& name, const int16_t payload_size,
     : VescPayload(payload_size), name_(name) {
   int16_t payload_id = static_cast<int16_t>(payload);
   assert(payload_id >= 0 && payload_id < 256);
-  assert(boost::distance(payload_end_) > 0);
+  // assert(boost::distance(payload_end_) > 0);
+  assert(payload_.size() == payload_size);
   setPayloadId(payload_id);
 }
 

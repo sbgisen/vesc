@@ -312,15 +312,6 @@ public:
 
 /*------------------------------------------------------------------*/
 
-/**
- * @brief Packet for setting a servo position
- **/
-class VescCanPacketSetServoPos : public VescCanPacket
-{
-public:
-  explicit VescCanPacketSetServoPos(double servo_pos);
-};
-
 
 }  // namespace vesc_driver
 

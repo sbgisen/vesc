@@ -517,7 +517,7 @@ VescCanPacketSetVelocityERPM::VescCanPacketSetVelocityERPM(double vel_erpm) : Ve
 VescCanPacketSetPos::VescCanPacketSetPos(double pos) : VescCanPacket("SetPos", 5, CAN_PACKET_ID::CAN_PACKET_SET_POS)
 {
   /** @todo range check pos */
-  const int32_t v = static_cast<int32_t>(pos * 100000.0);
+  const int32_t v = static_cast<int32_t>(pos * 1000000.0);
 
   setPayloadValue(static_cast<uint8_t>((v >> 24) & 0xFF),0);
   setPayloadValue(static_cast<uint8_t>((v >> 16) & 0xFF),1);

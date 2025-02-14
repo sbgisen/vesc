@@ -392,8 +392,8 @@ bool VescInterface::isRxDataUpdated() const {
 }
 
 void VescInterface::send(const VescPacket& data) {
-  std::string usb_port = "/dev/tty";
-  std::string can_port = "can";
+  const std::string usb_port = "/dev/tty";
+  const std::string can_port = "can";
   if (std::equal(usb_port.begin(), usb_port.end(), port_.begin())) {
     Buffer frame;
     frame.clear();
@@ -432,7 +432,7 @@ void VescInterface::send(const VescPacket& data) {
       throw SerialException(ss.str().c_str());
     }
   } else if (std::equal(can_port.begin(), can_port.end(), port_.begin())) {
-    int len = data.getPayload().size();
+    const int len = data.getPayload().size();
     Buffer buffer(0);
 
     if (len <= 6) {
@@ -454,7 +454,7 @@ void VescInterface::send(const VescPacket& data) {
 
         end_a = i + 7;
 
-        uint8_t send_len = 7;
+        const uint8_t send_len = 7;
         buffer.push_back(i);
 
         if ((i + 7) <= len) {
@@ -472,7 +472,7 @@ void VescInterface::send(const VescPacket& data) {
       }
 
       for (int i = end_a; i < len; i += 6) {
-        uint8_t send_len = 6;
+        const uint8_t send_len = 6;
         buffer.push_back(i >> 8);
         buffer.push_back(i & 0xFF);
 
@@ -508,28 +508,62 @@ void VescInterface::send(const VescPacket& data) {
   }
 }
 
+void VescInterface::canSend(const VescCanPacket& data) {
+  const int len = data.getPayload().size();
+  Buffer buffer(0);
+  buffer.insert(buffer.end(), data.getPayload().begin(),
+                data.getPayload().end());
+  uint32_t header = (static_cast<uint32_t>(data.getCanPacketId()) << 8);
+  impl_->can_driver_->port()->send(buffer, header);
+}
+
 void VescInterface::requestFWVersion() { send(VescPacketRequestFWVersion()); }
 
 void VescInterface::requestState() { send(VescPacketRequestValues()); }
 
 void VescInterface::setDutyCycle(double duty_cycle) {
-  send(VescPacketSetDuty(duty_cycle));
+  const std::string can_port = "can";
+  if (std::equal(can_port.begin(), can_port.end(), port_.begin())) {
+    canSend(VescCanPacketSetDuty(duty_cycle));
+  } else {
+    send(VescPacketSetDuty(duty_cycle));
+  }
 }
 
 void VescInterface::setCurrent(double current) {
-  send(VescPacketSetCurrent(current));
+  const std::string can_port = "can";
+  if (std::equal(can_port.begin(), can_port.end(), port_.begin())) {
+    canSend(VescCanPacketSetCurrent(current));
+  } else {
+    send(VescPacketSetCurrent(current));
+  }
 }
 
 void VescInterface::setBrake(double brake) {
-  send(VescPacketSetCurrentBrake(brake));
+  const std::string can_port = "can";
+  if (std::equal(can_port.begin(), can_port.end(), port_.begin())) {
+    canSend(VescCanPacketSetCurrentBrake(brake));
+  } else {
+    send(VescPacketSetCurrentBrake(brake));
+  }
 }
 
 void VescInterface::setSpeed(double speed) {
-  send(VescPacketSetVelocityERPM(speed));
+  const std::string can_port = "can";
+  if (std::equal(can_port.begin(), can_port.end(), port_.begin())) {
+    canSend(VescCanPacketSetCurrentBrake(speed));
+  } else {
+    send(VescPacketSetVelocityERPM(speed));
+  }
 }
 
 void VescInterface::setPosition(double position) {
-  send(VescPacketSetPos(position));
+  const std::string can_port = "can";
+  if (std::equal(can_port.begin(), can_port.end(), port_.begin())) {
+    canSend(VescCanPacketSetCurrentBrake(position));
+  } else {
+    send(VescPacketSetPos(position));
+  }
 }
 
 void VescInterface::setServo(double servo) {

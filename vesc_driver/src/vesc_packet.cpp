@@ -59,13 +59,13 @@ VescPayload::VescPayload(const int16_t payload_size)
  * @param payload_id ID of payload
  **/
 VescPacket::VescPacket(const std::string& name, const int16_t payload_size,
-                   const COMM_PACKET_ID payload)
+                   const COMM_PACKET_ID cmd)
     : VescPayload(payload_size), name_(name) {
-  int16_t payload_id = static_cast<int16_t>(payload);
-  assert(payload_id >= 0 && payload_id < 256);
+  int16_t packet_id = static_cast<int16_t>(cmd);
+  assert(packet_id >= 0 && packet_id < 256);
   // assert(boost::distance(payload_end_) > 0);
   assert(payload_.size() == payload_size);
-  setPayloadId(payload_id);
+  setPayloadId(packet_id);
 }
 
 /**
@@ -81,6 +81,29 @@ VescPacket::VescPacket(const std::string& name, std::shared_ptr<VescPayload> raw
   // payload_end_.second = std::min(payload_end_.first + original_payload_size,
   // frame_.end());
 }
+
+/**
+ * @brief Constructor
+ * @param name Data name
+ * @param payload_size Specified payload size
+ * @param payload_id ID of payload
+ **/
+VescCanPacket::VescCanPacket(const std::string& name, const int16_t payload_size, const CAN_PACKET_ID cmd)
+    : VescPayload(payload_size), name_(name), can_packet_id_(cmd) {
+  int16_t packet_id = static_cast<int16_t>(cmd);
+  assert(packet_id >= 0 && packet_id < 256);
+  assert(payload_.size() == payload_size);
+}
+
+/**
+ * @brief Constructor
+ * @param name Data name
+ * @param raw Pointer of a frame
+ **/
+VescCanPacket::VescCanPacket(const std::string& name, std::shared_ptr<VescPayload> raw)
+    : VescPayload(*raw), name_(name) {
+}
+
 /*------------------------------------------------------------------*/
 
 /**
@@ -366,10 +389,10 @@ VescPacketSetVelocityERPM::VescPacketSetVelocityERPM(double vel_erpm) : VescPack
 {
   const int32_t v = static_cast<int32_t>(vel_erpm);
 
-  setPayloadValue(static_cast<uint8_t>((v >> 24) & 0xFF),1);
-  setPayloadValue(static_cast<uint8_t>((v >> 16) & 0xFF),2);
-  setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),3);
-  setPayloadValue(static_cast<uint8_t>(v & 0xFF),4);
+  setPayloadValue(static_cast<uint8_t>((v >> 24) & 0xFF),0);
+  setPayloadValue(static_cast<uint8_t>((v >> 16) & 0xFF),1);
+  setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),2);
+  setPayloadValue(static_cast<uint8_t>(v & 0xFF),3);
 
 
 }
@@ -384,10 +407,10 @@ VescPacketSetPos::VescPacketSetPos(double pos) : VescPacket("SetPos", 5, COMM_PA
   /** @todo range check pos */
   const int32_t v = static_cast<int32_t>(pos * 100000.0);
 
-  setPayloadValue(static_cast<uint8_t>((v >> 24) & 0xFF),1);
-  setPayloadValue(static_cast<uint8_t>((v >> 16) & 0xFF),2);
-  setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),3);
-  setPayloadValue(static_cast<uint8_t>(v & 0xFF),4);
+  setPayloadValue(static_cast<uint8_t>((v >> 24) & 0xFF),0);
+  setPayloadValue(static_cast<uint8_t>((v >> 16) & 0xFF),1);
+  setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),2);
+  setPayloadValue(static_cast<uint8_t>(v & 0xFF),3);
 
 
 }
@@ -403,12 +426,107 @@ VescPacketSetServoPos::VescPacketSetServoPos(double servo_pos) : VescPacket("Set
 
   uint16_t v = static_cast<uint16_t>(servo_pos * 1000.0);
 
-  setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),1);
-  setPayloadValue(static_cast<uint8_t>(v & 0xFF),2);
+  setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),0);
+  setPayloadValue(static_cast<uint8_t>(v & 0xFF),1);
 
 }
 
 /*------------------------------------------------------------------*/
 
+
+/**
+ * @brief Constructor
+ **/
+VescCanPacketSetDuty::VescCanPacketSetDuty(double duty) : VescCanPacket("SetDuty", 5, CAN_PACKET_ID::CAN_PACKET_SET_DUTY)
+{
+  // checks the range of duty
+  if (duty > 1.0)
+  {
+    duty = 1.0;
+  }
+  else if (duty < -1.0)
+  {
+    duty = -1.0;
+  }
+
+  const int32_t v = static_cast<int32_t>(duty * 100000.0);
+
+  setPayloadValue(static_cast<uint8_t>((v >> 24) & 0xFF),0);
+  setPayloadValue(static_cast<uint8_t>((v >> 16) & 0xFF),1);
+  setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),2);
+  setPayloadValue(static_cast<uint8_t>(v & 0xFF),3);
+
+}
+
+/*------------------------------------------------------------------*/
+
+/**
+ * @brief Constructor
+ **/
+VescCanPacketSetCurrent::VescCanPacketSetCurrent(double current) : VescCanPacket("SetCurrent", 5, CAN_PACKET_ID::CAN_PACKET_SET_CURRENT)
+{
+  const int32_t v = static_cast<int32_t>(current * 1000.0);
+
+  setPayloadValue(static_cast<uint8_t>((v >> 24) & 0xFF),0);
+  setPayloadValue(static_cast<uint8_t>((v >> 16) & 0xFF),1);
+  setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),2);
+  setPayloadValue(static_cast<uint8_t>(v & 0xFF),3);
+
+
+}
+
+/*------------------------------------------------------------------*/
+
+/**
+ * @brief Constructor
+ **/
+VescCanPacketSetCurrentBrake::VescCanPacketSetCurrentBrake(double current_brake)
+  : VescCanPacket("SetCurrentBrake", 5, CAN_PACKET_ID::CAN_PACKET_SET_CURRENT_BRAKE)
+{
+  const int32_t v = static_cast<int32_t>(current_brake * 1000.0);
+
+  setPayloadValue(static_cast<uint8_t>((v >> 24) & 0xFF),0);
+  setPayloadValue(static_cast<uint8_t>((v >> 16) & 0xFF),1);
+  setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),2);
+  setPayloadValue(static_cast<uint8_t>(v & 0xFF),3);
+
+}
+
+/*------------------------------------------------------------------*/
+
+/**
+ * @brief Constructor
+ **/
+VescCanPacketSetVelocityERPM::VescCanPacketSetVelocityERPM(double vel_erpm) : VescCanPacket("SetERPM", 5, CAN_PACKET_ID::CAN_PACKET_SET_RPM)
+{
+  const int32_t v = static_cast<int32_t>(vel_erpm);
+
+  setPayloadValue(static_cast<uint8_t>((v >> 24) & 0xFF),0);
+  setPayloadValue(static_cast<uint8_t>((v >> 16) & 0xFF),1);
+  setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),2);
+  setPayloadValue(static_cast<uint8_t>(v & 0xFF),3);
+
+
+}
+
+/*------------------------------------------------------------------*/
+
+/**
+ * @brief Constructor
+ **/
+VescCanPacketSetPos::VescCanPacketSetPos(double pos) : VescCanPacket("SetPos", 5, CAN_PACKET_ID::CAN_PACKET_SET_POS)
+{
+  /** @todo range check pos */
+  const int32_t v = static_cast<int32_t>(pos * 100000.0);
+
+  setPayloadValue(static_cast<uint8_t>((v >> 24) & 0xFF),0);
+  setPayloadValue(static_cast<uint8_t>((v >> 16) & 0xFF),1);
+  setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),2);
+  setPayloadValue(static_cast<uint8_t>(v & 0xFF),3);
+
+
+}
+
+/*------------------------------------------------------------------*/
 
 }  // namespace vesc_driver

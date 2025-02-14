@@ -94,13 +94,26 @@ class VescPacket : public VescPayload {
 
  protected:
   VescPacket(const std::string& name, const int16_t payload_size,
-           const COMM_PACKET_ID payload);
+           const COMM_PACKET_ID cmd);
   VescPacket(const std::string& name, std::shared_ptr<VescPayload> raw);
 
  private:
   std::string name_;
 };
 
+
+class VescCanPacket : public VescPayload{
+  public:
+    virtual ~VescCanPacket() {}
+    virtual const std::string& getName() const final { return name_; }
+    virtual const CAN_PACKET_ID& getCanPacketId() const final { return can_packet_id_; }
+  protected:
+    VescCanPacket(const std::string& name, const int16_t payload_size, const CAN_PACKET_ID cmd);
+    VescCanPacket(const std::string& name, std::shared_ptr<VescPayload> raw);
+  private:
+    std::string name_;  
+    CAN_PACKET_ID can_packet_id_;
+};
 /*------------------------------------------------------------------*/
 
 /**
@@ -241,6 +254,73 @@ class VescPacketSetServoPos : public VescPacket
 public:
   explicit VescPacketSetServoPos(double servo_pos);
 };
+
+
+
+/**
+ * @brief Packet for setting duty
+ **/
+class VescCanPacketSetDuty : public VescCanPacket
+{
+public:
+  explicit VescCanPacketSetDuty(double duty);
+};
+
+/*------------------------------------------------------------------*/
+
+/**
+ * @brief Packet for setting reference current
+ **/
+class VescCanPacketSetCurrent : public VescCanPacket
+{
+public:
+  explicit VescCanPacketSetCurrent(double current);
+};
+
+/*------------------------------------------------------------------*/
+
+/**
+ * @brief Packet for setting current brake
+ **/
+class VescCanPacketSetCurrentBrake : public VescCanPacket
+{
+public:
+  explicit VescCanPacketSetCurrentBrake(double current_brake);
+};
+
+/*------------------------------------------------------------------*/
+
+/**
+ * @brief Packet for setting reference angular velocity
+ **/
+class VescCanPacketSetVelocityERPM : public VescCanPacket
+{
+public:
+  explicit VescCanPacketSetVelocityERPM(double vel_erpm);
+};
+
+/*------------------------------------------------------------------*/
+
+/**
+ * @brief Packet for setting a reference position
+ **/
+class VescCanPacketSetPos : public VescCanPacket
+{
+public:
+  explicit VescCanPacketSetPos(double pos);
+};
+
+/*------------------------------------------------------------------*/
+
+/**
+ * @brief Packet for setting a servo position
+ **/
+class VescCanPacketSetServoPos : public VescCanPacket
+{
+public:
+  explicit VescCanPacketSetServoPos(double servo_pos);
+};
+
 
 }  // namespace vesc_driver
 

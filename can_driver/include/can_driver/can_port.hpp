@@ -18,7 +18,9 @@ namespace can_driver {
 class CanPortConfig {
  public:
   /// \brief Default constructor
-  CanPortConfig(std::string port) : port(port) {
+  CanPortConfig(const std::string& port,const std::string& controller_id,
+                const std::string& vesct_id)
+      : port(port),controller_id(controller_id), vesct_id(vesct_id) {
     socket_ = socket(PF_CAN, SOCK_RAW, CAN_RAW);
     strncpy(ifr_.ifr_name, port.c_str(), IFNAMSIZ);
     ioctl(socket_, SIOCGIFINDEX, &ifr_);
@@ -37,15 +39,14 @@ class CanPortConfig {
     send_addr_.can_ifindex = ifr_.ifr_ifindex;
   }
 
-  /// \brief Function that returns the configured buad rate
-  /// \returns The configured buad rate in bps
   int get_socket() const { return socket_; }
 
  private:
-  std::string port;
+  const std::string& port;
   int socket_;
   struct ifreq ifr_;
   struct sockaddr_can send_addr_, recv_addr_;
+  const std::string &controller_id, &vesct_id;
 };
 
 }  // namespace can_driver

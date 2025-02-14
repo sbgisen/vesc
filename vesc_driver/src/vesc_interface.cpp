@@ -51,48 +51,20 @@ public:
 
   void* rxThread(void);
 
+  void* canThread(void);
+
   static void* rxThreadHelper(void* context)
   {
     return ((VescInterface::Impl*)context)->rxThread();
   }
 
   static void* canThreadHelper(void* context) {
-    struct can_frame rxmsg;
-    int socket = ((VescInterface::Impl*)context)->can_config_->get_socket();
-    std::cout << "Listening for CAN frames" << std::endl;
-    std::cout.flush();
-    while (1) {
-      auto nbytes = read(socket, &rxmsg, sizeof(rxmsg));;
-
-      if (nbytes < 0) {
-        std::cout<<"can raw socket read"<<std::endl;
-        continue;;
-      }
-
-      /* paranoid check ... */
-      if (nbytes < sizeof(struct can_frame)) {
-        std::cout<<"read: incomplete CAN frame"<<std::endl;
-        continue;
-      }
-
-      // print n_bytes
-      std::cout<<"nbytes = "<<nbytes<<std::endl;
-
-      // print can_id in hex
-      std::cout<<"can_id = 0x"<<std::hex<<rxmsg.can_id<<std::dec<<std::endl;
-      std::cout<<"can_dlc = "<<rxmsg.can_dlc<<std::endl;
-      std::cout<<"data = ";
-      for (int i = 0; i < rxmsg.can_dlc; i++) {
-        // print data in hex
-        std::cout<<"0x"<<std::hex<<(int)rxmsg.data[i]<<" "<<std::dec;
-      }
-      std::cout<<std::endl;
-      
-    }
+    return ((VescInterface::Impl*)context)->canThread();
   }
 
   pthread_t rx_thread_;
   bool rx_thread_run_;
+  bool can_thread_run_;
   PacketHandlerFunction packet_handler_;
   ErrorHandlerFunction error_handler_;
   std::unique_ptr<IoContext> owned_ctx{};
@@ -102,6 +74,52 @@ public:
   bool data_updated_;
   std::unique_ptr<drivers::serial_driver::SerialDriver> serial_driver_;
 };
+
+void* VescInterface::Impl::canThread(void) {
+
+  // Buffer buffer;
+  // buffer.reserve(4096);
+  // auto temp_buffer = Buffer(4096);
+
+  struct can_frame rxmsg;
+  int socket = can_config_->get_socket();
+
+  while (can_thread_run_) {
+    int nbytes = read(socket, &rxmsg, sizeof(rxmsg));
+
+    if (nbytes < 0) {
+      error_handler_("can data length < 0");
+    }
+
+    /* paranoid check ... */
+    if (nbytes < sizeof(struct can_frame)) {
+      error_handler_("read: incomplete CAN frame");
+    }
+
+    if ((rxmsg.can_id & CAN_EFF_FLAG) == 0) {
+      error_handler_(
+          "Expecting extended frame format. But received standard frame "
+          "format.");
+    }
+
+    rxmsg.can_id &= CAN_EFF_MASK; // can header
+
+    // uint8_t id = eid & 0xFF; // can device id
+
+    // CAN_PACKET_ID cmd = eid >> 8; // command 
+
+    // print can_id in hex
+    std::cout << "can_id = 0x" << std::hex << rxmsg.can_id << std::dec
+              << std::endl;
+    std::cout << "can_dlc = " << rxmsg.can_dlc << std::endl;
+    std::cout << "data = ";
+    for (int i = 0; i < rxmsg.can_dlc; i++) {
+      // print data in hex
+      std::cout << "0x" << std::hex << (int)rxmsg.data[i] << " " << std::dec;
+    }
+    std::cout << std::endl;
+  }
+}
 
 void* VescInterface::Impl::rxThread(void)
 {
@@ -116,6 +134,10 @@ void* VescInterface::Impl::rxThread(void)
     const auto bytes_read = serial_driver_->port()->receive(temp_buffer);
     buffer.reserve(buffer.size() + bytes_read);
     buffer.insert(buffer.end(), temp_buffer.begin(), temp_buffer.begin() + bytes_read);
+    // print temp_buffer
+    for (int i = 0; i < bytes_read; i++) {
+      std::cout << "0x" << std::hex << (int)temp_buffer[i] << " " << std::dec;
+    }
     // RCLCPP_INFO(rclcpp::get_logger("VescDriver"), "Read packets: %d", bytes_read);
     if (bytes_needed > 0 && 0 == bytes_read && !buffer.empty())
     {
@@ -185,7 +207,7 @@ void* VescInterface::Impl::rxThread(void)
   }
 }
 
-VescInterface::VescInterface(const std::string& port, const PacketHandlerFunction& packet_handler,
+VescInterface::VescInterface(const std::string& port,const std::string& controller_id,const std::string& vesc_id, const PacketHandlerFunction& packet_handler,
                              const ErrorHandlerFunction& error_handler)
   : impl_(new Impl())
 {
@@ -193,7 +215,7 @@ VescInterface::VescInterface(const std::string& port, const PacketHandlerFunctio
   setErrorHandler(error_handler);
   // attempt to conect if the port is specified
   if (!port.empty())
-    connect(port);
+    connect(port,controller_id,vesc_id);
 }
 
 VescInterface::~VescInterface()
@@ -216,7 +238,7 @@ void VescInterface::setErrorHandler(const ErrorHandlerFunction& handler)
   impl_->error_handler_ = handler;
 }
 
-void VescInterface::connect(const std::string& port)
+void VescInterface::connect(const std::string& port, const std::string& controller_id, const std::string& vesct_id)
 {
   // todo - mutex?
 
@@ -256,7 +278,7 @@ void VescInterface::connect(const std::string& port)
     // connect to can port
     try {
       impl_->can_config_ =
-          std::make_unique<drivers::can_driver::CanPortConfig>(port);
+          std::make_unique<drivers::can_driver::CanPortConfig>(port, controller_id, vesct_id);
 
       int result =
           pthread_create(&impl_->rx_thread_, NULL,

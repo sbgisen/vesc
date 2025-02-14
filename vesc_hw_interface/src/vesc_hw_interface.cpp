@@ -28,7 +28,7 @@ namespace vesc_hw_interface
 VescHwInterface::VescHwInterface()
 {
   vesc_interface_ = std::make_shared<VescInterface>(
-      std::string(), std::bind(&VescHwInterface::packetCallback, this, std::placeholders::_1),
+      std::string(), std::string(),std::string(),std::bind(&VescHwInterface::packetCallback, this, std::placeholders::_1),
       std::bind(&VescHwInterface::errorCallback, this, std::placeholders::_1));
 }
 
@@ -173,7 +173,7 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
   try
   {
     RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "connect to %s", port_.c_str());
-    vesc_interface_->connect(port_);
+    vesc_interface_->connect(port_, controller_id_, vesct_id_);
     RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "connected");
   }
   catch (const vesc_driver::SerialException& exception)

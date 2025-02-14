@@ -76,7 +76,6 @@ public:
 };
 
 void* VescInterface::Impl::canThread(void) {
-
   // Buffer buffer;
   // buffer.reserve(4096);
   // auto temp_buffer = Buffer(4096);
@@ -102,16 +101,74 @@ void* VescInterface::Impl::canThread(void) {
           "format.");
     }
 
-    rxmsg.can_id &= CAN_EFF_MASK; // can header
+    rxmsg.can_id &= CAN_EFF_MASK;  // can header
 
-    // uint8_t id = eid & 0xFF; // can device id
+    uint32_t eid = rxmsg.can_id;
 
-    // CAN_PACKET_ID cmd = eid >> 8; // command 
+    uint8_t id = eid & 0xFF;  // can device id
+
+    CAN_PACKET_ID cmd = static_cast<CAN_PACKET_ID>(eid >> 8);  // command
+
+    std::vector<uint8_t> data(0);
+
+    switch (cmd) {
+      case CAN_PACKET_ID::CAN_PACKET_PROCESS_SHORT_BUFFER: {
+        uint32_t ind = 0;
+        const uint32_t controller_id = rxmsg.data[ind++];
+        const int rx_buffer_response_type = rxmsg.data[ind++];
+        const unsigned int len = static_cast<unsigned int>(rxmsg.can_dlc) - ind;
+        if (len > 6) {
+          error_handler_(
+              "CAN_PACKET_PROCESS_SHORT_BUFFER should be smaller than 7 but we "
+              "got " +
+              std::to_string(len));
+        }
+        data =
+            std::vector<uint8_t>(rxmsg.data + ind, rxmsg.data + rxmsg.can_dlc);
+
+      } break;
+      case CAN_PACKET_ID::CAN_PACKET_FILL_RX_BUFFER: {
+        uint32_t ind = 0;
+        const unsigned int packet_number = rxmsg.data[ind++];
+        data =
+            std::vector<uint8_t>(rxmsg.data + ind, rxmsg.data + rxmsg.can_dlc);
+
+      }
+
+      break;
+      case CAN_PACKET_ID::CAN_PACKET_FILL_RX_BUFFER_LONG: {
+        uint32_t ind = 0;
+        unsigned int packet_number = rxmsg.data[0] + rxmsg.data[1] << 8;
+        ind += 2;
+        data =
+            std::vector<uint8_t>(rxmsg.data + ind, rxmsg.data + rxmsg.can_dlc);
+
+      } break;
+
+      case CAN_PACKET_ID::CAN_PACKET_PROCESS_RX_BUFFER: {
+        if (rxmsg.can_dlc != 6) {
+          error_handler_(
+              "CAN_PCAKET_PROCESS_RX_BUFFER should be equal 6 but we got " +
+              std::to_string(rxmsg.can_dlc));
+        }
+        uint32_t ind = 0;
+        const uint8_t controller_id = rxmsg.data[ind++];
+        const unsigned int rx_buffer_response_type = rxmsg.data[ind++];
+        const unsigned int full_data_len = rxmsg.data[ind++]
+                                           << 8 + rxmsg.data[ind++];
+        const unsigned short crc = rxmsg.data[ind++] << 8 + rxmsg.data[ind++];
+      }
+      default:
+        break;
+    }
+    if (cmd == CAN_PACKET_ID::CAN_PACKET_PROCESS_SHORT_BUFFER) {
+    } else if (cmd == CAN_PACKET_ID::CAN_PACKET_FILL_RX_BUFFER) {
+    }
 
     // print can_id in hex
     std::cout << "can_id = 0x" << std::hex << rxmsg.can_id << std::dec
               << std::endl;
-    std::cout << "can_dlc = " << rxmsg.can_dlc << std::endl;
+    std::cout << "can_dlc = " << int(rxmsg.can_dlc) << std::endl;
     std::cout << "data = ";
     for (int i = 0; i < rxmsg.can_dlc; i++) {
       // print data in hex

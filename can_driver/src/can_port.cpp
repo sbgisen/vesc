@@ -39,6 +39,7 @@ size_t CanPort::receive(std::vector<uint8_t>& buff, uint32_t& header) {
   if (id != port_config_.get_controller_id()) {
     return 0;
   }
+  buff.erase(buff.begin(), buff.end());
   buff.insert(buff.end(), frame.data, frame.data + frame.can_dlc);
 
   return frame.can_dlc;

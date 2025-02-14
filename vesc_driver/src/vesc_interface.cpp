@@ -212,7 +212,9 @@ void* VescInterface::Impl::rxThread(void)
         {
           // good start, now attempt to create packet
           std::string error;
-          VescPacketConstPtr packet = VescPacketFactory::createPacket(iter, buffer.end(), &bytes_needed, &error);
+          int frame_size = 0;
+          VescPacketConstPtr packet = VescPacketFactory::createPacket(
+              iter, buffer.end(), &bytes_needed, &frame_size, &error);
           if (packet)
           {
             // Packet received;
@@ -228,7 +230,7 @@ void* VescInterface::Impl::rxThread(void)
             // call packet handler
             packet_handler_(packet);
             // update state
-            iter = iter + packet->getPayload().size() + VescFrame::VESC_MIN_FRAME_SIZE;
+            iter = iter + frame_size;
             iter_begin = iter;
             // continue to look for another frame in buffer
             continue;

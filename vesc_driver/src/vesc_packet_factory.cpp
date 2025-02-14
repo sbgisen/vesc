@@ -74,9 +74,9 @@ VescPacketPtr createFailed(int* p_num_bytes_needed, std::string* p_what, const s
  * @return Pointer to a valid VescData if successful; otherwise, an empty
  * pointer.
  **/
-VescPacketPtr VescPacketFactory::createPacket(const Buffer::const_iterator& begin, const Buffer::const_iterator& end,
-                                              int* num_bytes_needed, std::string* what)
-{
+VescPacketPtr VescPacketFactory::createPacket(
+    const Buffer::const_iterator& begin, const Buffer::const_iterator& end,
+    int* num_bytes_needed, int* frame_size, std::string* what) {
   // initializes output variables
   if (num_bytes_needed != NULL)
   {
@@ -129,9 +129,9 @@ VescPacketPtr VescPacketFactory::createPacket(const Buffer::const_iterator& begi
   BufferRangeConst view_frame(begin, iter_eof + 1);
 
   // chekcs whether enough data is loaded in the buffer to complete the frame
-  int frame_size = boost::distance(view_frame);
-  if (buffer_size < frame_size)
-    return createFailed(num_bytes_needed, what, "Buffer does not contain a complete frame", frame_size - buffer_size);
+  *frame_size = boost::distance(view_frame);
+  if (buffer_size < *frame_size)
+    return createFailed(num_bytes_needed, what, "Buffer does not contain a complete frame", *frame_size - buffer_size);
 
   // checks whether the end-of-frame character is valid
   if (VescFrame::VESC_EOF_VAL != *iter_eof)

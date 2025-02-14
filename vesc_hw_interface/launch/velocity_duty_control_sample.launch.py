@@ -35,7 +35,7 @@ def launch_setup(context: LaunchContext, *args, **kwargs) -> list:
     doc = xacro.process_file(LaunchConfiguration('model').perform(context))
     robot_description = {"robot_description": doc.toprettyxml(indent='  ')}
 
-    robot_controllers = [vesc_pkg, '/config/velocity_duty_sample.yaml']
+    robot_controllers = [vesc_pkg, '/config/velocity_sample.yaml']
 
     control_node = Node(
         package="controller_manager",
@@ -73,7 +73,7 @@ def generate_launch_description() -> LaunchDescription:
     vesc_pkg = pathlib.Path(FindPackageShare('vesc_hw_interface').find('vesc_hw_interface'))
     model_arg = DeclareLaunchArgument(
         'model',
-        default_value=str(vesc_pkg / 'launch/velocity_duty_test.ros2_control.xacro'))
+        default_value=str(vesc_pkg / 'launch/velocity_test.ros2_control.xacro'))
 
     return LaunchDescription([
         model_arg,

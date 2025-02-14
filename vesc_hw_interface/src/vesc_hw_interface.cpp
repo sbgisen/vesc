@@ -222,16 +222,6 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
     effort_ = servo_controller_.getEffortSens();
   }
 
-  if (command_mode_ == "velocity_duty")
-  {
-    // initializes the wheel controller
-    wheel_controller_.init(info_, vesc_interface_);
-    wheel_controller_.setGearRatio(gear_ratio_);
-    wheel_controller_.setTorqueConst(torque_const_);
-    wheel_controller_.setRotorPoles(num_rotor_poles_);
-    wheel_controller_.setHallSensors(num_hall_sensors_);
-  }
-
   RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "Successfully configured!");
 
   return CallbackReturn::SUCCESS;
@@ -309,15 +299,7 @@ hardware_interface::return_type VescHwInterface::read(const rclcpp::Time& /*time
     position_ = servo_controller_.getPositionSens();
     velocity_ = servo_controller_.getVelocitySens();
     effort_ = servo_controller_.getEffortSens();
-  }
-  else if (command_mode_ == "velocity_duty")
-  {
-    vesc_interface_->requestState();
-    position_ = wheel_controller_.getPositionSens();
-    velocity_ = wheel_controller_.getVelocitySens();
-    effort_ = wheel_controller_.getEffortSens();
-  }
-  else
+  } else
   {
     vesc_interface_->requestState();
   }
@@ -353,12 +335,6 @@ hardware_interface::return_type VescHwInterface::write(const rclcpp::Time& /*tim
 
     // sends a reference velocity command
     vesc_interface_->setSpeed(command_erpm);
-  }
-  else if (command_mode_ == "velocity_duty")
-  {
-
-    const double target_duty = command_;
-    vesc_interface_->setDutyCycle(target_duty);
   }
   else if (command_mode_ == "effort")
   {
@@ -397,10 +373,6 @@ void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& pa
   if (command_mode_ == "position")
   {
     servo_controller_.updateSensor(packet);
-  }
-  else if (command_mode_ == "velocity_duty")
-  {
-    wheel_controller_.updateSensor(packet);
   }
   else if (packet->getName() == "Values")
   {

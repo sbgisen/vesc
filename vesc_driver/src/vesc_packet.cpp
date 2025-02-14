@@ -50,55 +50,6 @@ VescPayload::VescPayload(const int16_t payload_size)
   payload_.resize(payload_size);
 }
 
-/**
- * @brief Constructor
- * @param payload_size Specified payload size
- **/
-VescFrame::VescFrame(const int16_t payload_size):payload_(payload_size)
-{
-  assert(payload_size >= 0 && payload_size <= 1024);
-
-  if (payload_size < 256)
-  {
-    // single byte payload size
-    frame_header_.resize(VESC_MIN_HEADER_SIZE);
-    *(frame_header_.begin()) = 2;
-    *(frame_header_.begin() + 1) = payload_size;
-    
-  }
-  else
-  {
-    // two byte payload size
-    frame_header_.resize(VESC_MIN_HEADER_SIZE + 1);
-    *(frame_header_.begin()) = 3;
-    *(frame_header_.begin() + 1) = payload_size >> 8;
-    *(frame_header_.begin() + 2) = payload_size & 0xFF;
-  }
-  frame_footer_.resize(VESC_FOOTER_SIZE);
-
-  *(frame_footer_.end() - 1) = 3;
-}
-
-/**
- * @brief Constructor
- * @param frame Reference of a buffer with constant range
- * @param payload_size Specified payload size
- **/
-VescFrame::VescFrame(const BufferRangeConst& frame, const BufferRangeConst& payload): payload_(payload)
-{
-  /* VescPacketFactory::createPacket() should make sure that
-   *  the input is valid, but run a few cheap checks anyway */
-  assert(boost::distance(frame) >= VESC_MIN_FRAME_SIZE);
-  assert(boost::distance(frame) <= VESC_MAX_FRAME_SIZE);
-  assert(boost::distance(payload) <= VESC_MAX_PAYLOAD_SIZE);
-  assert(std::distance(frame.first, payload.first) > 0 && std::distance(payload.second, frame.second) > 0);
-
-  frame_header_.resize(std::distance(frame.first, payload.first));
-  frame_header_.assign(frame.first, payload.first);
-  frame_footer_.resize(std::distance(payload.second, frame.second));
-  frame_footer_.assign(payload.second, frame.second);
-}
-
 /*------------------------------------------------------------------*/
 
 /**

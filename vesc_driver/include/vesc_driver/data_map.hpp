@@ -18,6 +18,7 @@
 #define VESC_DRIVER_DATA_MAP_HPP_
 
 #include <cstdint>
+#include <boost/crc.hpp>
 
 namespace vesc_driver {
 /**
@@ -153,6 +154,17 @@ enum class CAN_PACKET_ID : std::uint32_t {
   CAN_PACKET_UPDATE_CAN_ID = 63,
   CAN_PACKET_ENABLE_PID_POS_OFFSET_POT_CALIB = 64,
 };
+
+constexpr int16_t VESC_MAX_PAYLOAD_SIZE = 1024;                     //  payload size (bytes)
+constexpr int16_t VESC_MIN_FRAME_SIZE = 5;                          // t frame size (bytes)
+constexpr int16_t VESC_MAX_FRAME_SIZE = 6 + VESC_MAX_PAYLOAD_SIZE;  //  frame size (bytes)
+constexpr int16_t VESC_SOF_VAL_SMALL_FRAME = 2;                     // f "small" frame value
+constexpr int16_t VESC_SOF_VAL_LARGE_FRAME = 3;                     // f "large" frame value
+constexpr int16_t VESC_EOF_VAL = 3;                                 // frame
+constexpr int16_t VESC_MIN_HEADER_SIZE = 2;  // Minimum header size (bytes)
+constexpr int16_t VESC_FOOTER_SIZE = 3;      // Footer size (bytes)
+
+using CRC = boost::crc_optimal<16, 0x1021, 0, 0, false, false>;
 
 }  // namespace vesc_driver
 #endif  // VESC_DRIVER_DATA_MAP_HPP_

@@ -101,62 +101,6 @@ class VescData : public VescPayload {
   std::string name_;
 };
 
-/**
- * @brief The raw frame for communicating with the VESC
- **/
-class VescFrame
-{
-public:
-  /**
-   * @brief Destructor
-   **/
-  virtual ~VescFrame()
-  {
-  }
-
-  /**
-   * @brief Gets a reference of the frame
-   * @return Reference of the frame
-   **/
-  virtual const Buffer getFrame() const {
-    Buffer frame;
-    frame.clear();
-    frame.insert(frame.end(), frame_header_.begin(), frame_header_.end());
-    frame.insert(frame.end(), payload_.getPayload().begin(),
-                 payload_.getPayload().end());
-    frame.insert(frame.end(), frame_footer_.begin(), frame_footer_.end());
-    return frame;
-  }
-
-  /* packet properties */
-  static const int16_t VESC_MAX_PAYLOAD_SIZE = 1024;                     // Maximum payload size (bytes)
-  static const int16_t VESC_MIN_FRAME_SIZE = 5;                          // Smallest frame size (bytes)
-  static const int16_t VESC_MAX_FRAME_SIZE = 6 + VESC_MAX_PAYLOAD_SIZE;  // Largest frame size (bytes)
-  static const int16_t VESC_SOF_VAL_SMALL_FRAME = 2;                     // Start of "small" frame value
-  static const int16_t VESC_SOF_VAL_LARGE_FRAME = 3;                     // Start of "large" frame value
-  static const int16_t VESC_EOF_VAL = 3;                                 // End-of-frame value
-
-  static const int16_t VESC_MIN_HEADER_SIZE = 2;  // Minimum header size (bytes)
-  static const int16_t VESC_FOOTER_SIZE = 3;      // Footer size (bytes)
-
-  /**
-   * @brief CRC parameters for the VESC
-   **/
-  typedef boost::crc_optimal<16, 0x1021, 0, 0, false, false> CRC;
-
-protected:
-  explicit VescFrame(const int16_t payload_size);
-
-  Buffer frame_header_;
-  Buffer frame_footer_;
-  // Stores frame data
-
-  VescPayload payload_;
-
-private:
-  VescFrame(const BufferRangeConst& frame, const BufferRangeConst& payload);
-};
-
 /*------------------------------------------------------------------*/
 
 /**

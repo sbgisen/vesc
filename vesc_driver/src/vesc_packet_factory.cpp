@@ -89,21 +89,21 @@ VescPacketPtr VescPacketFactory::createPacket(
 
   // requires at least VESC_MIN_FRAME_SIZE bytes in buffer
   int buffer_size(std::distance(begin, end));
-  if (buffer_size < VescFrame::VESC_MIN_FRAME_SIZE)
+  if (buffer_size < VESC_MIN_FRAME_SIZE)
   {
     return createFailed(num_bytes_needed, what, "Buffer does not contain a complete frame",
-                        VescFrame::VESC_MIN_FRAME_SIZE - buffer_size);
+                        VESC_MIN_FRAME_SIZE - buffer_size);
   }
 
   // checks whether buffer begins with a start-of-frame
-  if (VescFrame::VESC_SOF_VAL_SMALL_FRAME != *begin && VescFrame::VESC_SOF_VAL_LARGE_FRAME != *begin)
+  if (VESC_SOF_VAL_SMALL_FRAME != *begin && VESC_SOF_VAL_LARGE_FRAME != *begin)
   {
     return createFailed(num_bytes_needed, what, "Buffer must begin with start-of-frame character");
   }
 
   // gets a view of the payload
   BufferRangeConst view_payload;
-  if (VescFrame::VESC_SOF_VAL_SMALL_FRAME == *begin)
+  if (VESC_SOF_VAL_SMALL_FRAME == *begin)
   {
     // payload size field is one byte
     view_payload.first = begin + 2;
@@ -111,14 +111,14 @@ VescPacketPtr VescPacketFactory::createPacket(
   }
   else
   {
-    assert(VescFrame::VESC_SOF_VAL_LARGE_FRAME == *begin);
+    assert(VESC_SOF_VAL_LARGE_FRAME == *begin);
     // payload size field is two bytes
     view_payload.first = begin + 3;
     view_payload.second = view_payload.first + (*(begin + 1) << 8) + *(begin + 2);
   }
 
   // checks the length
-  if (boost::distance(view_payload) > VescFrame::VESC_MAX_PAYLOAD_SIZE)
+  if (boost::distance(view_payload) > VESC_MAX_PAYLOAD_SIZE)
   {
     return createFailed(num_bytes_needed, what, "Invalid payload length");
   }
@@ -134,12 +134,12 @@ VescPacketPtr VescPacketFactory::createPacket(
     return createFailed(num_bytes_needed, what, "Buffer does not contain a complete frame", *frame_size - buffer_size);
 
   // checks whether the end-of-frame character is valid
-  if (VescFrame::VESC_EOF_VAL != *iter_eof)
+  if (VESC_EOF_VAL != *iter_eof)
     return createFailed(num_bytes_needed, what, "Invalid end-of-frame character");
 
   // checks whether the crc is valid
   uint16_t crc = (static_cast<uint16_t>(*iter_crc) << 8) + *(iter_crc + 1);
-  VescFrame::CRC crc_calc;
+  CRC crc_calc;
   crc_calc.process_bytes(&(*view_payload.first), boost::distance(view_payload));
   if (crc != crc_calc.checksum())
     return createFailed(num_bytes_needed, what, "Invalid checksum");

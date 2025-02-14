@@ -228,7 +228,7 @@ void* VescInterface::Impl::rxThread(void)
             // call packet handler
             packet_handler_(packet);
             // update state
-            iter = iter + packet->getFrame().size();
+            iter = iter + packet->getPayload().size() + VescFrame::VESC_MIN_FRAME_SIZE;
             iter_begin = iter;
             // continue to look for another frame in buffer
             continue;
@@ -403,45 +403,45 @@ void VescInterface::send(const VescPacket& packet)
 
 void VescInterface::requestFWVersion()
 {
-  send(VescPacketRequestFWVersion());
+  // send(VescPacketRequestFWVersion());
 }
 
 void VescInterface::requestState()
 {
-  send(VescPacketRequestValues());
+  // send(VescPacketRequestValues());
 }
 
 void VescInterface::setDutyCycle(double duty_cycle)
 {
   RCLCPP_INFO(rclcpp::get_logger("VescDriver"), "Set duty: %f", duty_cycle);
-  send(VescPacketSetDuty(duty_cycle));
+  // send(VescPacketSetDuty(duty_cycle));
 }
 
 void VescInterface::setCurrent(double current)
 {
-  send(VescPacketSetCurrent(current));
+  // send(VescPacketSetCurrent(current));
 }
 
 void VescInterface::setBrake(double brake)
 {
-  send(VescPacketSetCurrentBrake(brake));
+  // send(VescPacketSetCurrentBrake(brake));
 }
 
 void VescInterface::setSpeed(double speed)
 {
-  send(VescPacketSetVelocityERPM(speed));
+  // send(VescPacketSetVelocityERPM(speed));
 }
 
 void VescInterface::setPosition(double position)
 {
   RCLCPP_DEBUG(rclcpp::get_logger("VescDriver"), "Set position: %f", position);
-  send(VescPacketSetPos(position));
+  // send(VescPacketSetPos(position));
 }
 
 void VescInterface::setServo(double servo)
 {
   RCLCPP_DEBUG(rclcpp::get_logger("VescDriver"), "Set servoPosition: %f", servo);
-  send(VescPacketSetServoPos(servo));
+  // send(VescPacketSetServoPos(servo));
 }
 
 }  // namespace vesc_driver

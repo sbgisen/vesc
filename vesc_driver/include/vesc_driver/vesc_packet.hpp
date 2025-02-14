@@ -36,6 +36,10 @@
 #ifndef VESC_DRIVER_VESC_PACKET_HPP_
 #define VESC_DRIVER_VESC_PACKET_HPP_
 
+#include <boost/crc.hpp>
+#include <boost/range/begin.hpp>
+#include <boost/range/distance.hpp>
+#include <boost/range/end.hpp>
 #include <cassert>
 #include <cstdint>
 #include <iterator>
@@ -44,11 +48,6 @@
 #include <utility>
 #include <vector>
 
-#include <boost/crc.hpp>
-#include <boost/range/begin.hpp>
-#include <boost/range/distance.hpp>
-#include <boost/range/end.hpp>
-
 #include "vesc_driver/data_map.hpp"
 
 namespace vesc_driver
@@ -56,6 +55,51 @@ namespace vesc_driver
 typedef std::vector<uint8_t> Buffer;
 typedef std::pair<Buffer::iterator, Buffer::iterator> BufferRange;
 typedef std::pair<Buffer::const_iterator, Buffer::const_iterator> BufferRangeConst;
+
+class VescPayload {
+ public:
+  virtual ~VescPayload() {}
+
+  virtual const Buffer& getPayload() const final { return payload_; }
+  explicit VescPayload(const int16_t payload_size);
+  explicit VescPayload(const BufferRangeConst& payload);
+  virtual const Buffer& setPayloadId(const int16_t payload_id) final {
+    *payload_.begin() = payload_id;
+  }
+  virtual const Buffer& setPayloadValue(const int16_t payload_value,
+                                        const uint8_t position) final {
+    *(payload_.begin() + position) = payload_value;
+  }
+
+ protected:
+  Buffer payload_;
+
+ private:
+  friend class VescPacketFactory;  // gives VescPacketFactory access to private
+                                   // constructor
+};
+
+class VescData : public VescPayload {
+ public:
+  /**
+   * @brief Destructor
+   **/
+  virtual ~VescData() {}
+
+  /**
+   * @brief Gets the packet name
+   * @return The packet name
+   **/
+  virtual const std::string& getName() const final { return name_; }
+
+ protected:
+  VescData(const std::string& name, const int16_t payload_size,
+           const COMM_PACKET_ID payload);
+  VescData(const std::string& name, std::shared_ptr<VescPayload> raw);
+
+ private:
+  std::string name_;
+};
 
 /**
  * @brief The raw frame for communicating with the VESC
@@ -74,9 +118,14 @@ public:
    * @brief Gets a reference of the frame
    * @return Reference of the frame
    **/
-  virtual const Buffer& getFrame() const
-  {
-    return frame_;
+  virtual const Buffer getFrame() const {
+    Buffer frame;
+    frame.clear();
+    frame.insert(frame.end(), frame_header_.begin(), frame_header_.end());
+    frame.insert(frame.end(), payload_.getPayload().begin(),
+                 payload_.getPayload().end());
+    frame.insert(frame.end(), frame_footer_.begin(), frame_footer_.end());
+    return frame;
   }
 
   /* packet properties */
@@ -87,6 +136,9 @@ public:
   static const int16_t VESC_SOF_VAL_LARGE_FRAME = 3;                     // Start of "large" frame value
   static const int16_t VESC_EOF_VAL = 3;                                 // End-of-frame value
 
+  static const int16_t VESC_MIN_HEADER_SIZE = 2;  // Minimum header size (bytes)
+  static const int16_t VESC_FOOTER_SIZE = 3;      // Footer size (bytes)
+
   /**
    * @brief CRC parameters for the VESC
    **/
@@ -95,18 +147,14 @@ public:
 protected:
   explicit VescFrame(const int16_t payload_size);
 
-  Buffer frame_;
+  Buffer frame_header_;
+  Buffer frame_footer_;
   // Stores frame data
 
-  BufferRange payload_end_;
-  // View into frame's payload section
-  // .first:  iterator which points the front of payload (in `frame_`/)
-  // .second: iterator which points the tail of payload (in `frame_`)
+  VescPayload payload_;
 
 private:
   VescFrame(const BufferRangeConst& frame, const BufferRangeConst& payload);
-
-  friend class VescPacketFactory;  // gives VescPacketFactory access to private constructor
 };
 
 /*------------------------------------------------------------------*/
@@ -133,26 +181,27 @@ public:
     return name_;
   }
 
-protected:
-  VescPacket(const std::string& name, const int16_t payload_size, const COMM_PACKET_ID payload);
+ protected:
+  VescPacket(const std::string& name, const int16_t payload_size,
+             const COMM_PACKET_ID payload);
   VescPacket(const std::string& name, std::shared_ptr<VescFrame> raw);
 
 private:
   std::string name_;
 };
 
-typedef std::shared_ptr<VescPacket> VescPacketPtr;
-typedef std::shared_ptr<VescPacket const> VescPacketConstPtr;
+typedef std::shared_ptr<VescData> VescPacketPtr;
+typedef std::shared_ptr<VescData const> VescPacketConstPtr;
 
 /*------------------------------------------------------------------*/
 
 /**
  * @brief Farmware version
  **/
-class VescPacketFWVersion : public VescPacket
+class VescPacketFWVersion : public VescData
 {
 public:
-  explicit VescPacketFWVersion(std::shared_ptr<VescFrame> raw);
+  explicit VescPacketFWVersion(std::shared_ptr<VescPayload> raw);
 
   int16_t fwMajor() const;
   int16_t fwMinor() const;
@@ -163,7 +212,7 @@ public:
 /**
  * @brief Requests farmware version
  **/
-class VescPacketRequestFWVersion : public VescPacket
+class VescPacketRequestFWVersion : public VescData
 {
 public:
   VescPacketRequestFWVersion();
@@ -174,10 +223,10 @@ public:
 /**
  * @brief Gets values in return packets
  **/
-class VescPacketValues : public VescPacket
+class VescPacketValues : public VescData
 {
 public:
-  explicit VescPacketValues(std::shared_ptr<VescFrame> raw);
+  explicit VescPacketValues(std::shared_ptr<VescPayload> raw);
 
   double getMosTemp() const;
   double getMotorTemp() const;

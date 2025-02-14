@@ -34,7 +34,7 @@
   <ros2_control name="vesc" type="actuator">
     <hardware>
       <plugin>vesc_hw_interface/VescHwInterface</plugin>
-      <param name="port">can1</param>
+      <param name="port">/dev/ttyACM1</param>
       <param name="controller_id">6</param>
       <param name="vesc_id">4</param>
       <param name="gear_ratio">1</param>

@@ -33,7 +33,7 @@
 namespace vesc_hw_interface
 {
 using vesc_driver::VescInterface;
-using vesc_driver::VescPacket;
+using vesc_driver::VescData;
 using vesc_driver::VescPacketValues;
 using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 
@@ -75,7 +75,7 @@ private:
   // joint_limits_interface::VelocityJointSaturationInterface limit_velocity_interface_;
   // joint_limits_interface::EffortJointSaturationInterface limit_effort_interface_;
 
-  void packetCallback(const std::shared_ptr<VescPacket const>&);
+  void packetCallback(const std::shared_ptr<VescData const>&);
   void errorCallback(const std::string&);
 };
 

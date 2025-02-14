@@ -42,10 +42,6 @@
       <param name="num_hall_sensors">3</param>
       <param name="screw_lead">1.0</param>
       <param name="num_rotor_poles">20</param>
-      <param name="motor/Kp">0.1</param>
-      <param name="motor/Ki">0.01</param>
-      <param name="motor/Kd">0.02</param>
-      <param name="motor/i_clamp">1.0</param>
       <param name="motor/duty_limiter">1.0</param>
       <param name="motor/antiwindup">true</param>
       <param name="motor/control_rate">100.0</param>

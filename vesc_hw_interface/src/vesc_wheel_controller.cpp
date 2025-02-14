@@ -34,11 +34,6 @@ void VescWheelController::init(hardware_interface::HardwareInfo& info,
     interface_ptr_ = interface_ptr;
   }
 
-  i_clamp_ = 0.2;
-  if (info.hardware_parameters.find("motor/i_clamp") != info.hardware_parameters.end())
-  {
-    i_clamp_ = std::stod(info.hardware_parameters["motor/i_clamp"]);
-  }
   duty_limiter_ = 1.0;
   if (info.hardware_parameters.find("motor/duty_limiter") != info.hardware_parameters.end())
   {
@@ -55,8 +50,6 @@ void VescWheelController::init(hardware_interface::HardwareInfo& info,
     control_rate_ = std::stod(info.hardware_parameters["motor/control_rate"]);
   }
 
-  RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "[Motor Gains] I clamp: %f, Antiwindup: %s", i_clamp_,
-              antiwindup_ ? "true" : "false");
   RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "[Motor Control] control_rate: %f", control_rate_);
 
   // Smoothing differentiation when hall sensor resolution is insufficient

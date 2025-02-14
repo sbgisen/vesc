@@ -28,6 +28,7 @@ ament_auto_add_library(
   ${PROJECT_NAME}
   SHARED
   src/can_port.cpp
+  src/can_driver.cpp
 )
 
 ament_auto_package()

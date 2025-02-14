@@ -45,6 +45,7 @@ CallbackReturn VescHwInterface::on_init(const hardware_interface::HardwareInfo& 
   effort_ = std::numeric_limits<double>::quiet_NaN();
 
   // initializes commands and states
+  command_ = 0.0;
   position_ = 0.0;
   velocity_ = 0.0;
   effort_ = 0.0;

@@ -71,12 +71,6 @@ void VescServoController::init(hardware_interface::HardwareInfo& info,
   calibration_rewind_ = false;
 
   // reads parameters
-
-  i_clamp_ = 1.0;
-  if (info.hardware_parameters.find("servo/i_clamp") != info.hardware_parameters.end())
-  {
-    i_clamp_ = std::stod(info.hardware_parameters["servo/i_clamp"]);
-  }
   duty_limiter_ = 1.0;
   if (info.hardware_parameters.find("servo/duty_limiter") != info.hardware_parameters.end())
   {

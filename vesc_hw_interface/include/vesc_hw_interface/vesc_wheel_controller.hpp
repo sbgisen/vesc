@@ -47,7 +47,6 @@ private:
   std::shared_ptr<VescInterface> interface_ptr_;
   VescStepDifference vesc_step_difference_;
 
-  double i_clamp_;
   bool antiwindup_;
   double duty_limiter_;
   double num_rotor_pole_pairs_, num_rotor_poles_;

@@ -34,21 +34,6 @@ void VescWheelController::init(hardware_interface::HardwareInfo& info,
     interface_ptr_ = interface_ptr;
   }
 
-  kp_ = 0.005;
-  if (info.hardware_parameters.find("motor/Kp") != info.hardware_parameters.end())
-  {
-    kp_ = std::stod(info.hardware_parameters["motor/Kp"]);
-  }
-  ki_ = 0.005;
-  if (info.hardware_parameters.find("motor/Ki") != info.hardware_parameters.end())
-  {
-    ki_ = std::stod(info.hardware_parameters["motor/Ki"]);
-  }
-  kd_ = 0.0025;
-  if (info.hardware_parameters.find("motor/Kd") != info.hardware_parameters.end())
-  {
-    kd_ = std::stod(info.hardware_parameters["motor/Kd"]);
-  }
   i_clamp_ = 0.2;
   if (info.hardware_parameters.find("motor/i_clamp") != info.hardware_parameters.end())
   {
@@ -70,7 +55,6 @@ void VescWheelController::init(hardware_interface::HardwareInfo& info,
     control_rate_ = std::stod(info.hardware_parameters["motor/control_rate"]);
   }
 
-  RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "[Motor Gains] P: %f, I: %f, D: %f", kp_, ki_, kd_);
   RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "[Motor Gains] I clamp: %f, Antiwindup: %s", i_clamp_,
               antiwindup_ ? "true" : "false");
   RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "[Motor Control] control_rate: %f", control_rate_);

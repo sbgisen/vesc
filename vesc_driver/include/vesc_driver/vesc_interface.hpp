@@ -143,9 +143,6 @@ private:
   // Pimpl - hide serial port members from class users
   class Impl;
   std::unique_ptr<Impl> impl_;
-  int socket_;
-  struct ifreq ifr_;
-  struct sockaddr_can send_addr_, recv_addr_;
 };
 
 // todo: review

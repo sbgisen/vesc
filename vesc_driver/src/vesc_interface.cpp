@@ -34,8 +34,10 @@
  ********************************************************************/
 
 #include "vesc_driver/vesc_interface.hpp"
-#include <serial_driver/serial_driver.hpp>
+
+#include <can_driver/can_port.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <serial_driver/serial_driver.hpp>
 
 namespace vesc_driver
 {
@@ -54,11 +56,38 @@ public:
     return ((VescInterface::Impl*)context)->rxThread();
   }
 
-  static void packetHandler(int cansocket) {
+  static void* canThreadHelper(void* context) {
     struct can_frame rxmsg;
+    int socket = ((VescInterface::Impl*)context)->can_config_->get_socket();
+    std::cout << "Listening for CAN frames" << std::endl;
+    std::cout.flush();
     while (1) {
-      read(cansocket, &rxmsg, sizeof(rxmsg));
-      printf("message received\n");
+      auto nbytes = read(socket, &rxmsg, sizeof(rxmsg));;
+
+      if (nbytes < 0) {
+        std::cout<<"can raw socket read"<<std::endl;
+        continue;;
+      }
+
+      /* paranoid check ... */
+      if (nbytes < sizeof(struct can_frame)) {
+        std::cout<<"read: incomplete CAN frame"<<std::endl;
+        continue;
+      }
+
+      // print n_bytes
+      std::cout<<"nbytes = "<<nbytes<<std::endl;
+
+      // print can_id in hex
+      std::cout<<"can_id = 0x"<<std::hex<<rxmsg.can_id<<std::dec<<std::endl;
+      std::cout<<"can_dlc = "<<rxmsg.can_dlc<<std::endl;
+      std::cout<<"data = ";
+      for (int i = 0; i < rxmsg.can_dlc; i++) {
+        // print data in hex
+        std::cout<<"0x"<<std::hex<<(int)rxmsg.data[i]<<" "<<std::dec;
+      }
+      std::cout<<std::endl;
+      
     }
   }
 
@@ -68,6 +97,7 @@ public:
   ErrorHandlerFunction error_handler_;
   std::unique_ptr<IoContext> owned_ctx{};
   std::unique_ptr<drivers::serial_driver::SerialPortConfig> device_config_;
+  std::unique_ptr<drivers::can_driver::CanPortConfig> can_config_;
   VescFrame::CRC send_crc_;
   bool data_updated_;
   std::unique_ptr<drivers::serial_driver::SerialDriver> serial_driver_;
@@ -225,24 +255,14 @@ void VescInterface::connect(const std::string& port)
   } else if (std::equal(can_port.begin(), can_port.end(), port.begin())) {
     // connect to can port
     try {
-      socket_ = socket(PF_CAN, SOCK_RAW, CAN_RAW);
-      strncpy(ifr_.ifr_name, port.c_str(), IFNAMSIZ);
-      ioctl(socket_, SIOCGIFINDEX, &ifr_);
-      if (socket_ < 0) {
-        throw std::exception();
-      }
+      impl_->can_config_ =
+          std::make_unique<drivers::can_driver::CanPortConfig>(port);
 
-      recv_addr_.can_family = AF_CAN;
-      recv_addr_.can_ifindex = ifr_.ifr_ifindex;
-      if (bind(socket_, (struct sockaddr*)&recv_addr_, sizeof(recv_addr_)) <
-          0) {
-        throw std::exception();
-      }
+      int result =
+          pthread_create(&impl_->rx_thread_, NULL,
+                         &VescInterface::Impl::canThreadHelper, impl_.get());
 
-      memset(&send_addr_, 0, sizeof(send_addr_));
-
-      send_addr_.can_family = AF_CAN;
-      send_addr_.can_ifindex = ifr_.ifr_ifindex;
+      assert(0 == result);
 
     } catch (const std::exception& e) {
       std::stringstream ss;

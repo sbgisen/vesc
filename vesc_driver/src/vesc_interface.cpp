@@ -191,11 +191,7 @@ void* VescInterface::Impl::rxThread(void)
     const auto bytes_read = serial_driver_->port()->receive(temp_buffer);
     buffer.reserve(buffer.size() + bytes_read);
     buffer.insert(buffer.end(), temp_buffer.begin(), temp_buffer.begin() + bytes_read);
-    // print temp_buffer
-    for (int i = 0; i < bytes_read; i++) {
-      std::cout << "0x" << std::hex << (int)temp_buffer[i] << " " << std::dec;
-    }
-    // RCLCPP_INFO(rclcpp::get_logger("VescDriver"), "Read packets: %d", bytes_read);
+
     if (bytes_needed > 0 && 0 == bytes_read && !buffer.empty())
     {
       error_handler_("Possibly out-of-sync with VESC, read timout in the middle of a frame.");

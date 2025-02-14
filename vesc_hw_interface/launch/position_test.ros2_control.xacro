@@ -1,15 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+<robot name="robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <cylinder length="0.6" radius="0.2"/>
+      </geometry>
+
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.6" radius="0.2"/>
+      </geometry>
+    </collision>
+  </link>
+  <link name="test">
+    <visual>
+      <geometry>
+        <cylinder length="0.6" radius="0.2"/>
+      </geometry>
+
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.6" radius="0.2"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="vesc_joint" type="continuous">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="test"/>
+  </joint>
   <ros2_control name="vesc" type="actuator">
     <hardware>
       <plugin>vesc_hw_interface/VescHwInterface</plugin>
       <param name="port">/dev/ttyACM0</param>
-      <param name="gear_ratio">0.230769</param>
+      <param name="gear_ratio">1</param>
       <param name="torque_const">1.0</param>
       <param name="num_hall_sensors">3</param>
       <param name="screw_lead">1.0</param>
       <param name="num_rotor_poles">20</param>
-      <param name="servo/Kp">0.005</param>
+      <param name="upper_limit">1</param>
+      <param name="lower_limit">0.0</param>
+      <param name="servo/Kp">0.5</param>
       <param name="servo/Ki">0.005</param>
       <param name="servo/Kd">0.0025</param>
       <param name="servo/i_clamp">1.0</param>
@@ -31,6 +64,7 @@
       <param name="servo/endstop_threshold">0.8</param>
       <param name="servo/endstop_margin">0.02</param>
       <param name="command_mode">position</param>
+      <param name="joint_type">continuous</param>
     </hardware>
     <joint name="vesc_joint">
       <command_interface name="position">

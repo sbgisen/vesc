@@ -33,13 +33,17 @@ def launch_setup(context: LaunchContext, *args, **kwargs) -> list:
 
     vesc_pkg = FindPackageShare("vesc_hw_interface").find("vesc_hw_interface")
     doc = xacro.process_file(LaunchConfiguration("model").perform(context))
+    print(LaunchConfiguration("model").perform(context))
+    print(doc)
     robot_description = {"robot_description": doc.toprettyxml(indent="  ")}
+    print(robot_description)
 
     robot_controllers = [vesc_pkg, "/config/position_sample.yaml"]
 
     control_node = Node(
         package="controller_manager", executable="ros2_control_node", parameters=[robot_description, robot_controllers], output="both"
     )
+    robot_state_pub_node = Node(package="robot_state_publisher", executable="robot_state_publisher", output="both", parameters=[robot_description])
 
     controllers = GroupAction(
         actions=[
@@ -58,7 +62,7 @@ def launch_setup(context: LaunchContext, *args, **kwargs) -> list:
         ]
     )
 
-    return [control_node, controllers]
+    return [control_node, robot_state_pub_node, controllers]
 
 
 def generate_launch_description() -> LaunchDescription:

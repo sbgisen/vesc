@@ -38,8 +38,12 @@ def launch_setup(context: LaunchContext, *args, **kwargs) -> list:
     robot_controllers = [vesc_pkg, "/config/velocity_sample.yaml"]
 
     control_node = Node(
-        package="controller_manager", executable="ros2_control_node", parameters=[robot_description, robot_controllers], output="both"
-    )
+        package="controller_manager",
+        executable="ros2_control_node",
+        parameters=[
+            robot_description,
+            robot_controllers],
+        output="both")
     robot_state_pub_node = Node(package="robot_state_publisher",
                                 executable="robot_state_publisher", output="both", parameters=[robot_description])
 

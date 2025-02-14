@@ -58,7 +58,7 @@ VescPayload::VescPayload(const int16_t payload_size)
  * @param payload_size Specified payload size
  * @param payload_id ID of payload
  **/
-VescData::VescData(const std::string& name, const int16_t payload_size,
+VescPacket::VescPacket(const std::string& name, const int16_t payload_size,
                    const COMM_PACKET_ID payload)
     : VescPayload(payload_size), name_(name) {
   int16_t payload_id = static_cast<int16_t>(payload);
@@ -73,7 +73,7 @@ VescData::VescData(const std::string& name, const int16_t payload_size,
  * @param name Data name
  * @param raw Pointer of a frame
  **/
-VescData::VescData(const std::string& name, std::shared_ptr<VescPayload> raw)
+VescPacket::VescPacket(const std::string& name, std::shared_ptr<VescPayload> raw)
     : VescPayload(*raw), name_(name) {
   // not sure what this is for
   // uint16_t original_payload_size = std::distance(payload_end_.first,
@@ -87,7 +87,7 @@ VescData::VescData(const std::string& name, std::shared_ptr<VescPayload> raw)
  * @brief Constructor
  * @param raw Pointer of VescFrame
  **/
-VescPacketFWVersion::VescPacketFWVersion(std::shared_ptr<VescPayload> raw) : VescData("FWVersion", raw)
+VescPacketFWVersion::VescPacketFWVersion(std::shared_ptr<VescPayload> raw) : VescPacket("FWVersion", raw)
 {
 }
 
@@ -114,7 +114,7 @@ int16_t VescPacketFWVersion::fwMinor() const
 /**
  * @brief Constructor
  **/
-VescPacketRequestFWVersion::VescPacketRequestFWVersion() : VescData("RequestFWVersion", 1, COMM_PACKET_ID::COMM_FW_VERSION)
+VescPacketRequestFWVersion::VescPacketRequestFWVersion() : VescPacket("RequestFWVersion", 1, COMM_PACKET_ID::COMM_FW_VERSION)
 {
 }
 
@@ -123,7 +123,7 @@ VescPacketRequestFWVersion::VescPacketRequestFWVersion() : VescData("RequestFWVe
 /**
  * @brief Constructor
  **/
-VescPacketValues::VescPacketValues(std::shared_ptr<VescPayload> raw) : VescData("Values", raw)
+VescPacketValues::VescPacketValues(std::shared_ptr<VescPayload> raw) : VescPacket("Values", raw)
 {
 }
 
@@ -293,7 +293,7 @@ double VescPacketValues::readBuffer(const PACKET_MAP  packet_map, const uint8_t 
 /**
  * @brief Constructor
  **/
-VescPacketRequestValues::VescPacketRequestValues() : VescData("RequestFWVersion", 1, COMM_PACKET_ID::COMM_GET_VALUES)
+VescPacketRequestValues::VescPacketRequestValues() : VescPacket("RequestFWVersion", 1, COMM_PACKET_ID::COMM_GET_VALUES)
 {
 }
 
@@ -302,7 +302,7 @@ VescPacketRequestValues::VescPacketRequestValues() : VescData("RequestFWVersion"
 /**
  * @brief Constructor
  **/
-VescPacketSetDuty::VescPacketSetDuty(double duty) : VescData("SetDuty", 5, COMM_PACKET_ID::COMM_SET_DUTY)
+VescPacketSetDuty::VescPacketSetDuty(double duty) : VescPacket("SetDuty", 5, COMM_PACKET_ID::COMM_SET_DUTY)
 {
   // checks the range of duty
   if (duty > 1.0)
@@ -328,7 +328,7 @@ VescPacketSetDuty::VescPacketSetDuty(double duty) : VescData("SetDuty", 5, COMM_
 /**
  * @brief Constructor
  **/
-VescPacketSetCurrent::VescPacketSetCurrent(double current) : VescData("SetCurrent", 5, COMM_PACKET_ID::COMM_SET_CURRENT)
+VescPacketSetCurrent::VescPacketSetCurrent(double current) : VescPacket("SetCurrent", 5, COMM_PACKET_ID::COMM_SET_CURRENT)
 {
   const int32_t v = static_cast<int32_t>(current * 1000.0);
 
@@ -346,7 +346,7 @@ VescPacketSetCurrent::VescPacketSetCurrent(double current) : VescData("SetCurren
  * @brief Constructor
  **/
 VescPacketSetCurrentBrake::VescPacketSetCurrentBrake(double current_brake)
-  : VescData("SetCurrentBrake", 5, COMM_PACKET_ID::COMM_SET_CURRENT_BRAKE)
+  : VescPacket("SetCurrentBrake", 5, COMM_PACKET_ID::COMM_SET_CURRENT_BRAKE)
 {
   const int32_t v = static_cast<int32_t>(current_brake * 1000.0);
 
@@ -362,7 +362,7 @@ VescPacketSetCurrentBrake::VescPacketSetCurrentBrake(double current_brake)
 /**
  * @brief Constructor
  **/
-VescPacketSetVelocityERPM::VescPacketSetVelocityERPM(double vel_erpm) : VescData("SetERPM", 5, COMM_PACKET_ID::COMM_SET_ERPM)
+VescPacketSetVelocityERPM::VescPacketSetVelocityERPM(double vel_erpm) : VescPacket("SetERPM", 5, COMM_PACKET_ID::COMM_SET_ERPM)
 {
   const int32_t v = static_cast<int32_t>(vel_erpm);
 
@@ -379,7 +379,7 @@ VescPacketSetVelocityERPM::VescPacketSetVelocityERPM(double vel_erpm) : VescData
 /**
  * @brief Constructor
  **/
-VescPacketSetPos::VescPacketSetPos(double pos) : VescData("SetPos", 5, COMM_PACKET_ID::COMM_SET_POS)
+VescPacketSetPos::VescPacketSetPos(double pos) : VescPacket("SetPos", 5, COMM_PACKET_ID::COMM_SET_POS)
 {
   /** @todo range check pos */
   const int32_t v = static_cast<int32_t>(pos * 100000.0);
@@ -397,7 +397,7 @@ VescPacketSetPos::VescPacketSetPos(double pos) : VescData("SetPos", 5, COMM_PACK
 /**
  * @brief Constructor
  **/
-VescPacketSetServoPos::VescPacketSetServoPos(double servo_pos) : VescData("SetServoPos", 3, COMM_PACKET_ID::COMM_SET_SERVO_POS)
+VescPacketSetServoPos::VescPacketSetServoPos(double servo_pos) : VescPacket("SetServoPos", 3, COMM_PACKET_ID::COMM_SET_SERVO_POS)
 {
   /** @todo range check pos */
 

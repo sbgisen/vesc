@@ -391,7 +391,7 @@ bool VescInterface::isRxDataUpdated() const {
   return output;
 }
 
-void VescInterface::send(const VescData& data) {
+void VescInterface::send(const VescPacket& data) {
   std::string usb_port = "/dev/tty";
   std::string can_port = "can";
   if (std::equal(usb_port.begin(), usb_port.end(), port_.begin())) {

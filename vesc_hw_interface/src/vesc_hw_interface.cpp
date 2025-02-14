@@ -401,7 +401,7 @@ rclcpp::Time VescHwInterface::getTime() const
   return clock.now();
 }
 
-void VescHwInterface::packetCallback(const std::shared_ptr<VescData const>& packet)
+void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& packet)
 {
   if (!vesc_interface_->isRxDataUpdated())
   {

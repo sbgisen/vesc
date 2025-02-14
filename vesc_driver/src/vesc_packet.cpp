@@ -45,16 +45,13 @@ VescFrame::VescFrame(const int16_t payload_size)
 {
   assert(payload_size >= 0 && payload_size <= 1024);
 
-  if (payload_size < 256)
-  {
+  if (payload_size < 256) {
     // single byte payload size
     frame_.resize(VESC_MIN_FRAME_SIZE + payload_size);
     *(frame_.begin()) = 2;
     *(frame_.begin() + 1) = payload_size;
     payload_end_.first = frame_.begin() + 2;
-  }
-  else
-  {
+  } else {
     // two byte payload size
     frame_.resize(VESC_MIN_FRAME_SIZE + 1 + payload_size);
     *(frame_.begin()) = 3;
@@ -72,7 +69,7 @@ VescFrame::VescFrame(const int16_t payload_size)
  * @param frame Reference of a buffer with constant range
  * @param payload_size Specified payload size
  **/
-VescFrame::VescFrame(const BufferRangeConst& frame, const BufferRangeConst& payload)
+VescFrame::VescFrame(const BufferRangeConst & frame, const BufferRangeConst & payload)
 {
   /* VescPacketFactory::createPacket() should make sure that
    *  the input is valid, but run a few cheap checks anyway */
@@ -95,8 +92,8 @@ VescFrame::VescFrame(const BufferRangeConst& frame, const BufferRangeConst& payl
  * @param payload_size Specified payload size
  * @param payload_id ID of payload
  **/
-VescPacket::VescPacket(const std::string& name, const int16_t payload_size, const int16_t payload_id)
-  : VescFrame(payload_size), name_(name)
+VescPacket::VescPacket(const std::string & name, const int16_t payload_size, const int16_t payload_id)
+: VescFrame(payload_size), name_(name)
 {
   assert(payload_id >= 0 && payload_id < 256);
   assert(boost::distance(payload_end_) > 0);
@@ -108,7 +105,7 @@ VescPacket::VescPacket(const std::string& name, const int16_t payload_size, cons
  * @param name Packet name
  * @param raw Pointer of a frame
  **/
-VescPacket::VescPacket(const std::string& name, std::shared_ptr<VescFrame> raw) : VescFrame(*raw), name_(name)
+VescPacket::VescPacket(const std::string & name, std::shared_ptr<VescFrame> raw) : VescFrame(*raw), name_(name)
 {
   uint16_t original_payload_size = std::distance(payload_end_.first, payload_end_.second);
   payload_end_.first = frame_.begin() + 2;
@@ -121,27 +118,19 @@ VescPacket::VescPacket(const std::string& name, std::shared_ptr<VescFrame> raw) 
  * @brief Constructor
  * @param raw Pointer of VescFrame
  **/
-VescPacketFWVersion::VescPacketFWVersion(std::shared_ptr<VescFrame> raw) : VescPacket("FWVersion", raw)
-{
-}
+VescPacketFWVersion::VescPacketFWVersion(std::shared_ptr<VescFrame> raw) : VescPacket("FWVersion", raw) {}
 
 /**
  * @brief Gets major farmware version
  * @return Major farmware version
  **/
-int16_t VescPacketFWVersion::fwMajor() const
-{
-  return *(payload_end_.first + 1);
-}
+int16_t VescPacketFWVersion::fwMajor() const { return *(payload_end_.first + 1); }
 
 /**
  * @brief Gets minor farmware version
  * @return Minor farmware version
  **/
-int16_t VescPacketFWVersion::fwMinor() const
-{
-  return *(payload_end_.first + 2);
-}
+int16_t VescPacketFWVersion::fwMinor() const { return *(payload_end_.first + 2); }
 
 /*------------------------------------------------------------------*/
 
@@ -162,45 +151,31 @@ VescPacketRequestFWVersion::VescPacketRequestFWVersion() : VescPacket("RequestFW
 /**
  * @brief Constructor
  **/
-VescPacketValues::VescPacketValues(std::shared_ptr<VescFrame> raw) : VescPacket("Values", raw)
-{
-}
+VescPacketValues::VescPacketValues(std::shared_ptr<VescFrame> raw) : VescPacket("Values", raw) {}
 
 /**
  * @brief Gets temperature of MOSFETs
  * @return Temperature of MOSFETs
  **/
-double VescPacketValues::getMosTemp() const
-{
-  return readBuffer(TEMP_MOS, 2) / 10.0;
-}
+double VescPacketValues::getMosTemp() const { return readBuffer(TEMP_MOS, 2) / 10.0; }
 
 /**
  * @brief Gets temperature of the motor
  * @return Temperature of the motor
  **/
-double VescPacketValues::getMotorTemp() const
-{
-  return readBuffer(TEMP_MOTOR, 2) / 10.0;
-}
+double VescPacketValues::getMotorTemp() const { return readBuffer(TEMP_MOTOR, 2) / 10.0; }
 
 /**
  * @brief Gets motor current
  * @return Motor current
  **/
-double VescPacketValues::getMotorCurrent() const
-{
-  return readBuffer(CURRENT_MOTOR, 4) / 100.0;
-}
+double VescPacketValues::getMotorCurrent() const { return readBuffer(CURRENT_MOTOR, 4) / 100.0; }
 
 /**
  * @brief Gets input current
  * @return Input current
  **/
-double VescPacketValues::getInputCurrent() const
-{
-  return readBuffer(CURRENT_IN, 4) / 100.0;
-}
+double VescPacketValues::getInputCurrent() const { return readBuffer(CURRENT_IN, 4) / 100.0; }
 
 /**
  * @brief Gets the current duty value
@@ -211,8 +186,7 @@ double VescPacketValues::getDuty() const
   int16_t duty_raw = static_cast<int32_t>(readBuffer(DUTY_NOW, 2));
 
   // inverts to derive a negative value
-  if (duty_raw > 1000)
-  {
+  if (duty_raw > 1000) {
     duty_raw = !duty_raw;
   }
 
@@ -223,82 +197,55 @@ double VescPacketValues::getDuty() const
  * @brief Gets the current angular velocity
  * @return The current angular velocity
  **/
-double VescPacketValues::getVelocityERPM() const
-{
-  return readBuffer(ERPM, 4);
-}
+double VescPacketValues::getVelocityERPM() const { return readBuffer(ERPM, 4); }
 
 /**
  * @brief Gets input voltage
  * @return Input voltage
  **/
-double VescPacketValues::getInputVoltage() const
-{
-  return readBuffer(VOLTAGE_IN, 2) / 10.0;
-}
+double VescPacketValues::getInputVoltage() const { return readBuffer(VOLTAGE_IN, 2) / 10.0; }
 
 /**
  * @brief Gets consumed charge
  * @return Consumed charge
  **/
-double VescPacketValues::getConsumedCharge() const
-{
-  return readBuffer(AMP_HOURS, 4) / 10000.0;
-}
+double VescPacketValues::getConsumedCharge() const { return readBuffer(AMP_HOURS, 4) / 10000.0; }
 
 /**
  * @brief Gets input charge
  * @return Input charge
  **/
-double VescPacketValues::getInputCharge() const
-{
-  return readBuffer(AMP_HOURS_CHARGED, 4) / 10000.0;
-}
+double VescPacketValues::getInputCharge() const { return readBuffer(AMP_HOURS_CHARGED, 4) / 10000.0; }
 
 /**
  * @brief Gets consumed power
  * @return Consumed power
  **/
-double VescPacketValues::getConsumedPower() const
-{
-  return readBuffer(WATT_HOURS, 4) / 10000.0;
-}
+double VescPacketValues::getConsumedPower() const { return readBuffer(WATT_HOURS, 4) / 10000.0; }
 
 /**
  * @brief Gets input power
  * @return Input power
  **/
-double VescPacketValues::getInputPower() const
-{
-  return readBuffer(WATT_HOURS, 4) / 10000.0;
-}
+double VescPacketValues::getInputPower() const { return readBuffer(WATT_HOURS, 4) / 10000.0; }
 
 /**
  * @brief Gets the current position
  * @return The current position
  **/
-double VescPacketValues::getPosition() const
-{
-  return readBuffer(TACHOMETER, 4);
-}
+double VescPacketValues::getPosition() const { return readBuffer(TACHOMETER, 4); }
 
 /**
  * @brief Gets absolute displacement
  * @return Absolute displacement
  **/
-double VescPacketValues::getDisplacement() const
-{
-  return readBuffer(TACHOMETER_ABS, 4);
-}
+double VescPacketValues::getDisplacement() const { return readBuffer(TACHOMETER_ABS, 4); }
 
 /**
  * @brief Gets fault code
  * @return Fault code
  **/
-int VescPacketValues::getFaultCode() const
-{
-  return static_cast<int32_t>(*(payload_end_.first + FAULT_CODE));
-}
+int VescPacketValues::getFaultCode() const { return static_cast<int32_t>(*(payload_end_.first + FAULT_CODE)); }
 
 /**
  * @brief Reads a value from the buffer
@@ -309,8 +256,7 @@ int VescPacketValues::getFaultCode() const
 double VescPacketValues::readBuffer(const uint8_t map_id, const uint8_t size) const
 {
   int32_t value = 0;
-  switch (size)
-  {
+  switch (size) {
     case 2:
       value += static_cast<int32_t>(*(payload_end_.first + map_id) << 8);
       value += static_cast<int32_t>(*(payload_end_.first + map_id + 1));
@@ -348,12 +294,9 @@ VescPacketRequestValues::VescPacketRequestValues() : VescPacket("RequestFWVersio
 VescPacketSetDuty::VescPacketSetDuty(double duty) : VescPacket("SetDuty", 5, COMM_SET_DUTY)
 {
   // checks the range of duty
-  if (duty > 1.0)
-  {
+  if (duty > 1.0) {
     duty = 1.0;
-  }
-  else if (duty < -1.0)
-  {
+  } else if (duty < -1.0) {
     duty = -1.0;
   }
 
@@ -398,7 +341,7 @@ VescPacketSetCurrent::VescPacketSetCurrent(double current) : VescPacket("SetCurr
  * @brief Constructor
  **/
 VescPacketSetCurrentBrake::VescPacketSetCurrentBrake(double current_brake)
-  : VescPacket("SetCurrentBrake", 5, COMM_SET_CURRENT_BRAKE)
+: VescPacket("SetCurrentBrake", 5, COMM_SET_CURRENT_BRAKE)
 {
   const int32_t v = static_cast<int32_t>(current_brake * 1000.0);
 

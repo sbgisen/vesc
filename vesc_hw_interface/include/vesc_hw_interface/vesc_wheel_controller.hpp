@@ -63,7 +63,6 @@ private:
   double velocity_sens_;
   double effort_sens_;
 
-  double error_, error_dt_, error_integ_;
   double target_steps_;
   bool pid_initialize_;
   bool sensor_initialize_;

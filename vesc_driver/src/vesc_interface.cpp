@@ -35,7 +35,7 @@
 
 #include "vesc_driver/vesc_interface.hpp"
 
-#include <can_driver/can_port.hpp>
+#include <can_driver/can_driver.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <serial_driver/serial_driver.hpp>
 
@@ -44,7 +44,8 @@ class VescInterface::Impl {
  public:
   Impl()
       : owned_ctx(new IoContext(2)),
-        serial_driver_(new drivers::serial_driver::SerialDriver(*owned_ctx)) {
+        serial_driver_(new drivers::serial_driver::SerialDriver(*owned_ctx)),
+        can_driver_(new drivers::can_driver::CanDriver(*owned_ctx)) {
     data_updated_ = false;
   }
 
@@ -71,57 +72,41 @@ class VescInterface::Impl {
   CRC send_crc_;
   bool data_updated_;
   std::unique_ptr<drivers::serial_driver::SerialDriver> serial_driver_;
+  std::unique_ptr<drivers::can_driver::CanDriver> can_driver_;
 };
 
 void* VescInterface::Impl::canThread(void) {
-  struct can_frame rxmsg;
-  int socket = can_config_->get_socket();
-
   while (1) {
-    int nbytes = read(socket, &rxmsg, sizeof(rxmsg));
+    // int nbytes = read(socket, &rxmsg, sizeof(rxmsg));
 
-    if (nbytes < 0) {
-      error_handler_("can data length < 0");
-    }
+    // if (nbytes < 0) {
+    //   error_handler_("can data length < 0");
+    // }
 
-    /* paranoid check ... */
-    if (nbytes < static_cast<int>(sizeof(struct can_frame))) {
-      error_handler_("read: incomplete CAN frame");
-    }
+    // /* paranoid check ... */
+    // if (nbytes < static_cast<int>(sizeof(struct can_frame))) {
+    //   error_handler_("read: incomplete CAN frame");
+    // }
+    Buffer tmp_buffer;
+    uint32_t header = 0;
 
-    if ((rxmsg.can_id & CAN_EFF_FLAG) == 0) {
-      error_handler_(
-          "Expecting extended frame format. But received standard frame "
-          "format.");
-    }
-
-    rxmsg.can_id &= CAN_EFF_MASK;  // can header
-
-    uint32_t eid = rxmsg.can_id;
-
-    uint8_t id = eid & 0xFF;  // can device id
-    if (id != can_config_->get_controller_id()) {
-      continue;
-    }
-
-    CAN_PACKET_ID cmd = static_cast<CAN_PACKET_ID>(eid >> 8);  // command
-
+    can_driver_->port()->receive(tmp_buffer, header);
+    CAN_PACKET_ID cmd = static_cast<CAN_PACKET_ID>(header >> 8);  // command
     Buffer buffer(0);
-
     switch (cmd) {
       case CAN_PACKET_ID::CAN_PACKET_PROCESS_SHORT_BUFFER: {  // end of packet
         uint32_t ind = 0;
-        const uint32_t controller_id = rxmsg.data[ind++];
-        const int rx_buffer_response_type = rxmsg.data[ind++];
-        const unsigned int len = static_cast<unsigned int>(rxmsg.can_dlc) - ind;
+        const uint32_t controller_id = tmp_buffer[ind++];
+        const int rx_buffer_response_type = tmp_buffer[ind++];
+        const unsigned int len =
+            static_cast<unsigned int>(tmp_buffer.size()) - ind;
         if (len > 6) {
           error_handler_(
               "CAN_PACKET_PROCESS_SHORT_BUFFER should be smaller than 7 but we "
               "got " +
               std::to_string(len));
         }
-        buffer.insert(buffer.end(), rxmsg.data + ind,
-                      rxmsg.data + rxmsg.can_dlc);
+        buffer.insert(buffer.end(), tmp_buffer.begin() + ind, tmp_buffer.end());
 
         std::string error;
         int bytes_needed = VESC_MIN_FRAME_SIZE;
@@ -136,35 +121,32 @@ void* VescInterface::Impl::canThread(void) {
       } break;
       case CAN_PACKET_ID::CAN_PACKET_FILL_RX_BUFFER: {
         uint32_t ind = 0;
-        const unsigned int packet_number = rxmsg.data[ind++];
-        buffer.insert(buffer.end(), rxmsg.data + ind,
-                      rxmsg.data + rxmsg.can_dlc);
+        const unsigned int packet_number = tmp_buffer[ind++];
+        buffer.insert(buffer.end(), tmp_buffer.begin() + ind, tmp_buffer.end());
 
       }
 
       break;
       case CAN_PACKET_ID::CAN_PACKET_FILL_RX_BUFFER_LONG: {
         uint32_t ind = 0;
-        unsigned int packet_number = rxmsg.data[0] + rxmsg.data[1] << 8;
-        ind += 2;
-        buffer.insert(buffer.end(), rxmsg.data + ind,
-                      rxmsg.data + rxmsg.can_dlc);
+        unsigned int packet_number = tmp_buffer[ind++] + tmp_buffer[ind++] << 8;
+        buffer.insert(buffer.end(), tmp_buffer.begin() + ind, tmp_buffer.end());
 
       } break;
 
       case CAN_PACKET_ID::CAN_PACKET_PROCESS_RX_BUFFER: {  // end of packet
-        if (rxmsg.can_dlc != 6) {
+        if (tmp_buffer.size() != 6) {
           error_handler_(
               "CAN_PCAKET_PROCESS_RX_BUFFER should be equal 6 but we got " +
-              std::to_string(rxmsg.can_dlc));
+              std::to_string(tmp_buffer.size()));
         }
         uint32_t ind = 0;
-        const uint8_t controller_id = rxmsg.data[ind++];
-        const unsigned int rx_buffer_response_type = rxmsg.data[ind++];
-        const unsigned int full_data_len = rxmsg.data[ind++]
-                                           << 8 + rxmsg.data[ind++];
-        const uint16_t crc = static_cast<uint16_t>(rxmsg.data[ind++])
-                             << 8 + rxmsg.data[ind++];
+        const uint8_t controller_id = tmp_buffer[ind++];
+        const unsigned int rx_buffer_response_type = tmp_buffer[ind++];
+        const unsigned int full_data_len = tmp_buffer[ind++]
+                                           << 8 + tmp_buffer[ind++];
+        const uint16_t crc = static_cast<uint16_t>(tmp_buffer[ind++])
+                             << 8 + tmp_buffer[ind++];
         // TODO: check crc
         // if (crc != crc_calc.checksum()) {
         //   error_handler_("Invalid checksum");
@@ -339,6 +321,8 @@ void VescInterface::connect(const std::string& port, const int& controller_id,
       impl_->can_config_ = std::make_unique<drivers::can_driver::CanPortConfig>(
           port, controller_id, vesct_id);
 
+      impl_->can_driver_->init_port(port, *impl_->can_config_);
+
       int result =
           pthread_create(&impl_->rx_thread_, NULL,
                          &VescInterface::Impl::canThreadHelper, impl_.get());
@@ -426,26 +410,17 @@ void VescInterface::send(const VescData& data) {
     }
   } else if (std::equal(can_port.begin(), can_port.end(), port_.begin())) {
     int len = data.getPayload().size();
-
-    struct can_frame frame;
-    frame.can_id = 4 | CAN_EFF_FLAG;
+    Buffer buffer(0);
 
     if (len <= 6) {
-      uint32_t ind = 0;
-      frame.data[ind++] = 6;
-      frame.data[ind++] = 0;
-      memcpy(frame.data + ind, data.getPayload().data(), len);
-      ind += len;
-      int s = impl_->can_config_->get_socket();
-
-      frame.can_id |=
+      buffer.push_back(6);
+      buffer.push_back(0);
+      buffer.insert(buffer.end(), data.getPayload().begin(),
+                    data.getPayload().end());
+      uint32_t header =
           (static_cast<uint32_t>(CAN_PACKET_ID::CAN_PACKET_PROCESS_SHORT_BUFFER)
            << 8);
-      frame.can_dlc = ind;
-      frame.len = ind;
-      sendto(s, &frame, sizeof(struct can_frame), 0,
-             (struct sockaddr*)&(impl_->can_config_->send_addr_),
-             sizeof(impl_->can_config_->send_addr_));
+      impl_->can_driver_->port()->send(buffer, header);
 
     } else {
       unsigned int end_a = 0;
@@ -457,70 +432,57 @@ void VescInterface::send(const VescData& data) {
         end_a = i + 7;
 
         uint8_t send_len = 7;
-        frame.data[0] = i;
+        buffer.push_back(i);
 
         if ((i + 7) <= len) {
-          memcpy(frame.data + 1, data.getPayload().data() + i, send_len);
+          buffer.insert(buffer.end(), data.getPayload().begin() + i,
+                        data.getPayload().begin() + i + send_len);
         } else {
-          send_len = len - i;
-          memcpy(frame.data + 1, data.getPayload().data() + i, send_len);
+          buffer.insert(buffer.end(), data.getPayload().begin() + i,
+                        data.getPayload().end());
         }
-
-        int s = impl_->can_config_->get_socket();
-        frame.can_id |=
+        uint32_t header =
             (static_cast<uint32_t>(CAN_PACKET_ID::CAN_PACKET_FILL_RX_BUFFER)
              << 8);
-        frame.can_dlc = send_len + 1;
-        frame.len = send_len + 1;
-        sendto(s, &frame, sizeof(struct can_frame), 0,
-               (struct sockaddr*)&(impl_->can_config_->send_addr_),
-               sizeof(impl_->can_config_->send_addr_));
+
+        impl_->can_driver_->port()->send(buffer, header);
       }
 
       for (unsigned int i = end_a; i < len; i += 6) {
         uint8_t send_len = 6;
-        frame.data[0] = i >> 8;
-        frame.data[1] = i & 0xFF;
+        buffer.push_back(i >> 8);
+        buffer.push_back(i & 0xFF);
 
         if ((i + 6) <= len) {
-          memcpy(frame.data + 2, data.getPayload().data() + i, send_len);
+          buffer.insert(buffer.end(), data.getPayload().begin() + i,
+                        data.getPayload().begin() + i + send_len);
         } else {
-          send_len = len - i;
-          memcpy(frame.data + 2, data.getPayload().data() + i, send_len);
+          buffer.insert(buffer.end(), data.getPayload().begin() + i,
+                        data.getPayload().end());
         }
 
-        int s = impl_->can_config_->get_socket();
-        frame.can_id |= (static_cast<uint32_t>(
-                             CAN_PACKET_ID::CAN_PACKET_FILL_RX_BUFFER_LONG)
-                         << 8);
-        frame.can_dlc = send_len + 2;
-        frame.len = send_len + 2;
-        sendto(s, &frame, sizeof(struct can_frame), 0,
-               (struct sockaddr*)&(impl_->can_config_->send_addr_),
-               sizeof(impl_->can_config_->send_addr_));
+        uint32_t header = (static_cast<uint32_t>(
+                               CAN_PACKET_ID::CAN_PACKET_FILL_RX_BUFFER_LONG)
+                           << 8);
+        impl_->can_driver_->port()->send(buffer, header);
       }
 
       uint32_t ind = 0;
-      frame.data[ind++] = 6;
-      frame.data[ind++] = 0;
-      frame.data[ind++] = len >> 8;
-      frame.data[ind++] = len & 0xFF;
+      buffer.push_back(6);
+      buffer.push_back(0);
+      buffer.push_back(len >> 8);
+      buffer.push_back(len & 0xFF);
       CRC crc_calc;
       crc_calc.process_bytes(&(*(data.getPayload().begin())),
                              boost::distance(data.getPayload()));
       uint16_t crc = crc_calc.checksum();
-      frame.data[ind++] = (uint8_t)(crc >> 8);
-      frame.data[ind++] = (uint8_t)(crc & 0xFF);
+      buffer.push_back((uint8_t)(crc >> 8));
+      buffer.push_back((uint8_t)(crc & 0xFF));
 
-      int s = impl_->can_config_->get_socket();
-      frame.can_id |=
+      uint32_t header =
           (static_cast<uint32_t>(CAN_PACKET_ID::CAN_PACKET_PROCESS_RX_BUFFER)
            << 8);
-      frame.can_dlc = ind + 1;
-      frame.len = ind + 1;
-      sendto(s, &frame, sizeof(struct can_frame), 0,
-             (struct sockaddr*)&(impl_->can_config_->send_addr_),
-             sizeof(impl_->can_config_->send_addr_));
+      impl_->can_driver_->port()->send(buffer, header);
     }
   }
 }

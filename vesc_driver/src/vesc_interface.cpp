@@ -102,6 +102,9 @@ void* VescInterface::Impl::canThread(void) {
     uint32_t eid = rxmsg.can_id;
 
     uint8_t id = eid & 0xFF;  // can device id
+    if (id != can_config_->get_controller_id()) {
+      continue;
+    }
 
     CAN_PACKET_ID cmd = static_cast<CAN_PACKET_ID>(eid >> 8);  // command
 
@@ -275,8 +278,8 @@ void* VescInterface::Impl::rxThread(void)
 }
 
 VescInterface::VescInterface(const std::string& port,
-                             const std::string& controller_id,
-                             const std::string& vesc_id,
+                             const int& controller_id,
+                             const int& vesc_id,
                              const PacketHandlerFunction& packet_handler,
                              const ErrorHandlerFunction& error_handler)
     : impl_(new Impl()), port_(port) {
@@ -307,7 +310,7 @@ void VescInterface::setErrorHandler(const ErrorHandlerFunction& handler)
   impl_->error_handler_ = handler;
 }
 
-void VescInterface::connect(const std::string& port, const std::string& controller_id, const std::string& vesct_id)
+void VescInterface::connect(const std::string& port, const int& controller_id, const int& vesct_id)
 {
   // todo - mutex?
   port_ = port;

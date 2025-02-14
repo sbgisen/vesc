@@ -28,7 +28,7 @@ namespace vesc_hw_interface
 VescHwInterface::VescHwInterface()
 {
   vesc_interface_ = std::make_shared<VescInterface>(
-      std::string(), std::string(),std::string(),std::bind(&VescHwInterface::packetCallback, this, std::placeholders::_1),
+      std::string(), int(),int(),std::bind(&VescHwInterface::packetCallback, this, std::placeholders::_1),
       std::bind(&VescHwInterface::errorCallback, this, std::placeholders::_1));
 }
 
@@ -65,6 +65,14 @@ CallbackReturn VescHwInterface::on_init(const hardware_interface::HardwareInfo& 
   if (info_.hardware_parameters.find("num_hall_sensors") != info_.hardware_parameters.end())
   {
     num_hall_sensors_ = std::stoi(info_.hardware_parameters["num_hall_sensors"]);
+  }
+  if (info_.hardware_parameters.find("controller_id") != info_.hardware_parameters.end())
+  {
+    controller_id_ = std::stoi(info_.hardware_parameters["controller_id"]);
+  }
+  if (info_.hardware_parameters.find("vesct_id") != info_.hardware_parameters.end())
+  {
+    vesct_id_ = std::stoi(info_.hardware_parameters["vesct_id"]);
   }
 
   RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "Gear ratio is set to %f", gear_ratio_);

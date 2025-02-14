@@ -40,7 +40,8 @@ def launch_setup(context: LaunchContext, *args, **kwargs) -> list:
     control_node = Node(
         package="controller_manager", executable="ros2_control_node", parameters=[robot_description, robot_controllers], output="both"
     )
-    robot_state_pub_node = Node(package="robot_state_publisher", executable="robot_state_publisher", output="both", parameters=[robot_description])
+    robot_state_pub_node = Node(package="robot_state_publisher",
+                                executable="robot_state_publisher", output="both", parameters=[robot_description])
 
     controllers = GroupAction(
         actions=[
@@ -48,13 +49,15 @@ def launch_setup(context: LaunchContext, *args, **kwargs) -> list:
                 package="controller_manager",
                 executable="spawner",
                 output="both",
-                arguments=["--controller-manager", "controller_manager", "joint_state_broadcaster"],
+                arguments=["--controller-manager",
+                           "controller_manager", "joint_state_broadcaster"],
             ),
             Node(
                 package="controller_manager",
                 executable="spawner",
                 output="both",
-                arguments=["--controller-manager", "controller_manager", "joint_velocity_controller"],
+                arguments=["--controller-manager",
+                           "controller_manager", "joint_velocity_controller"],
             ),
         ]
     )
@@ -68,7 +71,9 @@ def generate_launch_description() -> LaunchDescription:
     Returns:
         Launch descriptions
     """
-    vesc_pkg = pathlib.Path(FindPackageShare("vesc_hw_interface").find("vesc_hw_interface"))
-    model_arg = DeclareLaunchArgument("model", default_value=str(vesc_pkg / "launch/velocity_test.ros2_control.xacro"))
+    vesc_pkg = pathlib.Path(FindPackageShare(
+        "vesc_hw_interface").find("vesc_hw_interface"))
+    model_arg = DeclareLaunchArgument("model", default_value=str(
+        vesc_pkg / "launch/velocity_test.ros2_control.xacro"))
 
     return LaunchDescription([model_arg, OpaqueFunction(function=launch_setup)])

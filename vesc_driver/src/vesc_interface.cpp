@@ -509,7 +509,6 @@ void VescInterface::send(const VescPacket& data) {
 }
 
 void VescInterface::canSend(const VescCanPacket& data) {
-  const int len = data.getPayload().size();
   Buffer buffer(0);
   buffer.insert(buffer.end(), data.getPayload().begin(),
                 data.getPayload().end());

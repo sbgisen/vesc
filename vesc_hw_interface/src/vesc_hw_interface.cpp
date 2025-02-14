@@ -346,13 +346,8 @@ hardware_interface::return_type VescHwInterface::write(const rclcpp::Time& /*tim
   }
   if (command_mode_ == "position")
   {
-    // Limit the speed using the parameters listed in xacro
-    // limit_position_interface_.enforceLimits(period);
-    // limit_position_handle_.enforceLimits(period);
-
-    // executes PID control
-    servo_controller_.setTargetPosition(command);
-    servo_controller_.control(1.0 / period.seconds());
+    const double target_position = command_;
+    vesc_interface_->setPosition(target_position);
   }
   else if (command_mode_ == "velocity")
   {

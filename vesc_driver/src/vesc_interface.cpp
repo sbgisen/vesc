@@ -83,7 +83,7 @@ void* VescInterface::Impl::canThread(void) {
   struct can_frame rxmsg;
   int socket = can_config_->get_socket();
 
-  while (can_thread_run_) {
+  while (1) {
     int nbytes = read(socket, &rxmsg, sizeof(rxmsg));
 
     if (nbytes < 0) {
@@ -283,10 +283,12 @@ void* VescInterface::Impl::rxThread(void)
   }
 }
 
-VescInterface::VescInterface(const std::string& port,const std::string& controller_id,const std::string& vesc_id, const PacketHandlerFunction& packet_handler,
+VescInterface::VescInterface(const std::string& port,
+                             const std::string& controller_id,
+                             const std::string& vesc_id,
+                             const PacketHandlerFunction& packet_handler,
                              const ErrorHandlerFunction& error_handler)
-  : impl_(new Impl())
-{
+    : impl_(new Impl()), port_(port) {
   setPacketHandler(packet_handler);
   setErrorHandler(error_handler);
   // attempt to conect if the port is specified
@@ -317,7 +319,7 @@ void VescInterface::setErrorHandler(const ErrorHandlerFunction& handler)
 void VescInterface::connect(const std::string& port, const std::string& controller_id, const std::string& vesct_id)
 {
   // todo - mutex?
-
+  port_ = port;
   std::string usb_port = "/dev/tty";
   std::string can_port = "can";
   if (std::equal(usb_port.begin(), usb_port.end(), port.begin())) {
@@ -410,46 +412,135 @@ bool VescInterface::isRxDataUpdated() const
 
 void VescInterface::send(const VescData& data)
 {
-  RCLCPP_DEBUG(rclcpp::get_logger("VescDriver"), "send data");
-  Buffer frame;
-  frame.clear();
-  int16_t payload_size = data.getPayload().size();
-  // header
-  assert(payload_size >= 0 && payload_size <= 1024);
+  std::string usb_port = "/dev/tty";
+  std::string can_port = "can";
+  if (std::equal(usb_port.begin(), usb_port.end(), port_.begin())) {
+    Buffer frame;
+    frame.clear();
+    int16_t payload_size = data.getPayload().size();
+    // header
+    assert(payload_size >= 0 && payload_size <= 1024);
 
-  if (payload_size < 256)
-  {
-    // single byte payload size
-    frame.push_back(static_cast<uint8_t>(VESC_SOF_VAL_SMALL_FRAME));
-    frame.push_back(static_cast<uint8_t>(payload_size));
-    
-  }
-  else
-  {
-    // two byte payload size
-    frame.push_back(static_cast<uint8_t>(VESC_SOF_VAL_LARGE_FRAME));
-    frame.push_back(static_cast<uint8_t>(payload_size >> 8));
-    frame.push_back(static_cast<uint8_t>(payload_size & 0xFF));
-  }
+    if (payload_size < 256) {
+      // single byte payload size
+      frame.push_back(static_cast<uint8_t>(VESC_SOF_VAL_SMALL_FRAME));
+      frame.push_back(static_cast<uint8_t>(payload_size));
 
+    } else {
+      // two byte payload size
+      frame.push_back(static_cast<uint8_t>(VESC_SOF_VAL_LARGE_FRAME));
+      frame.push_back(static_cast<uint8_t>(payload_size >> 8));
+      frame.push_back(static_cast<uint8_t>(payload_size & 0xFF));
+    }
 
+    // payload
+    frame.insert(frame.end(), data.getPayload().begin(),
+                 data.getPayload().end());
+    // calculate CRC
+    CRC crc_calc;
+    crc_calc.process_bytes(&(*(data.getPayload().begin())),
+                           boost::distance(data.getPayload()));
+    uint16_t crc = crc_calc.checksum();
+    frame.push_back(static_cast<uint8_t>(crc >> 8));
+    frame.push_back(static_cast<uint8_t>(crc & 0xFF));
+    frame.push_back(static_cast<uint8_t>(VESC_EOF_VAL));
 
-  // payload
-  frame.insert(frame.end(), data.getPayload().begin(), data.getPayload().end());
-  // calculate CRC
-  CRC crc_calc;
-  crc_calc.process_bytes(&(*(data.getPayload().begin())), boost::distance(data.getPayload()));
-  uint16_t crc = crc_calc.checksum();
-  frame.push_back(static_cast<uint8_t>(crc >> 8));
-  frame.push_back(static_cast<uint8_t>(crc & 0xFF));
-  frame.push_back(static_cast<uint8_t>(VESC_EOF_VAL));
+    std::size_t written = impl_->serial_driver_->port()->send(frame);
+    if (written != frame.size()) {
+      std::stringstream ss;
+      ss << "Wrote " << written << " bytes, expected " << frame.size() << ".";
+      throw SerialException(ss.str().c_str());
+    }
+  } else if (std::equal(can_port.begin(), can_port.end(), port_.begin())) {
+    int len = data.getPayload().size();
 
-  std::size_t written = impl_->serial_driver_->port()->send(frame);
-  if (written != frame.size())
-  {
-    std::stringstream ss;
-    ss << "Wrote " << written << " bytes, expected " << frame.size() << ".";
-    throw SerialException(ss.str().c_str());
+    struct can_frame frame;
+    frame.can_id = 4 | CAN_EFF_FLAG;
+
+    if (len <= 6) {
+      uint32_t ind = 0;
+      frame.data[ind++] = 6;
+      frame.data[ind++] = 0;
+      memcpy(frame.data + ind, data.getPayload().data(), len);
+      ind += len;
+      int s = impl_->can_config_->get_socket();
+
+      frame.can_id |= (static_cast<uint32_t>(CAN_PACKET_ID::CAN_PACKET_PROCESS_SHORT_BUFFER)<<8);
+      frame.can_dlc = ind;
+      frame.len = ind;
+      sendto(s, &frame, sizeof(struct can_frame), 0,
+             (struct sockaddr*)&(impl_->can_config_->send_addr_),
+             sizeof(impl_->can_config_->send_addr_));
+
+    } else {
+      unsigned int end_a = 0;
+      for (unsigned int i = 0; i < len; i += 7) {
+        if (i > 255) {
+          break;
+        }
+
+        end_a = i + 7;
+
+        uint8_t send_len = 7;
+        frame.data[0] = i;
+
+        if ((i + 7) <= len) {
+          memcpy(frame.data + 1, data.getPayload().data() + i, send_len);
+        } else {
+          send_len = len - i;
+          memcpy(frame.data + 1, data.getPayload().data() + i, send_len);
+        }
+
+        int s = impl_->can_config_->get_socket();
+        frame.can_id |= (static_cast<uint32_t>(CAN_PACKET_ID::CAN_PACKET_FILL_RX_BUFFER)<<8);
+        frame.can_dlc = send_len + 1;
+        frame.len = send_len + 1;
+        sendto(s, &frame, sizeof(struct can_frame), 0,
+               (struct sockaddr*)&(impl_->can_config_->send_addr_),
+               sizeof(impl_->can_config_->send_addr_));
+      }
+
+      for (unsigned int i = end_a; i < len; i += 6) {
+        uint8_t send_len = 6;
+        frame.data[0] = i >> 8;
+        frame.data[1] = i & 0xFF;
+
+        if ((i + 6) <= len) {
+          memcpy(frame.data + 2, data.getPayload().data() + i, send_len);
+        } else {
+          send_len = len - i;
+          memcpy(frame.data + 2, data.getPayload().data() + i, send_len);
+        }
+
+        int s = impl_->can_config_->get_socket();
+        frame.can_id |= (static_cast<uint32_t>(CAN_PACKET_ID::CAN_PACKET_FILL_RX_BUFFER_LONG)<<8);
+        frame.can_dlc = send_len + 2;
+        frame.len = send_len + 2;
+        sendto(s, &frame, sizeof(struct can_frame), 0,
+               (struct sockaddr*)&(impl_->can_config_->send_addr_),
+               sizeof(impl_->can_config_->send_addr_));
+      }
+
+      uint32_t ind = 0;
+      frame.data[ind++] = 6;
+      frame.data[ind++] = 0;
+      frame.data[ind++] = len >> 8;
+      frame.data[ind++] = len & 0xFF;
+      CRC crc_calc;
+      crc_calc.process_bytes(&(*(data.getPayload().begin())),
+                             boost::distance(data.getPayload()));
+      uint16_t crc = crc_calc.checksum();
+      frame.data[ind++] = (uint8_t)(crc >> 8);
+      frame.data[ind++] = (uint8_t)(crc & 0xFF);
+
+      int s = impl_->can_config_->get_socket();
+      frame.can_id |= (static_cast<uint32_t>(CAN_PACKET_ID::CAN_PACKET_PROCESS_RX_BUFFER)<<8);
+      frame.can_dlc = ind+1;
+      frame.len = ind+1;
+      sendto(s, &frame, sizeof(struct can_frame), 0,
+             (struct sockaddr*)&(impl_->can_config_->send_addr_),
+             sizeof(impl_->can_config_->send_addr_));
+    }
   }
 }
 

@@ -143,6 +143,7 @@ private:
   // Pimpl - hide serial port members from class users
   class Impl;
   std::unique_ptr<Impl> impl_;
+  std::string port_;
 };
 
 // todo: review

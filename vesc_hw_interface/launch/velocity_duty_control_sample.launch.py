@@ -37,10 +37,18 @@ def launch_setup(context: LaunchContext, *args, **kwargs) -> list:
 
     robot_controllers = [vesc_pkg, '/config/velocity_duty_sample.yaml']
 
-    control_node = Node(package="controller_manager",
-                        executable="ros2_control_node",
-                        parameters=[robot_description, robot_controllers],
-                        output="both")
+    control_node = Node(
+        package="controller_manager",
+        executable="ros2_control_node",
+        parameters=[robot_description, robot_controllers],
+        output="both"
+    )
+    robot_state_pub_node = Node(
+        package="robot_state_publisher",
+        executable="robot_state_publisher",
+        output="both",
+        parameters=[robot_description]
+    )
 
     controllers = GroupAction(actions=[Node(package='controller_manager',
                                             executable='spawner',
@@ -53,7 +61,7 @@ def launch_setup(context: LaunchContext, *args, **kwargs) -> list:
                                             arguments=["--controller-manager", "controller_manager",
                                                        'joint_velocity_controller'])])
 
-    return [control_node, controllers]
+    return [control_node, robot_state_pub_node, controllers]
 
 
 def generate_launch_description() -> LaunchDescription:

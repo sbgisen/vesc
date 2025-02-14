@@ -171,6 +171,58 @@ VescPacketPtr VescPacketFactory::createPacket(
   }
 }
 
+VescPacketPtr VescPacketFactory::createCanPacket(
+    const Buffer::const_iterator& begin, const Buffer::const_iterator& end,
+    int* num_bytes_needed, std::string* what) {
+  // initializes output variables
+  if (num_bytes_needed != NULL)
+  {
+    *num_bytes_needed = 0;
+  }
+  if (what != NULL)
+  {
+    what->clear();
+  }
+
+
+  // gets a view of the payload
+  BufferRangeConst view_payload;
+  view_payload.first = begin;
+  view_payload.second = end;
+
+  // checks the length
+  if (boost::distance(view_payload) > VESC_MAX_PAYLOAD_SIZE)
+  {
+    return createFailed(num_bytes_needed, what, "Invalid payload length");
+  }
+
+  // constructs the raw frame
+  std::shared_ptr<VescPayload> raw_frame(new VescPayload(view_payload));
+
+  // constructs the corresponding subclass if the packet has a payload
+  if (boost::distance(view_payload) > 0)
+  {
+    // gets constructor function from payload id
+    FactoryMap* p_map(getMap());
+    FactoryMap::const_iterator search(p_map->find(static_cast<COMM_PACKET_ID>(*view_payload.first)));
+
+    if (search != p_map->end())
+    {
+      return search->second(raw_frame);
+    }
+    else
+    {
+      // no subclass constructor for this packet
+      return createFailed(num_bytes_needed, what, "Unkown payload type.");
+    }
+  }
+  else
+  {
+    // no payload
+    return createFailed(num_bytes_needed, what, "Frame does not have a payload");
+  }
+}
+
 /**
  * @brief Registers a type of the packet
  * @param payload_id Payload ID

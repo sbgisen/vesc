@@ -63,6 +63,10 @@ public:
                                    const Buffer::const_iterator&, int*, int*,
                                    std::string*);
 
+ static VescPacketPtr createCanPacket(const Buffer::const_iterator&,
+                                      const Buffer::const_iterator&,
+                                      int*, std::string*);
+
  typedef std::function<VescPacketPtr(std::shared_ptr<VescPayload>)> CreateFn;
 
  /** Register a packet type with the factory. */

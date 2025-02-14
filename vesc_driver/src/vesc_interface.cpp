@@ -252,7 +252,6 @@ bool VescInterface::isRxDataUpdated() const
 
 void VescInterface::send(const VescPacket& packet)
 {
-  RCLCPP_DEBUG(rclcpp::get_logger("VescDriver"), "send data");
   std::size_t written = impl_->serial_driver_->port()->send(packet.getFrame());
   if (written != packet.getFrame().size())
   {

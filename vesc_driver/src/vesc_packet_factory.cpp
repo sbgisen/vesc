@@ -152,7 +152,7 @@ VescPacketPtr VescPacketFactory::createPacket(const Buffer::const_iterator& begi
   {
     // gets constructor function from payload id
     FactoryMap* p_map(getMap());
-    FactoryMap::const_iterator search(p_map->find(*view_payload.first));
+    FactoryMap::const_iterator search(p_map->find(static_cast<COMM_PACKET_ID>(*view_payload.first)));
 
     if (search != p_map->end())
     {
@@ -176,7 +176,7 @@ VescPacketPtr VescPacketFactory::createPacket(const Buffer::const_iterator& begi
  * @param payload_id Payload ID
  * @param fn Function pointer
  **/
-void VescPacketFactory::registerPacketType(int payload_id, CreateFn fn)
+void VescPacketFactory::registerPacketType(COMM_PACKET_ID payload_id, CreateFn fn)
 {
   FactoryMap* p_map(getMap());
   assert(0 == p_map->count(payload_id));
@@ -193,7 +193,7 @@ VescPacketFactory::FactoryMap* VescPacketFactory::getMap()
   return &m;
 }
 
-REGISTER_PACKET_TYPE(COMM_FW_VERSION, VescPacketFWVersion)
-REGISTER_PACKET_TYPE(COMM_GET_VALUES, VescPacketValues)
+REGISTER_PACKET_TYPE(COMM_PACKET_ID::COMM_FW_VERSION, VescPacketFWVersion)
+REGISTER_PACKET_TYPE(COMM_PACKET_ID::COMM_GET_VALUES, VescPacketValues)
 
 }  // namespace vesc_driver

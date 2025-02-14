@@ -134,7 +134,7 @@ public:
   }
 
 protected:
-  VescPacket(const std::string& name, const int16_t payload_size, const int16_t payload_id);
+  VescPacket(const std::string& name, const int16_t payload_size, const COMM_PACKET_ID payload);
   VescPacket(const std::string& name, std::shared_ptr<VescFrame> raw);
 
 private:
@@ -195,7 +195,7 @@ public:
   int getFaultCode() const;
 
 private:
-  double readBuffer(const uint8_t, const uint8_t) const;
+  double readBuffer(const PACKET_MAP, const uint8_t) const;
 };
 
 /*------------------------------------------------------------------*/

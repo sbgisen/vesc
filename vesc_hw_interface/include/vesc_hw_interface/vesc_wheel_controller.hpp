@@ -45,7 +45,7 @@ public:
 
 private:
   std::shared_ptr<VescInterface> interface_ptr_;
-  
+
   double num_rotor_pole_pairs_, num_rotor_poles_;
   double num_hall_sensors_;
   double gear_ratio_, torque_const_;
@@ -60,7 +60,6 @@ private:
   double target_steps_;
   bool pid_initialize_;
   bool sensor_initialize_;
-
 };
 }  // namespace vesc_hw_interface
 

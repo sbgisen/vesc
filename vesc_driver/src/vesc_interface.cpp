@@ -54,6 +54,14 @@ public:
     return ((VescInterface::Impl*)context)->rxThread();
   }
 
+  static void packetHandler(int cansocket) {
+    struct can_frame rxmsg;
+    while (1) {
+      read(cansocket, &rxmsg, sizeof(rxmsg));
+      printf("message received\n");
+    }
+  }
+
   pthread_t rx_thread_;
   bool rx_thread_run_;
   PacketHandlerFunction packet_handler_;
@@ -182,36 +190,68 @@ void VescInterface::connect(const std::string& port)
 {
   // todo - mutex?
 
-  if (isConnected())
-  {
-    throw SerialException("Already connected to serial port.");
-  }
-
-  // connect to serial port
-  try
-  {
-    const uint32_t baud_rate = 115200;
-    const auto fc = drivers::serial_driver::FlowControl::NONE;
-    const auto pt = drivers::serial_driver::Parity::NONE;
-    const auto sb = drivers::serial_driver::StopBits::ONE;
-    impl_->device_config_ = std::make_unique<drivers::serial_driver::SerialPortConfig>(baud_rate, fc, pt, sb);
-    impl_->serial_driver_->init_port(port, *impl_->device_config_);
-    if (!impl_->serial_driver_->port()->is_open())
-    {
-      impl_->serial_driver_->port()->open();
+  std::string usb_port = "/dev/tty";
+  std::string can_port = "can";
+  if (std::equal(usb_port.begin(), usb_port.end(), port.begin())) {
+    if (isConnected()) {
+      throw SerialException("Already connected to serial port.");
     }
-  }
-  catch (const std::exception& e)
-  {
-    std::stringstream ss;
-    ss << "Failed to open the serial port to the VESC. " << e.what();
-    throw SerialException(ss.str().c_str());
-  }
+    // connect to serial port
+    try {
+      const uint32_t baud_rate = 115200;
+      const auto fc = drivers::serial_driver::FlowControl::NONE;
+      const auto pt = drivers::serial_driver::Parity::NONE;
+      const auto sb = drivers::serial_driver::StopBits::ONE;
+      impl_->device_config_ =
+          std::make_unique<drivers::serial_driver::SerialPortConfig>(
+              baud_rate, fc, pt, sb);
+      impl_->serial_driver_->init_port(port, *impl_->device_config_);
+      if (!impl_->serial_driver_->port()->is_open()) {
+        impl_->serial_driver_->port()->open();
+      }
+    } catch (const std::exception& e) {
+      std::stringstream ss;
+      ss << "Failed to open the serial port to the VESC. " << e.what();
+      throw SerialException(ss.str().c_str());
+    }
 
-  // start up a monitoring thread
-  impl_->rx_thread_run_ = true;
-  int result = pthread_create(&impl_->rx_thread_, NULL, &VescInterface::Impl::rxThreadHelper, impl_.get());
-  assert(0 == result);
+    // start up a monitoring thread
+    impl_->rx_thread_run_ = true;
+    int result =
+        pthread_create(&impl_->rx_thread_, NULL,
+                       &VescInterface::Impl::rxThreadHelper, impl_.get());
+    assert(0 == result);
+
+  } else if (std::equal(can_port.begin(), can_port.end(), port.begin())) {
+    // connect to can port
+    try {
+      socket_ = socket(PF_CAN, SOCK_RAW, CAN_RAW);
+      strncpy(ifr_.ifr_name, port.c_str(), IFNAMSIZ);
+      ioctl(socket_, SIOCGIFINDEX, &ifr_);
+      if (socket_ < 0) {
+        throw std::exception();
+      }
+
+      recv_addr_.can_family = AF_CAN;
+      recv_addr_.can_ifindex = ifr_.ifr_ifindex;
+      if (bind(socket_, (struct sockaddr*)&recv_addr_, sizeof(recv_addr_)) <
+          0) {
+        throw std::exception();
+      }
+
+      memset(&send_addr_, 0, sizeof(send_addr_));
+
+      send_addr_.can_family = AF_CAN;
+      send_addr_.can_ifindex = ifr_.ifr_ifindex;
+
+    } catch (const std::exception& e) {
+      std::stringstream ss;
+      ss << "Failed to open the can port to the VESC. " << e.what();
+      throw SerialException(ss.str().c_str());
+    }
+  } else {
+    throw SerialException("Invalid port name.");
+  }
 }
 
 void VescInterface::disconnect()

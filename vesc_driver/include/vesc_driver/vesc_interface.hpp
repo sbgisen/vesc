@@ -44,8 +44,16 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <algorithm>
 
 #include <pthread.h>
+
+#include <linux/can.h>
+#include <linux/can/raw.h>
+#include <sys/ioctl.h>
+#include <net/if.h>
+#include <sys/socket.h>
+#include <cstring>  
 
 #include "vesc_driver/vesc_packet.hpp"
 #include "vesc_driver/vesc_packet_factory.hpp"
@@ -135,6 +143,9 @@ private:
   // Pimpl - hide serial port members from class users
   class Impl;
   std::unique_ptr<Impl> impl_;
+  int socket_;
+  struct ifreq ifr_;
+  struct sockaddr_can send_addr_, recv_addr_;
 };
 
 // todo: review

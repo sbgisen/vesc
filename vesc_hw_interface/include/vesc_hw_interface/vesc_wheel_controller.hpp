@@ -34,8 +34,6 @@ class VescWheelController
 {
 public:
   void init(hardware_interface::HardwareInfo& info, const std::shared_ptr<VescInterface>& interface);
-  void control(const double control_rate);
-  void setTargetVelocity(const double velocity);
   void setGearRatio(const double gear_ratio);
   void setTorqueConst(const double torque_const);
   void setRotorPoles(const int rotor_poles);

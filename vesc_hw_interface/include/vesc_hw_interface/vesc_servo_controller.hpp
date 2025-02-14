@@ -55,6 +55,7 @@ public:
   void executeCalibration();
   void updateSensor(const std::shared_ptr<VescPacket const>& packet);
   bool calibrate();
+
 private:
   rclcpp::Node::SharedPtr node_;
   std::shared_ptr<VescInterface> interface_ptr_;
@@ -72,10 +73,10 @@ private:
   std::string calibration_mode_;       // "duty" or "current" (default: "current")
   double calibration_position_;        // unit: rad or m
   double zero_position_;               // unit: rad or m
-  int num_rotor_poles_;               // the number of rotor poles
-  int num_hall_sensors_;              // the number of hall sensors
-  double gear_ratio_, torque_const_;  // physical params
-  double screw_lead_;                 // linear distance (m) of 1 revolution
+  int num_rotor_poles_;                // the number of rotor poles
+  int num_hall_sensors_;               // the number of hall sensors
+  double gear_ratio_, torque_const_;   // physical params
+  double screw_lead_;                  // linear distance (m) of 1 revolution
   int joint_type_;
   // ros::Timer control_timer_;
   // Internal variables for PID control

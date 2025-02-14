@@ -33,10 +33,7 @@ def launch_setup(context: LaunchContext, *args, **kwargs) -> list:
 
     vesc_pkg = FindPackageShare("vesc_hw_interface").find("vesc_hw_interface")
     doc = xacro.process_file(LaunchConfiguration("model").perform(context))
-    print(LaunchConfiguration("model").perform(context))
-    print(doc)
     robot_description = {"robot_description": doc.toprettyxml(indent="  ")}
-    print(robot_description)
 
     robot_controllers = [vesc_pkg, "/config/position_sample.yaml"]
 

@@ -73,7 +73,6 @@ private:
   std::string calibration_mode_;       // "duty" or "current" (default: "current")
   double calibration_position_;        // unit: rad or m
   double zero_position_;               // unit: rad or m
-  double kp_, ki_, kd_;
   double i_clamp_, duty_limiter_;
   bool antiwindup_;
   double control_rate_;

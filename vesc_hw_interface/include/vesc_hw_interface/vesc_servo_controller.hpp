@@ -72,9 +72,6 @@ private:
   std::string calibration_mode_;       // "duty" or "current" (default: "current")
   double calibration_position_;        // unit: rad or m
   double zero_position_;               // unit: rad or m
-  double i_clamp_, duty_limiter_;
-  bool antiwindup_;
-  double control_rate_;
   int num_rotor_poles_;               // the number of rotor poles
   int num_hall_sensors_;              // the number of hall sensors
   double gear_ratio_, torque_const_;  // physical params

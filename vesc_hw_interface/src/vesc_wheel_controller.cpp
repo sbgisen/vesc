@@ -34,47 +34,6 @@ void VescWheelController::init(hardware_interface::HardwareInfo& info,
     interface_ptr_ = interface_ptr;
   }
 
-  duty_limiter_ = 1.0;
-  if (info.hardware_parameters.find("motor/duty_limiter") != info.hardware_parameters.end())
-  {
-    duty_limiter_ = std::stod(info.hardware_parameters["motor/duty_limiter"]);
-  }
-  antiwindup_ = true;
-  if (info.hardware_parameters.find("motor/antiwindup") != info.hardware_parameters.end())
-  {
-    antiwindup_ = info.hardware_parameters["motor/antiwindup"] == "true";
-  }
-  control_rate_ = 100.0;
-  if (info.hardware_parameters.find("motor/control_rate") != info.hardware_parameters.end())
-  {
-    control_rate_ = std::stod(info.hardware_parameters["motor/control_rate"]);
-  }
-
-  RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "[Motor Control] control_rate: %f", control_rate_);
-
-  // Smoothing differentiation when hall sensor resolution is insufficient
-  bool smooth_diff = true;
-  if (info.hardware_parameters.find("motor/enable_smooth_diff") != info.hardware_parameters.end())
-  {
-    smooth_diff = info.hardware_parameters["motor/enable_smooth_diff"] == "true";
-  }
-  if (smooth_diff)
-  {
-    double smooth_diff_max_sampling_time = 1.0;
-    if (info.hardware_parameters.find("motor/smooth_diff/max_sample_sec") != info.hardware_parameters.end())
-    {
-      smooth_diff_max_sampling_time = std::stod(info.hardware_parameters["motor/smooth_diff/max_sample_sec"]);
-    }
-    int counter_td_vw_max_step = 10;
-    if (info.hardware_parameters.find("motor/smooth_diff/max_smooth_step") != info.hardware_parameters.end())
-    {
-      counter_td_vw_max_step = std::stoi(info.hardware_parameters["motor/smooth_diff/max_smooth_step"]);
-    }
-    vesc_step_difference_.enableSmooth(control_rate_, smooth_diff_max_sampling_time, counter_td_vw_max_step);
-    RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"),
-                "[Motor Control] Smooth differentiation enabled, max_sample_sec: %f, max_smooth_step: %d",
-                smooth_diff_max_sampling_time, counter_td_vw_max_step);
-  }
 
   sensor_initialize_ = true;
   pid_initialize_ = true;
@@ -85,8 +44,7 @@ void VescWheelController::init(hardware_interface::HardwareInfo& info,
   velocity_sens_ = 0.0;
   effort_sens_ = 0.0;
 
-  // control_timer_ = nh.createTimer(ros::Duration(1.0 / control_rate_), &VescWheelController::controlTimerCallback,
-  // this);
+
 }
 
 void VescWheelController::setGearRatio(const double gear_ratio)

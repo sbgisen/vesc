@@ -45,10 +45,7 @@ public:
 
 private:
   std::shared_ptr<VescInterface> interface_ptr_;
-  VescStepDifference vesc_step_difference_;
-
-  bool antiwindup_;
-  double duty_limiter_;
+  
   double num_rotor_pole_pairs_, num_rotor_poles_;
   double num_hall_sensors_;
   double gear_ratio_, torque_const_;
@@ -64,9 +61,6 @@ private:
   bool pid_initialize_;
   bool sensor_initialize_;
 
-  double control_rate_;
-  // rclcpp::Timer control_timer_;
-  // void controlTimerCallback(const ros::TimerEvent& e);
 };
 }  // namespace vesc_hw_interface
 

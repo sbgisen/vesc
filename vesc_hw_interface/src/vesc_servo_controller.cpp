@@ -71,21 +71,7 @@ void VescServoController::init(hardware_interface::HardwareInfo& info,
   calibration_rewind_ = false;
 
   // reads parameters
-  kp_ = 50.0;
-  if (info.hardware_parameters.find("servo/Kp") != info.hardware_parameters.end())
-  {
-    kp_ = std::stod(info.hardware_parameters["servo/Kp"]);
-  }
-  ki_ = 0.0;
-  if (info.hardware_parameters.find("servo/Ki") != info.hardware_parameters.end())
-  {
-    ki_ = std::stod(info.hardware_parameters["servo/Ki"]);
-  }
-  kd_ = 1.0;
-  if (info.hardware_parameters.find("servo/Kd") != info.hardware_parameters.end())
-  {
-    kd_ = std::stod(info.hardware_parameters["servo/Kd"]);
-  }
+
   i_clamp_ = 1.0;
   if (info.hardware_parameters.find("servo/i_clamp") != info.hardware_parameters.end())
   {
@@ -221,7 +207,6 @@ void VescServoController::init(hardware_interface::HardwareInfo& info,
   }
 
   // shows parameters
-  RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "[Servo Gains] P: %f, I: %f, D: %f", kp_, ki_, kd_);
   if (calibration_mode_ == CURRENT_)
   {
     RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "[Servo Calibration] Mode: %s, value: %f", CURRENT_.data(),

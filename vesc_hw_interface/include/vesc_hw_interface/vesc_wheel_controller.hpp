@@ -49,7 +49,6 @@ private:
   std::shared_ptr<VescInterface> interface_ptr_;
   VescStepDifference vesc_step_difference_;
 
-  double kp_, ki_, kd_;
   double i_clamp_;
   bool antiwindup_;
   double duty_limiter_;

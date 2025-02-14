@@ -326,86 +326,8 @@ void VescServoController::executeCalibration()
 
 bool VescServoController::calibrate()
 {
-  if (!calibration_flag_)
-  {
-    return true;
-  }
-  // sends a command for calibration
-  if (calibration_mode_ == CURRENT_)
-  {
-    auto sign = calibration_rewind_ ? -1.0 : 1.0;
-    interface_ptr_->setCurrent(sign * calibration_current_);
-  }
-  else if (calibration_mode_ == DUTY_)
-  {
-    auto sign = calibration_rewind_ ? -1.0 : 1.0;
-    interface_ptr_->setDutyCycle(sign * calibration_duty_);
-  }
-  else
-  {
-    RCLCPP_ERROR(rclcpp::get_logger("VescHwInterface"), "Please set the calibration mode surely");
-    return false;
-  }
-
-  if (calibration_rewind_)
-  {
-    if (std::fabs(calibration_position_ - sens_position_) > (upper_endstop_position_ - lower_endstop_position_) / 10.0)
-    {
-      calibration_current_ = calibration_strict_current_;
-      calibration_duty_ = calibration_strict_duty_;
-      calibration_rewind_ = false;
-    }
-    return false;
-  }
-
-  if (std::accumulate(endstop_deque_.begin(), endstop_deque_.end(), 0.0) != 0.0)
-  {
-    zero_position_ = sens_position_ + zero_position_ - calibration_position_;
-    if ((calibration_mode_ == CURRENT_ &&
-         std::fabs(calibration_current_ - calibration_strict_current_) < std::numeric_limits<double>::epsilon()) ||
-        (calibration_mode_ == DUTY_ &&
-         std::fabs(calibration_duty_ - calibration_strict_duty_) < std::numeric_limits<double>::epsilon()))
-    {
-      target_position_ = calibration_position_;
-      vesc_step_difference_.resetStepDifference(position_steps_);
-      RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "Calibration Finished");
-      calibration_flag_ = false;
-      return true;
-    }
-    else
-    {
-      RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "Calibrate with strict current/duty.");
-      calibration_rewind_ = true;
-      return false;
-    }
-  }
-
-  calibration_steps_++;
-
-  if (calibration_steps_ % 20 == 0)
-  {
-    if (std::abs(sens_position_ - calibration_previous_position_) <= std::numeric_limits<double>::epsilon())
-    {
-      // finishes calibrating
-      calibration_steps_ = 0;
-      zero_position_ = sens_position_ + zero_position_ - calibration_position_;
-      target_position_ = calibration_position_;
-      vesc_step_difference_.resetStepDifference(position_steps_);
-      RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "Calibration Finished");
-      calibration_flag_ = false;
-      return true;
-    }
-    else
-    {
-      calibration_previous_position_ = sens_position_;
-      return false;
-    }
-  }
-  else
-  {
-    // continues calibration
-    return false;
-  }
+  // Tod do calibration
+  return true;
 }
 
 // void VescServoController::controlTimerCallback(const ros::TimerEvent& e)

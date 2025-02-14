@@ -215,14 +215,7 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
     }
     if (calibration)
     {
-      while (rclcpp::ok())
-      {
-        vesc_interface_->requestState();
-        servo_controller_.spinSensorData();
-        if (servo_controller_.calibrate())
-          break;
-        rclcpp::sleep_for(std::chrono::milliseconds(10));
-      }
+      //  ToDo: calibration
     }
     position_ = servo_controller_.getPositionSens();
     velocity_ = servo_controller_.getVelocitySens();

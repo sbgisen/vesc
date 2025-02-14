@@ -55,7 +55,6 @@ public:
   void executeCalibration();
   void updateSensor(const std::shared_ptr<VescPacket const>& packet);
   bool calibrate();
-
 private:
   rclcpp::Node::SharedPtr node_;
   std::shared_ptr<VescInterface> interface_ptr_;

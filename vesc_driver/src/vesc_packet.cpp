@@ -103,37 +103,6 @@ VescFrame::VescFrame(const BufferRangeConst& frame, const BufferRangeConst& payl
 
 /**
  * @brief Constructor
- * @param name Packet name
- * @param payload_size Specified payload size
- * @param payload_id ID of payload
- **/
-VescPacket::VescPacket(const std::string& name, const int16_t payload_size, const COMM_PACKET_ID payload)
-  : VescFrame(payload_size), name_(name)
-{
-  int16_t payload_id = static_cast<int16_t>(payload);
-  assert(payload_id >= 0 && payload_id < 256);
-  assert(boost::distance(payload_end_) > 0);
-  payload_.setPayloadId(payload_id);
-  
-}
-
-/**
- * @brief Constructor
- * @param name Packet name
- * @param raw Pointer of a frame
- **/
-VescPacket::VescPacket(const std::string& name, std::shared_ptr<VescFrame> raw) : VescFrame(*raw), name_(name)
-{
-  // not sure what this is for
-  // uint16_t original_payload_size = std::distance(payload_end_.first, payload_end_.second);
-  // payload_end_.first = frame_.begin() + 2;
-  // payload_end_.second = std::min(payload_end_.first + original_payload_size, frame_.end());
-}
-
-/*------------------------------------------------------------------*/
-
-/**
- * @brief Constructor
  * @param raw Pointer of VescFrame
  **/
 VescPacketFWVersion::VescPacketFWVersion(std::shared_ptr<VescPayload> raw) : VescData("FWVersion", raw)
@@ -458,18 +427,6 @@ VescPacketSetServoPos::VescPacketSetServoPos(double servo_pos) : VescData("SetSe
 }
 
 /*------------------------------------------------------------------*/
-/*
-VescPacketSetDetect::VescPacketSetDetect(uint8_t mode) :
-  VescPacket("SetDetect", 3, COMM_SET_DETECT)
-{
-  *(payload_end_.first + 1) = mode;
 
-  VescFrame::CRC crc_calc;
-  crc_calc.process_bytes(&(*payload_end_.first), boost::distance(payload_end_));
-  uint16_t crc = crc_calc.checksum();
-  *(frame_->end() - 3) = static_cast<uint8_t>(crc >> 8);
-  *(frame_->end() - 2) = static_cast<uint8_t>(crc & 0xFF);
-}
-*/
 
 }  // namespace vesc_driver

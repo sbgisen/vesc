@@ -52,7 +52,7 @@ VescPacketPtr createFailed(int* p_num_bytes_needed, std::string* p_what, const s
 
 /**
  * @brief Creates a VESC packet
- * @details Create a VescPacket from a buffer (factory function). Packet must
+ * @details Create a VescData from a buffer (factory function). Packet must
  * start @p begin and complete (end of frame character) before what @p begin
  * points to end. The buffer element @p end is not examined, i.e. it can be the
  * past-the-end element. This function only returns a packet if the packet is
@@ -71,7 +71,7 @@ VescPacketPtr createFailed(int* p_num_bytes_needed, std::string* p_what, const s
  * @param num_bytes_needed[out] Number of bytes needed to determine the packet
  *  size or complete the frame.
  * @param what[out] Message string giving a reason why the packet was not found.
- * @return Pointer to a valid VescPacket if successful; otherwise, an empty
+ * @return Pointer to a valid VescData if successful; otherwise, an empty
  * pointer.
  **/
 VescPacketPtr VescPacketFactory::createPacket(const Buffer::const_iterator& begin, const Buffer::const_iterator& end,

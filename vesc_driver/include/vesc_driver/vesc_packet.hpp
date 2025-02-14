@@ -162,33 +162,7 @@ private:
 /**
  * @brief VescFrame with a non-zero length payload
  **/
-class VescPacket : public VescFrame
-{
-public:
-  /**
-   * @brief Destructor
-   **/
-  virtual ~VescPacket()
-  {
-  }
 
-  /**
-   * @brief Gets the packet name
-   * @return The packet name
-   **/
-  virtual const std::string& getName() const
-  {
-    return name_;
-  }
-
- protected:
-  VescPacket(const std::string& name, const int16_t payload_size,
-             const COMM_PACKET_ID payload);
-  VescPacket(const std::string& name, std::shared_ptr<VescFrame> raw);
-
-private:
-  std::string name_;
-};
 
 typedef std::shared_ptr<VescData> VescPacketPtr;
 typedef std::shared_ptr<VescData const> VescPacketConstPtr;

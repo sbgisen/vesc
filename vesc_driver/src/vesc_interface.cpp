@@ -252,7 +252,7 @@ bool VescInterface::isRxDataUpdated() const
 
 void VescInterface::send(const VescPacket& packet)
 {
-  RCLCPP_INFO(rclcpp::get_logger("VescDriver"), "send data");
+  RCLCPP_DEBUG(rclcpp::get_logger("VescDriver"), "send data");
   std::size_t written = impl_->serial_driver_->port()->send(packet.getFrame());
   if (written != packet.getFrame().size())
   {
@@ -295,13 +295,13 @@ void VescInterface::setSpeed(double speed)
 
 void VescInterface::setPosition(double position)
 {
-  RCLCPP_INFO(rclcpp::get_logger("VescDriver"), "Set position: %f", position);
+  RCLCPP_DEBUG(rclcpp::get_logger("VescDriver"), "Set position: %f", position);
   send(VescPacketSetPos(position));
 }
 
 void VescInterface::setServo(double servo)
 {
-  RCLCPP_INFO(rclcpp::get_logger("VescDriver"), "Set servoPosition: %f", servo);
+  RCLCPP_DEBUG(rclcpp::get_logger("VescDriver"), "Set servoPosition: %f", servo);
   send(VescPacketSetServoPos(servo));
 }
 

@@ -56,13 +56,13 @@ typedef std::vector<uint8_t> Buffer;
 typedef std::pair<Buffer::iterator, Buffer::iterator> BufferRange;
 typedef std::pair<Buffer::const_iterator, Buffer::const_iterator> BufferRangeConst;
 
-class VescPayload {
+class VescFrame {
  public:
-  virtual ~VescPayload() {}  // segmenation fault
+  virtual ~VescFrame() {}  // segmenation fault
 
   virtual const Buffer& getPayload() const final { return payload_; }
-  explicit VescPayload(const int16_t payload_size);
-  explicit VescPayload(const BufferRangeConst& payload);
+  explicit VescFrame(const int16_t payload_size);
+  explicit VescFrame(const BufferRangeConst& payload);
   virtual void setPayloadId(const int16_t payload_id) final {
     *payload_.begin() = payload_id;
   }
@@ -79,7 +79,7 @@ class VescPayload {
                                    // constructor
 };
 
-class VescPacket : public VescPayload {
+class VescPacket : public VescFrame {
  public:
   /**
    * @brief Destructor
@@ -95,21 +95,21 @@ class VescPacket : public VescPayload {
  protected:
   VescPacket(const std::string& name, const int16_t payload_size,
            const COMM_PACKET_ID cmd);
-  VescPacket(const std::string& name, std::shared_ptr<VescPayload> raw);
+  VescPacket(const std::string& name, std::shared_ptr<VescFrame> raw);
 
  private:
   std::string name_;
 };
 
 
-class VescCanPacket : public VescPayload{
+class VescCanPacket : public VescFrame{
   public:
     virtual ~VescCanPacket() {}
     virtual const std::string& getName() const final { return name_; }
     virtual const CAN_PACKET_ID& getCanPacketId() const final { return can_packet_id_; }
   protected:
     VescCanPacket(const std::string& name, const int16_t payload_size, const CAN_PACKET_ID cmd);
-    VescCanPacket(const std::string& name, std::shared_ptr<VescPayload> raw);
+    VescCanPacket(const std::string& name, std::shared_ptr<VescFrame> raw);
   private:
     std::string name_;  
     CAN_PACKET_ID can_packet_id_;
@@ -132,7 +132,7 @@ typedef std::shared_ptr<VescPacket const> VescPacketConstPtr;
 class VescPacketFWVersion : public VescPacket
 {
 public:
-  explicit VescPacketFWVersion(std::shared_ptr<VescPayload> raw);
+  explicit VescPacketFWVersion(std::shared_ptr<VescFrame> raw);
 
   int16_t fwMajor() const;
   int16_t fwMinor() const;
@@ -157,7 +157,7 @@ public:
 class VescPacketValues : public VescPacket
 {
 public:
-  explicit VescPacketValues(std::shared_ptr<VescPayload> raw);
+  explicit VescPacketValues(std::shared_ptr<VescFrame> raw);
 
   double getMosTemp() const;
   double getMotorTemp() const;

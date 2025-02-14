@@ -38,13 +38,13 @@
 namespace vesc_driver
 {
 
-VescPayload::VescPayload(const BufferRangeConst& payload) 
+VescFrame::VescFrame(const BufferRangeConst& payload) 
 {
   payload_.resize(std::distance(boost::begin(payload), boost::end(payload)));
   payload_.assign(boost::begin(payload), boost::end(payload));
 }
 
-VescPayload::VescPayload(const int16_t payload_size)
+VescFrame::VescFrame(const int16_t payload_size)
 {
   assert(payload_size >= 0 && payload_size <= 1024);
   payload_.resize(payload_size);
@@ -60,7 +60,7 @@ VescPayload::VescPayload(const int16_t payload_size)
  **/
 VescPacket::VescPacket(const std::string& name, const int16_t payload_size,
                    const COMM_PACKET_ID cmd)
-    : VescPayload(payload_size), name_(name) {
+    : VescFrame(payload_size), name_(name) {
   int16_t packet_id = static_cast<int16_t>(cmd);
   assert(packet_id >= 0 && packet_id < 256);
   // assert(boost::distance(payload_end_) > 0);
@@ -73,8 +73,8 @@ VescPacket::VescPacket(const std::string& name, const int16_t payload_size,
  * @param name Data name
  * @param raw Pointer of a frame
  **/
-VescPacket::VescPacket(const std::string& name, std::shared_ptr<VescPayload> raw)
-    : VescPayload(*raw), name_(name) {
+VescPacket::VescPacket(const std::string& name, std::shared_ptr<VescFrame> raw)
+    : VescFrame(*raw), name_(name) {
   // not sure what this is for
   // uint16_t original_payload_size = std::distance(payload_end_.first,
   // payload_end_.second); payload_end_.first = frame_.begin() + 2;
@@ -89,7 +89,7 @@ VescPacket::VescPacket(const std::string& name, std::shared_ptr<VescPayload> raw
  * @param payload_id ID of payload
  **/
 VescCanPacket::VescCanPacket(const std::string& name, const int16_t payload_size, const CAN_PACKET_ID cmd)
-    : VescPayload(payload_size), name_(name), can_packet_id_(cmd) {
+    : VescFrame(payload_size), name_(name), can_packet_id_(cmd) {
   int16_t packet_id = static_cast<int16_t>(cmd);
   assert(packet_id >= 0 && packet_id < 256);
   assert(static_cast<int16_t>(payload_.size()) == payload_size);
@@ -101,8 +101,8 @@ VescCanPacket::VescCanPacket(const std::string& name, const int16_t payload_size
  * @param name Data name
  * @param raw Pointer of a frame
  **/
-VescCanPacket::VescCanPacket(const std::string& name, std::shared_ptr<VescPayload> raw)
-    : VescPayload(*raw), name_(name) {
+VescCanPacket::VescCanPacket(const std::string& name, std::shared_ptr<VescFrame> raw)
+    : VescFrame(*raw), name_(name) {
 }
 
 /*------------------------------------------------------------------*/
@@ -111,7 +111,7 @@ VescCanPacket::VescCanPacket(const std::string& name, std::shared_ptr<VescPayloa
  * @brief Constructor
  * @param raw Pointer of VescFrame
  **/
-VescPacketFWVersion::VescPacketFWVersion(std::shared_ptr<VescPayload> raw) : VescPacket("FWVersion", raw)
+VescPacketFWVersion::VescPacketFWVersion(std::shared_ptr<VescFrame> raw) : VescPacket("FWVersion", raw)
 {
 }
 
@@ -147,7 +147,7 @@ VescPacketRequestFWVersion::VescPacketRequestFWVersion() : VescPacket("RequestFW
 /**
  * @brief Constructor
  **/
-VescPacketValues::VescPacketValues(std::shared_ptr<VescPayload> raw) : VescPacket("Values", raw)
+VescPacketValues::VescPacketValues(std::shared_ptr<VescFrame> raw) : VescPacket("Values", raw)
 {
 }
 

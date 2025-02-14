@@ -76,7 +76,7 @@ class VescInterface::Impl {
 };
 
 void* VescInterface::Impl::canThread(void) {
-  while (1) {
+  while (can_thread_run_) {
     Buffer tmp_buffer;
     uint32_t header = 0;
 
@@ -86,8 +86,9 @@ void* VescInterface::Impl::canThread(void) {
     switch (cmd) {
       case CAN_PACKET_ID::CAN_PACKET_PROCESS_SHORT_BUFFER: {  // end of packet
         uint32_t ind = 0;
-        const uint32_t controller_id = tmp_buffer[ind++];
-        const int rx_buffer_response_type = tmp_buffer[ind++];
+        // const uint32_t controller_id = tmp_buffer[ind++];
+        // const int rx_buffer_response_type = tmp_buffer[ind++];
+        ind += 2;
         const unsigned int len =
             static_cast<unsigned int>(tmp_buffer.size()) - ind;
         if (len > 6) {
@@ -111,7 +112,7 @@ void* VescInterface::Impl::canThread(void) {
       } break;
       case CAN_PACKET_ID::CAN_PACKET_FILL_RX_BUFFER: {
         uint32_t ind = 0;
-        const unsigned int packet_number = tmp_buffer[ind++];
+        ind++;
         buffer.insert(buffer.end(), tmp_buffer.begin() + ind, tmp_buffer.end());
 
       }
@@ -119,7 +120,9 @@ void* VescInterface::Impl::canThread(void) {
       break;
       case CAN_PACKET_ID::CAN_PACKET_FILL_RX_BUFFER_LONG: {
         uint32_t ind = 0;
-        unsigned int packet_number = tmp_buffer[ind++] + tmp_buffer[ind++] << 8;
+        // unsigned int packet_number =
+        //     tmp_buffer[ind++] + (tmp_buffer[ind++] << 8);
+        ind += 2;
         buffer.insert(buffer.end(), tmp_buffer.begin() + ind, tmp_buffer.end());
 
       } break;
@@ -130,13 +133,15 @@ void* VescInterface::Impl::canThread(void) {
               "CAN_PCAKET_PROCESS_RX_BUFFER should be equal 6 but we got " +
               std::to_string(tmp_buffer.size()));
         }
-        uint32_t ind = 0;
-        const uint8_t controller_id = tmp_buffer[ind++];
-        const unsigned int rx_buffer_response_type = tmp_buffer[ind++];
-        const unsigned int full_data_len = tmp_buffer[ind++]
-                                           << 8 + tmp_buffer[ind++];
-        const uint16_t crc = static_cast<uint16_t>(tmp_buffer[ind++])
-                             << 8 + tmp_buffer[ind++];
+        int ind = 0;
+        // const uint8_t controller_id = tmp_buffer[ind++];
+        // const unsigned int rx_buffer_response_type = tmp_buffer[ind++];
+        ind += 2;
+        const unsigned int full_data_len =
+            (tmp_buffer[ind] << 8) + tmp_buffer[ind + 1];
+        ind += 2;
+        // const uint16_t crc = static_cast<uint16_t>(tmp_buffer[ind++])
+        //                      << 8 + tmp_buffer[ind++];
         // TODO: check crc
         // if (crc != crc_calc.checksum()) {
         //   error_handler_("Invalid checksum");
@@ -163,6 +168,7 @@ void* VescInterface::Impl::canThread(void) {
     } else if (cmd == CAN_PACKET_ID::CAN_PACKET_FILL_RX_BUFFER) {
     }
   }
+  return NULL;
 }
 
 void* VescInterface::Impl::rxThread(void) {
@@ -239,6 +245,7 @@ void* VescInterface::Impl::rxThread(void) {
       buffer.erase(buffer.begin(), iter);
     }
   }
+  return NULL;
 }
 
 VescInterface::VescInterface(const std::string& port, const int& controller_id,
@@ -313,6 +320,8 @@ void VescInterface::connect(const std::string& port, const int& controller_id,
 
       impl_->can_driver_->init_port(port, *impl_->can_config_);
 
+      impl_->can_thread_run_ = true;
+
       int result =
           pthread_create(&impl_->rx_thread_, NULL,
                          &VescInterface::Impl::canThreadHelper, impl_.get());
@@ -331,23 +340,47 @@ void VescInterface::connect(const std::string& port, const int& controller_id,
 
 void VescInterface::disconnect() {
   // todo - mutex?
-
+  const std::string usb_port = "/dev/tty";
+  const std::string can_port = "can";
   if (isConnected()) {
     // bring down read thread
-    impl_->rx_thread_run_ = false;
-    int result = pthread_join(impl_->rx_thread_, NULL);
-    assert(0 == result);
-
-    impl_->serial_driver_->port()->close();
+    if (std::equal(usb_port.begin(), usb_port.end(), port_.begin())) {
+      impl_->rx_thread_run_ = false;
+      int result = pthread_join(impl_->rx_thread_, NULL);
+      assert(0 == result);
+      impl_->serial_driver_->port()->close();
+      return;
+    }
+    if (std::equal(can_port.begin(), can_port.end(), port_.begin())) {
+      impl_->can_thread_run_ = false;
+      int result = pthread_join(impl_->rx_thread_, NULL);
+      assert(0 == result);
+      return;
+    }
   }
 }
 
 bool VescInterface::isConnected() const {
-  auto port = impl_->serial_driver_->port();
+  const std::string usb_port = "/dev/tty";
+  const std::string can_port = "can";
+  if (std::equal(usb_port.begin(), usb_port.end(), port_.begin())) {
+    auto port = impl_->serial_driver_->port();
 
-  if (port) {
-    return port->is_open();
+    if (port) {
+      return port->is_open();
+    } else {
+      return false;
+    }
+  } else if (std::equal(can_port.begin(), can_port.end(), port_.begin())) {
+    auto port = impl_->can_driver_->port();
+
+    if (port) {
+      return true;
+    } else {
+      return false;
+    }
   } else {
+    impl_->error_handler_("Unknown port type.");
     return false;
   }
 }
@@ -414,7 +447,7 @@ void VescInterface::send(const VescData& data) {
 
     } else {
       unsigned int end_a = 0;
-      for (unsigned int i = 0; i < len; i += 7) {
+      for (int i = 0; i < len; i += 7) {
         if (i > 255) {
           break;
         }
@@ -438,7 +471,7 @@ void VescInterface::send(const VescData& data) {
         impl_->can_driver_->port()->send(buffer, header);
       }
 
-      for (unsigned int i = end_a; i < len; i += 6) {
+      for (int i = end_a; i < len; i += 6) {
         uint8_t send_len = 6;
         buffer.push_back(i >> 8);
         buffer.push_back(i & 0xFF);
@@ -456,8 +489,6 @@ void VescInterface::send(const VescData& data) {
                            << 8);
         impl_->can_driver_->port()->send(buffer, header);
       }
-
-      uint32_t ind = 0;
       buffer.push_back(6);
       buffer.push_back(0);
       buffer.push_back(len >> 8);

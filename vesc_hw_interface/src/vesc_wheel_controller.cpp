@@ -178,6 +178,8 @@ void VescWheelController::control(const double control_rate)
   interface_ptr_->setDutyCycle(u);
 
   pid_initialize_ = std::fabs(target_velocity_) < 0.0001;  // disable PID control when command is 0
+
+  RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "cur %f, tgt %f", current_vel, target_velocity_);
 }
 
 void VescWheelController::setTargetVelocity(const double velocity)

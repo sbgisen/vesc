@@ -199,9 +199,9 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
       RCLCPP_WARN(rclcpp::get_logger("VescHwInterface"), "No joint position limits found in URDF, using default limits");
     }
     homing_position_ = lower_limit_;
-    if (info_.hardware_parameters.find("homing_position") != info_.hardware_parameters.end())
+    if (info_.hardware_parameters.find("servo/calibration_position") != info_.hardware_parameters.end())
     {
-      homing_position_ = std::stod(info_.hardware_parameters["homing_position"]);
+      homing_position_ = std::stod(info_.hardware_parameters["servo/calibration_position"]);
     }
 
     // initializes the servo controller

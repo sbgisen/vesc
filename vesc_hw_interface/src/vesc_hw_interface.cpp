@@ -183,6 +183,8 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
 
   upper_limit_ = 0.0;
   lower_limit_ = 0.0;
+  homing_offset_ = 0.0;
+  homing_enabled_ = false;
   if (command_mode_ == hardware_interface::HW_IF_POSITION || command_mode_ == "position_duty")
   {
     // parse URDF for limit parameters
@@ -193,6 +195,11 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
       lower_limit_ = joint_limit_itr->second.min_position;
     } else {
       RCLCPP_WARN(rclcpp::get_logger("VescHwInterface"), "No joint position limits found in URDF, using default limits");
+    }
+    homing_position_ = lower_limit_;
+    if (info_.hardware_parameters.find("homing_position") != info_.hardware_parameters.end())
+    {
+      homing_position_ = std::stod(info_.hardware_parameters["homing_position"]);
     }
 
     // initializes the servo controller
@@ -206,12 +213,12 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
                            joint_type_ == "continuous" ? 1 :
                                                          2,
                            screw_lead_, upper_limit_, lower_limit_);
-    bool calibration = true;
+    homing_enabled_ = true;
     if (info_.hardware_parameters.find("servo/calibration") != info_.hardware_parameters.end())
     {
-      calibration = info_.hardware_parameters["servo/calibration"] == "true";
+      homing_enabled_ = info_.hardware_parameters["servo/calibration"] == "true";
     }
-    if (calibration)
+    if (homing_enabled_)
     {
       while (rclcpp::ok())
       {
@@ -222,9 +229,13 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
         rclcpp::sleep_for(std::chrono::milliseconds(10));
       }
     }
-    position_ = servo_controller_.getPositionSens();
-    velocity_ = servo_controller_.getVelocitySens();
-    effort_ = servo_controller_.getEffortSens();
+    homing_enabled_ = false;
+    if (command_mode_ == "position_duty")
+    {
+      position_ = servo_controller_.getPositionSens();
+      velocity_ = servo_controller_.getVelocitySens();
+      effort_ = servo_controller_.getEffortSens();
+    }
   }
 
   if (command_mode_ == "velocity_duty")
@@ -350,8 +361,8 @@ hardware_interface::return_type VescHwInterface::write(const rclcpp::Time& /*tim
   }
   else if (command_mode_ == "position")
   {
-    command = 180.0 * (command - lower_limit_) / (upper_limit_ - lower_limit_);
-    command = std::fmod(command + 360.0, 360.0);
+    command = 180.0 * (command - homing_position_) / (upper_limit_ - lower_limit_);
+    command = std::fmod(command + homing_offset_ + 360.0, 360.0);
     vesc_interface_->setPosition(command);
   }
   else if (command_mode_ == "velocity")
@@ -423,16 +434,23 @@ void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& pa
     const auto velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_rotor_poles_ / 2);
     const auto position = values->getPosition();
 
+    if (homing_enabled_)
+    {
+      servo_controller_.updateSensor(packet);
+      homing_offset_ = position;
+      return;
+    }
+
     // calculate position
     if (joint_type_ == "revolute" || joint_type_ == "prismatic")
     {
       // `position` is [deg] but here we mapped the position to the joint limits hence unit is irrelevant
-      position_ = std::fmod(position + 360.0, 360.0);
+      position_ = std::fmod(position - homing_offset_ + 360.0, 360.0);
       if (position_ > 180.0)
       {
         position_ -= 360.0;
       }
-      position_ = lower_limit_ + position_ * (upper_limit_ - lower_limit_) / 180.0;
+      position_ = homing_position_ + position_ * (upper_limit_ - lower_limit_) / 180.0;
     }
 
     velocity_ = velocity_rpm / 60.0 * 2.0 * M_PI * gear_ratio_;                // unit: rad/s or m/s

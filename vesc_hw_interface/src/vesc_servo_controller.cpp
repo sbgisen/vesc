@@ -527,7 +527,7 @@ void VescServoController::updateSensor(const std::shared_ptr<VescPacket const>& 
     std::shared_ptr<VescPacketValues const> values = std::dynamic_pointer_cast<VescPacketValues const>(packet);
     const double current = values->getMotorCurrent();
     const double velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_rotor_poles_ / 2);
-    const int32_t steps = static_cast<int32_t>(values->getPosition());
+    const int32_t steps = static_cast<int32_t>(values->getTachometer());
     if (sensor_initialize_)
     {
       steps_previous_ = steps;

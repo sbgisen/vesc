@@ -62,6 +62,7 @@ private:
 
   std::string joint_name_, command_mode_, port_;
   std::string joint_type_;
+  double upper_limit_, lower_limit_;
 
   double command_;
   double position_, velocity_, effort_;  // joint states

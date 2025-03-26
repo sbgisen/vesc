@@ -67,6 +67,9 @@ private:
   bool homing_enabled_;
   double homing_offset_;
   double homing_position_;
+  int32_t prev_steps_;
+  double position_steps_;
+  bool sensor_initialize_;
 
   double command_;
   double position_, velocity_, effort_;  // joint states

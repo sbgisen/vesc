@@ -47,6 +47,8 @@ CallbackReturn VescHwInterface::on_init(const hardware_interface::HardwareInfo& 
   position_ = 0.0;
   velocity_ = 0.0;
   effort_ = 0.0;
+  sensor_initialize_ = false;
+  position_steps_ = 0.0;
 
   // reads system parameters
   port_ = info_.hardware_parameters["port"];
@@ -458,12 +460,18 @@ void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& pa
     const auto current = values->getMotorCurrent();
     const auto velocity_rpm = values->getVelocityERPM() / static_cast<double>(num_rotor_poles_ / 2);
     const auto position = values->getPosition();
+    const auto steps = static_cast<int32_t>(values->getTachometer());
 
     if (homing_enabled_)
     {
       servo_controller_.updateSensor(packet);
       homing_offset_ = position;
       return;
+    }
+    if (!sensor_initialize_)
+    {
+      sensor_initialize_ = true;
+      prev_steps_ = steps;
     }
 
     // calculate position
@@ -477,9 +485,26 @@ void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& pa
       }
       position_ = homing_position_ + position_ * (upper_limit_ - lower_limit_) / 180.0;
     }
+    else if (joint_type_ == "continuous")
+    {
+      // use tachometer to calculate position
+      position_steps_ += static_cast<double>(steps - prev_steps_);
+      prev_steps_ = steps;
+      position_ = (position_steps_ * 2.0 * M_PI) / (num_rotor_poles_ * 3.0) * gear_ratio_;  // unit: rad
+    }
 
-    velocity_ = velocity_rpm / 60.0 * 2.0 * M_PI * gear_ratio_;                // unit: rad/s or m/s
-    effort_ = current * torque_const_ / gear_ratio_;                           // unit: Nm or N
+    // calculate velocity
+    if (joint_type_ == "revolute" || joint_type_ == "continuous")
+    {
+      velocity_ = (velocity_rpm * gear_ratio_) / 60.0 * 2.0 * M_PI;  // unit: rad/s
+    }
+    else if (joint_type_ == "prismatic")
+    {
+      velocity_ = (velocity_rpm * gear_ratio_) / 60.0;  // unit: m/s
+    }
+
+    // calculate effort
+    effort_ = current * torque_const_ / gear_ratio_;  // unit: Nm or N
   }
 }
 

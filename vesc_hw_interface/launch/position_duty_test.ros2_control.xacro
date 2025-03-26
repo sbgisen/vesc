@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <link name="base_link"/>
+  <link name="vesc_link"/>
+  <joint name="vesc_joint" type="prismatic">
+    <parent link="base_link"/>
+    <child link="vesc_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-1.0" upper="1.0" velocity="10" effort="5000"/>
+  </joint>
   <ros2_control name="vesc" type="actuator">
     <hardware>
       <plugin>vesc_hw_interface/VescHwInterface</plugin>
@@ -30,7 +39,7 @@
       <param name="servo/endstop_window">1</param>
       <param name="servo/endstop_threshold">0.8</param>
       <param name="servo/endstop_margin">0.02</param>
-      <param name="command_mode">position</param>
+      <param name="command_mode">position_duty</param>
     </hardware>
     <joint name="vesc_joint">
       <command_interface name="position">

@@ -35,6 +35,7 @@ namespace vesc_hw_interface
 using vesc_driver::VescInterface;
 using vesc_driver::VescPacket;
 using vesc_driver::VescPacketValues;
+using vesc_driver::VescPacketMCConf;
 using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 
 class VescHwInterface : public hardware_interface::ActuatorInterface

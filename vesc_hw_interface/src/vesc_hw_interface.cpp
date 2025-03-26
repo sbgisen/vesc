@@ -248,6 +248,11 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
     wheel_controller_.setHallSensors(num_hall_sensors_);
   }
 
+  if ((command_mode_ == hardware_interface::HW_IF_POSITION) || (command_mode_ == hardware_interface::HW_IF_VELOCITY) || (command_mode_ == hardware_interface::HW_IF_EFFORT))
+  {
+    vesc_interface_->requestMCConfiguration();
+  }
+
   RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "Successfully configured!");
 
   return CallbackReturn::SUCCESS;
@@ -421,10 +426,30 @@ void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& pa
   if (command_mode_ == "position_duty")
   {
     servo_controller_.updateSensor(packet);
+    return;
   }
-  else if (command_mode_ == "velocity_duty")
+  if (command_mode_ == "velocity_duty")
   {
     wheel_controller_.updateSensor(packet);
+    return;
+  }
+
+  if (packet->getName() == "MCConfiguration")
+  {
+    std::shared_ptr<VescPacketMCConf const> mc_conf = std::dynamic_pointer_cast<VescPacketMCConf const>(packet);
+
+    auto config = mc_conf->getConfig();
+    num_rotor_poles_ = config.si_motor_poles;
+    gear_ratio_ = config.si_gear_ratio;
+    if (config.motor_type == MOTOR_TYPE_FOC) {
+      auto pole_pairs = num_rotor_poles_ / 2.0;
+      auto flux_linkage = config.foc_motor_flux_linkage;
+      torque_const_ = (60.0 / (2.0 * M_PI * pole_pairs)) * flux_linkage;
+    }
+    RCLCPP_INFO_STREAM(rclcpp::get_logger("VescHwInterface"), "Extracted configuration from VESC:");
+    RCLCPP_INFO_STREAM(rclcpp::get_logger("VescHwInterface"), "  - Number of rotor poles: " << num_rotor_poles_);
+    RCLCPP_INFO_STREAM(rclcpp::get_logger("VescHwInterface"), "  - Gear ratio: " << gear_ratio_);
+    RCLCPP_INFO_STREAM(rclcpp::get_logger("VescHwInterface"), "  - Torque constant: " << torque_const_);
   }
   else if (packet->getName() == "Values")
   {
@@ -456,8 +481,6 @@ void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& pa
     velocity_ = velocity_rpm / 60.0 * 2.0 * M_PI * gear_ratio_;                // unit: rad/s or m/s
     effort_ = current * torque_const_ / gear_ratio_;                           // unit: Nm or N
   }
-
-  return;
 }
 
 void VescHwInterface::errorCallback(const std::string& error)

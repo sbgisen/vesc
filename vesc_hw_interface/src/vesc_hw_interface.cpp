@@ -183,6 +183,12 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
     return CallbackReturn::FAILURE;
   }
 
+  if ((command_mode_ == hardware_interface::HW_IF_POSITION) || (command_mode_ == hardware_interface::HW_IF_VELOCITY) || (command_mode_ == hardware_interface::HW_IF_EFFORT))
+  {
+    vesc_interface_->requestMCConfiguration();
+    rclcpp::sleep_for(std::chrono::milliseconds(100));
+  }
+
   upper_limit_ = 0.0;
   lower_limit_ = 0.0;
   homing_offset_ = 0.0;
@@ -248,11 +254,6 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
     wheel_controller_.setTorqueConst(torque_const_);
     wheel_controller_.setRotorPoles(num_rotor_poles_);
     wheel_controller_.setHallSensors(num_hall_sensors_);
-  }
-
-  if ((command_mode_ == hardware_interface::HW_IF_POSITION) || (command_mode_ == hardware_interface::HW_IF_VELOCITY) || (command_mode_ == hardware_interface::HW_IF_EFFORT))
-  {
-    vesc_interface_->requestMCConfiguration();
   }
 
   RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "Successfully configured!");

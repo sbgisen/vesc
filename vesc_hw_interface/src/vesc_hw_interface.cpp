@@ -471,8 +471,18 @@ void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& pa
     }
     if (!sensor_initialize_)
     {
-      sensor_initialize_ = true;
-      prev_steps_ = steps;
+      if (joint_type_ == "revolute" || joint_type_ == "prismatic")
+      {
+        sensor_initialize_ = (std::fabs(homing_offset_ - position) < std::numeric_limits<double>::epsilon()) ? true : false;
+        homing_offset_ = position;
+      }
+      else if (joint_type_ == "continuous")
+      {
+        sensor_initialize_ = (steps == prev_steps_) ? true : false;
+        prev_steps_ = steps;
+      }
+      RCLCPP_INFO_STREAM(rclcpp::get_logger("VescHwInterface"), "waiting for values to settle...");
+      return;
     }
 
     // calculate position

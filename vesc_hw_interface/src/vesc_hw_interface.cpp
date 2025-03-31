@@ -490,7 +490,7 @@ void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& pa
     {
       // `position` is [deg] but here we mapped the position to the joint limits hence unit is irrelevant
       position_ = std::fmod(position - homing_offset_ + 360.0, 360.0);
-      if (position_ > 180.0)
+      if (position_ > 270.0)
       {
         position_ -= 360.0;
       }

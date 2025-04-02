@@ -192,6 +192,7 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
   upper_limit_ = 0.0;
   lower_limit_ = 0.0;
   homing_offset_ = 0.0;
+  homing_done_ = false;
   homing_enabled_ = false;
   if (command_mode_ == hardware_interface::HW_IF_POSITION || command_mode_ == "position_duty")
   {
@@ -237,7 +238,7 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
         rclcpp::sleep_for(std::chrono::milliseconds(10));
       }
     }
-    homing_enabled_ = false;
+    homing_done_ = true;
     if (command_mode_ == "position_duty")
     {
       position_ = servo_controller_.getPositionSens();
@@ -463,7 +464,7 @@ void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& pa
     const auto position = values->getPosition();
     const auto steps = static_cast<int32_t>(values->getTachometer());
 
-    if (homing_enabled_)
+    if (!homing_done_ && homing_enabled_)
     {
       servo_controller_.updateSensor(packet);
       homing_offset_ = position;
@@ -473,6 +474,11 @@ void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& pa
     {
       if (joint_type_ == "revolute" || joint_type_ == "prismatic")
       {
+        if (!homing_enabled_)
+        {
+          sensor_initialize_ = true;
+          return;
+        }
         sensor_initialize_ = (std::fabs(homing_offset_ - position) < std::numeric_limits<double>::epsilon()) ? true : false;
         homing_offset_ = position;
       }

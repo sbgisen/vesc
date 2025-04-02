@@ -65,6 +65,7 @@ private:
   std::string joint_type_;
   double upper_limit_, lower_limit_;
   bool homing_enabled_;
+  bool homing_done_;
   double homing_offset_;
   double homing_position_;
   int32_t prev_steps_;

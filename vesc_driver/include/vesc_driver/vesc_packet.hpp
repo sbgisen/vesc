@@ -138,6 +138,9 @@ protected:
   VescPacket(const std::string& name, std::shared_ptr<VescFrame> raw);
   double readBuffer(const uint8_t, const uint8_t) const;
   double readAutoBuffer(const int) const;
+  void writeBuffer(const int16_t value, const int map_id);
+  void writeBuffer(const uint32_t value, const int map_id);
+  void writeBufferAuto(const double value, const int map_id);
 
 private:
   std::string name_;
@@ -302,6 +305,17 @@ class VescPacketSetServoPos : public VescPacket
 public:
   explicit VescPacketSetServoPos(double servo_pos);
 };
+
+/*------------------------------------------------------------------*/
+
+/**
+ * @brief Packet for setting a MC configuration
+ **/
+ class VescPacketSetMCConf : public VescPacket
+ {
+ public:
+   explicit VescPacketSetMCConf(const MCConfiguration & config);
+ };
 
 }  // namespace vesc_driver
 

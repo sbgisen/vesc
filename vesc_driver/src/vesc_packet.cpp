@@ -34,6 +34,8 @@
  ********************************************************************/
 
 #include "vesc_driver/vesc_packet.hpp"
+#include <cmath>
+#include <cstdint>
 #include <cstring>
 
 namespace vesc_driver
@@ -159,6 +161,50 @@ double VescPacket::readAutoBuffer(const int map_id) const
   float value;
   std::memcpy(&value, &bits, sizeof(value));
   return static_cast<double>(value);
+}
+
+/**
+ * @brief Writes a value to the buffer
+ * @param value value to write
+ * @param map_id start address to read
+ **/
+void VescPacket::writeBuffer(const int16_t value, const int map_id)
+{
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(value >> 8);
+  *(payload_end_.first + map_id + 1) = static_cast<uint8_t>(value & 0xFF);
+}
+
+void VescPacket::writeBuffer(const uint32_t value, const int map_id)
+{
+  *(payload_end_.first + map_id)     = static_cast<uint8_t>(value >> 24);
+  *(payload_end_.first + map_id + 1) = static_cast<uint8_t>(value >> 16);
+  *(payload_end_.first + map_id + 2) = static_cast<uint8_t>(value >> 8);
+  *(payload_end_.first + map_id + 3) = static_cast<uint8_t>(value & 0xFF);
+}
+
+void VescPacket::writeBufferAuto(const double value, const int map_id)
+{
+  auto v = static_cast<float>(value);
+  if (v == 0.0F) {
+    *(payload_end_.first + map_id)     = 0;
+    *(payload_end_.first + map_id + 1) = 0;
+    *(payload_end_.first + map_id + 2) = 0;
+    *(payload_end_.first + map_id + 3) = 0;
+    return;
+  }
+
+  bool neg = (v < 0.0F);
+  float abs_val = std::abs(v);
+  int E;
+  float m = std::frexp(abs_val, &E);
+  int exp_field = E + 126;
+  uint32_t sig_i = static_cast<uint32_t>((m - 0.5f) * 16777216.0f);
+  uint32_t res = (neg ? (1U << 31) : 0) | (static_cast<uint32_t>(exp_field) << 23) | (sig_i & 0x7FFFFF);
+
+  *(payload_end_.first + map_id)     = static_cast<uint8_t>(res >> 24);
+  *(payload_end_.first + map_id + 1) = static_cast<uint8_t>(res >> 16);
+  *(payload_end_.first + map_id + 2) = static_cast<uint8_t>(res >> 8);
+  *(payload_end_.first + map_id + 3) = static_cast<uint8_t>(res & 0xFF);
 }
 
 /*------------------------------------------------------------------*/
@@ -727,18 +773,195 @@ VescPacketSetServoPos::VescPacketSetServoPos(double servo_pos) : VescPacket("Set
 }
 
 /*------------------------------------------------------------------*/
-/*
-VescPacketSetDetect::VescPacketSetDetect(uint8_t mode) :
-  VescPacket("SetDetect", 3, COMM_SET_DETECT)
+/**
+ * @brief Constructor
+ **/
+VescPacketSetMCConf::VescPacketSetMCConf(const MCConfiguration & config) : VescPacket("SetMCConf", 3, COMM_SET_MCCONF)
 {
-  *(payload_end_.first + 1) = mode;
+  int map_id = 1;
+
+  writeBuffer(static_cast<uint32_t>(config.signature), map_id); map_id += 4;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.pwm_mode); map_id += 1;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.comm_mode); map_id += 1;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.motor_type); map_id += 1;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.sensor_mode); map_id += 1;
+  writeBufferAuto(config.l_current_max, map_id); map_id += 4;
+  writeBufferAuto(config.l_current_min, map_id); map_id += 4;
+  writeBufferAuto(config.l_in_current_max, map_id); map_id += 4;
+  writeBufferAuto(config.l_in_current_min, map_id); map_id += 4;
+  writeBufferAuto(config.l_abs_current_max, map_id); map_id += 4;
+  writeBufferAuto(config.l_min_erpm, map_id); map_id += 4;
+  writeBufferAuto(config.l_max_erpm, map_id); map_id += 4;
+  writeBuffer(static_cast<int16_t>(config.l_erpm_start * 10000.0), map_id); map_id += 2;
+  writeBufferAuto(config.l_max_erpm_fbrake, map_id); map_id += 4;
+  writeBufferAuto(config.l_max_erpm_fbrake_cc, map_id); map_id += 4;
+  writeBufferAuto(config.l_min_vin, map_id); map_id += 4;
+  writeBufferAuto(config.l_max_vin, map_id); map_id += 4;
+  writeBufferAuto(config.l_battery_cut_start, map_id); map_id += 4;
+  writeBufferAuto(config.l_battery_cut_end, map_id); map_id += 4;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.l_slow_abs_current); map_id += 1;
+  writeBuffer(static_cast<int16_t>(config.l_temp_fet_start * 10.0), map_id); map_id += 2;
+  writeBuffer(static_cast<int16_t>(config.l_temp_fet_end * 10.0), map_id); map_id += 2;
+  writeBuffer(static_cast<int16_t>(config.l_temp_motor_start * 10.0), map_id); map_id += 2;
+  writeBuffer(static_cast<int16_t>(config.l_temp_motor_end * 10.0), map_id); map_id += 2;
+  writeBuffer(static_cast<int16_t>(config.l_temp_accel_dec * 100000.0), map_id); map_id += 2;
+  writeBuffer(static_cast<int16_t>(config.l_min_duty * 10000.0), map_id); map_id += 2;
+  writeBuffer(static_cast<int16_t>(config.l_max_duty * 10000.0), map_id); map_id += 2;
+  writeBufferAuto(config.l_watt_max, map_id); map_id += 4;
+  writeBufferAuto(config.l_watt_min, map_id); map_id += 4;
+  writeBuffer(static_cast<int16_t>(config.l_current_max_scale * 10000.0), map_id); map_id += 2;
+  writeBuffer(static_cast<int16_t>(config.l_current_min_scale * 10000.0), map_id); map_id += 2;
+  writeBuffer(static_cast<int16_t>(config.l_duty_start * 10000.0), map_id); map_id += 2;
+  writeBufferAuto(config.sl_min_erpm, map_id); map_id += 4;
+  writeBufferAuto(config.sl_min_erpm_cycle_int_limit, map_id); map_id += 4;
+  writeBufferAuto(config.sl_max_fullbreak_current_dir_change, map_id); map_id += 4;
+  writeBuffer(static_cast<int16_t>(config.sl_cycle_int_limit * 10.0), map_id); map_id += 2;
+  writeBuffer(static_cast<int16_t>(config.sl_phase_advance_at_br * 10000.0), map_id); map_id += 2;
+  writeBufferAuto(config.sl_cycle_int_rpm_br, map_id); map_id += 4;
+  writeBufferAuto(config.sl_bemf_coupling_k, map_id); map_id += 4;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.hall_table[0]); map_id += 1;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.hall_table[1]); map_id += 1;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.hall_table[2]); map_id += 1;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.hall_table[3]); map_id += 1;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.hall_table[4]); map_id += 1;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.hall_table[5]); map_id += 1;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.hall_table[6]); map_id += 1;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.hall_table[7]); map_id += 1;
+  writeBufferAuto(config.hall_sl_erpm, map_id); map_id += 4;
+  writeBufferAuto(config.foc_current_kp, map_id); map_id += 4;
+  writeBufferAuto(config.foc_current_ki, map_id); map_id += 4;
+  writeBufferAuto(config.foc_f_zv, map_id); map_id += 4;
+  writeBufferAuto(config.foc_dt_us, map_id); map_id += 4;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.foc_encoder_inverted); map_id += 1;
+  writeBufferAuto(config.foc_encoder_offset, map_id); map_id += 4;
+  writeBufferAuto(config.foc_encoder_ratio, map_id); map_id += 4;
+  writeBufferAuto(config.foc_encoder_sin_gain, map_id); map_id += 4;
+  writeBufferAuto(config.foc_encoder_cos_gain, map_id); map_id += 4;
+  writeBufferAuto(config.foc_encoder_sin_offset, map_id); map_id += 4;
+  writeBufferAuto(config.foc_encoder_cos_offset, map_id); map_id += 4;
+  writeBufferAuto(config.foc_encoder_sincos_filter_constant, map_id); map_id += 4;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.foc_sensor_mode); map_id += 1;
+  writeBufferAuto(config.foc_pll_kp, map_id); map_id += 4;
+  writeBufferAuto(config.foc_pll_ki, map_id); map_id += 4;
+  writeBufferAuto(config.foc_motor_l, map_id); map_id += 4;
+  writeBufferAuto(config.foc_motor_ld_lq_diff, map_id); map_id += 4;
+  writeBufferAuto(config.foc_motor_r, map_id); map_id += 4;
+  writeBufferAuto(config.foc_motor_flux_linkage, map_id); map_id += 4;
+  writeBufferAuto(config.foc_observer_gain, map_id); map_id += 4;
+  writeBufferAuto(config.foc_observer_gain_slow, map_id); map_id += 4;
+  writeBuffer(static_cast<int16_t>(config.foc_observer_offset * 1000.0), map_id); map_id += 2;
+  writeBufferAuto(config.foc_duty_dowmramp_kp, map_id); map_id += 4;
+  writeBufferAuto(config.foc_duty_dowmramp_ki, map_id); map_id += 4;
+  writeBufferAuto(config.foc_openloop_rpm, map_id); map_id += 4;
+  writeBuffer(static_cast<int16_t>(config.foc_openloop_rpm_low * 1000.0), map_id); map_id += 2;
+  writeBufferAuto(config.foc_d_gain_scale_start, map_id); map_id += 4;
+  writeBufferAuto(config.foc_d_gain_scale_max_mod, map_id); map_id += 4;
+  writeBuffer(static_cast<int16_t>(config.foc_sl_openloop_hyst * 100.0), map_id); map_id += 2;
+  writeBuffer(static_cast<int16_t>(config.foc_sl_openloop_time_lock * 100.0), map_id); map_id += 2;
+  writeBuffer(static_cast<int16_t>(config.foc_sl_openloop_time_ramp * 100.0), map_id); map_id += 2;
+  writeBuffer(static_cast<int16_t>(config.foc_sl_openloop_time * 100.0), map_id); map_id += 2;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.foc_hall_table[0]); map_id += 1;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.foc_hall_table[1]); map_id += 1;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.foc_hall_table[2]); map_id += 1;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.foc_hall_table[3]); map_id += 1;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.foc_hall_table[4]); map_id += 1;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.foc_hall_table[5]); map_id += 1;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.foc_hall_table[6]); map_id += 1;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.foc_hall_table[7]); map_id += 1;
+  writeBufferAuto(config.foc_hall_interp_erpm, map_id); map_id += 4;
+  writeBufferAuto(config.foc_sl_erpm, map_id); map_id += 4;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.foc_sample_v0_v7); map_id += 1;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.foc_sample_high_current); map_id += 1;
+  writeBuffer(static_cast<int16_t>(config.foc_sat_comp * 1000.0), map_id); map_id += 2;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.foc_temp_comp); map_id += 1;
+  writeBuffer(static_cast<int16_t>(config.foc_temp_comp_base_temp * 100.0), map_id); map_id += 2;
+  writeBuffer(static_cast<int16_t>(config.foc_current_filter_const * 10000.0), map_id); map_id += 2;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.foc_cc_decoupling); map_id += 1;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.foc_observer_type); map_id += 1;
+  writeBufferAuto(config.foc_hfi_voltage_start, map_id); map_id += 4;
+  writeBufferAuto(config.foc_hfi_voltage_run, map_id); map_id += 4;
+  writeBufferAuto(config.foc_hfi_voltage_max, map_id); map_id += 4;
+  writeBufferAuto(config.foc_sl_erpm_hfi, map_id); map_id += 4;
+  writeBuffer(static_cast<int16_t>(config.foc_hfi_start_samples), map_id); map_id += 2;
+  writeBufferAuto(config.foc_hfi_obs_ovr_sec, map_id); map_id += 4;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.foc_hfi_samples); map_id += 1;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.foc_offsets_cal_on_boot); map_id += 1;
+  writeBufferAuto(config.foc_offsets_current[0], map_id); map_id += 4;
+  writeBufferAuto(config.foc_offsets_current[1], map_id); map_id += 4;
+  writeBufferAuto(config.foc_offsets_current[2], map_id); map_id += 4;
+  writeBuffer(static_cast<int16_t>(config.foc_offsets_voltage[0] * 10000.0), map_id); map_id += 2;
+  writeBuffer(static_cast<int16_t>(config.foc_offsets_voltage[1] * 10000.0), map_id); map_id += 2;
+  writeBuffer(static_cast<int16_t>(config.foc_offsets_voltage[2] * 10000.0), map_id); map_id += 2;
+  writeBuffer(static_cast<int16_t>(config.foc_offsets_voltage_undriven[0] * 10000.0), map_id); map_id += 2;
+  writeBuffer(static_cast<int16_t>(config.foc_offsets_voltage_undriven[1] * 10000.0), map_id); map_id += 2;
+  writeBuffer(static_cast<int16_t>(config.foc_offsets_voltage_undriven[2] * 10000.0), map_id); map_id += 2;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.foc_phase_filter_enable); map_id += 1;
+  writeBufferAuto(config.foc_phase_filter_max_erpm, map_id); map_id += 4;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.foc_mtpa_mode); map_id += 1;
+  writeBufferAuto(config.foc_fw_current_max, map_id); map_id += 4;
+  writeBuffer(static_cast<int16_t>(config.foc_fw_duty_start * 10000.0), map_id); map_id += 2;
+  writeBuffer(static_cast<int16_t>(config.foc_fw_ramp_time * 1000.0), map_id); map_id += 2;
+  writeBuffer(static_cast<int16_t>(config.foc_fw_q_current_factor * 10000.0), map_id); map_id += 2;
+  writeBuffer(static_cast<int16_t>(config.gpd_buffer_notify_left), map_id); map_id += 2;
+  writeBuffer(static_cast<int16_t>(config.gpd_buffer_interpol), map_id); map_id += 2;
+  writeBuffer(static_cast<int16_t>(config.gpd_current_filter_const * 10000.0), map_id); map_id += 2;
+  writeBufferAuto(config.gpd_current_kp, map_id); map_id += 4;
+  writeBufferAuto(config.gpd_current_ki, map_id); map_id += 4;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.sp_pid_loop_rate); map_id += 1;
+  writeBufferAuto(config.s_pid_kp, map_id); map_id += 4;
+  writeBufferAuto(config.s_pid_ki, map_id); map_id += 4;
+  writeBufferAuto(config.s_pid_kd, map_id); map_id += 4;
+  writeBuffer(static_cast<int16_t>(config.s_pid_kd_filter * 10000.0), map_id); map_id += 2;
+  writeBufferAuto(config.s_pid_min_erpm, map_id); map_id += 4;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.s_pid_allow_braking); map_id += 1;
+  writeBufferAuto(config.s_pid_ramp_erpms_s, map_id); map_id += 4;
+  writeBufferAuto(config.p_pid_kp, map_id); map_id += 4;
+  writeBufferAuto(config.p_pid_ki, map_id); map_id += 4;
+  writeBufferAuto(config.p_pid_kd, map_id); map_id += 4;
+  writeBufferAuto(config.p_pid_kd_proc, map_id); map_id += 4;
+  writeBufferAuto(config.p_pid_kd_filter, map_id); map_id += 4;
+  writeBufferAuto(config.p_pid_ang_div, map_id); map_id += 4;
+  writeBuffer(static_cast<int16_t>(config.p_pid_gain_dec_angle * 10.0), map_id); map_id += 2;
+  writeBufferAuto(config.p_pid_offset, map_id); map_id += 4;
+  writeBufferAuto(config.cc_startup_boost_duty, map_id); map_id += 4;
+  writeBufferAuto(config.cc_min_current, map_id); map_id += 4;
+  writeBufferAuto(config.cc_gain, map_id); map_id += 4;
+  writeBufferAuto(config.cc_ramp_step_max, map_id); map_id += 4;
+  writeBufferAuto(config.m_fault_stop_time_ms, map_id); map_id += 4;
+  writeBufferAuto(config.m_duty_ramp_step, map_id); map_id += 4;
+  writeBufferAuto(config.m_current_backoff_gain, map_id); map_id += 4;
+  writeBufferAuto(config.m_encoder_counts, map_id); map_id += 4;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.m_sensor_port_mode); map_id += 1;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.m_invert_direction); map_id += 1;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.m_drv8301_oc_mode); map_id += 1;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.m_drv8301_oc_adj); map_id += 1;
+  writeBufferAuto(config.m_bldc_f_sw_min, map_id); map_id += 4;
+  writeBufferAuto(config.m_bldc_f_sw_max, map_id); map_id += 4;
+  writeBufferAuto(config.m_dc_f_sw, map_id); map_id += 4;
+  writeBufferAuto(config.m_ntc_motor_beta, map_id); map_id += 4;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.m_out_aux_mode); map_id += 1;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.m_motor_temp_sens_type); map_id += 1;
+  writeBufferAuto(config.m_ptc_motor_coeff, map_id); map_id += 4;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.m_hall_extra_samples); map_id += 1;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.si_motor_poles); map_id += 1;
+  writeBufferAuto(config.si_gear_ratio, map_id); map_id += 4;
+  writeBufferAuto(config.si_wheel_diameter, map_id); map_id += 4;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.si_battery_type); map_id += 1;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.si_battery_cells); map_id += 1;
+  writeBufferAuto(config.si_battery_ah, map_id); map_id += 4;
+  writeBufferAuto(config.si_motor_nl_current, map_id); map_id += 4;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.bms.type); map_id += 1;
+  writeBuffer(static_cast<int16_t>(config.bms.t_limit_start * 100.0), map_id); map_id += 2;
+  writeBuffer(static_cast<int16_t>(config.bms.t_limit_end * 100.0), map_id); map_id += 2;
+  writeBuffer(static_cast<int16_t>(config.bms.soc_limit_start * 1000.0), map_id); map_id += 2;
+  writeBuffer(static_cast<int16_t>(config.bms.soc_limit_end * 1000.0), map_id); map_id += 2;
+  *(payload_end_.first + map_id) = static_cast<uint8_t>(config.bms.fwd_can_mode); map_id += 1;
 
   VescFrame::CRC crc_calc;
   crc_calc.process_bytes(&(*payload_end_.first), boost::distance(payload_end_));
   uint16_t crc = crc_calc.checksum();
-  *(frame_->end() - 3) = static_cast<uint8_t>(crc >> 8);
-  *(frame_->end() - 2) = static_cast<uint8_t>(crc & 0xFF);
+  *(frame_.end() - 3) = static_cast<uint8_t>(crc >> 8);
+  *(frame_.end() - 2) = static_cast<uint8_t>(crc & 0xFF);
 }
-*/
 
 }  // namespace vesc_driver

@@ -57,6 +57,12 @@ public:
   void executeCalibration();
   void updateSensor(const std::shared_ptr<VescPacket const>& packet);
   bool calibrate();
+  struct CalibrationParameters
+  {
+    double calibration_position;
+    bool enable_calibration;
+  };
+  CalibrationParameters getCalibrationParameters() const;
 
 private:
   rclcpp::Node::SharedPtr node_;

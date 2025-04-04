@@ -610,4 +610,11 @@ void VescServoController::endstopCallback(const std_msgs::msg::Bool::ConstShared
   }
 }
 
+VescServoController::CalibrationParameters VescServoController::getCalibrationParameters() const
+{
+  CalibrationParameters params;
+  params.calibration_position = calibration_position_;
+  params.enable_calibration = calibration_flag_;
+  return params;
+}
 }  // namespace vesc_hw_interface

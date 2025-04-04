@@ -67,6 +67,11 @@ CallbackReturn VescHwInterface::on_init(const hardware_interface::HardwareInfo& 
   {
     num_hall_sensors_ = std::stoi(info_.hardware_parameters["num_hall_sensors"]);
   }
+  screw_lead_ = 1.0;
+  if (info_.hardware_parameters.find("screw_lead") != info_.hardware_parameters.end())
+  {
+    screw_lead_ = std::stod(info_.hardware_parameters["screw_lead"]);
+  }
 
   RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "Gear ratio is set to %f", gear_ratio_);
   RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "Torque constant is set to %f", torque_const_);
@@ -205,28 +210,17 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
     } else {
       RCLCPP_WARN(rclcpp::get_logger("VescHwInterface"), "No joint position limits found in URDF, using default limits");
     }
-    homing_position_ = lower_limit_;
-    if (info_.hardware_parameters.find("servo/calibration_position") != info_.hardware_parameters.end())
-    {
-      homing_position_ = std::stod(info_.hardware_parameters["servo/calibration_position"]);
-    }
 
     // initializes the servo controller
-    screw_lead_ = 1.0;
-    if (info_.hardware_parameters.find("screw_lead") != info_.hardware_parameters.end())
-    {
-      screw_lead_ = std::stod(info_.hardware_parameters["screw_lead"]);
-    }
     servo_controller_.init(info_, vesc_interface_, gear_ratio_, torque_const_, num_rotor_poles_, num_hall_sensors_,
                            joint_type_ == "revolute"   ? 0 :
                            joint_type_ == "continuous" ? 1 :
                                                          2,
                            screw_lead_, upper_limit_, lower_limit_);
-    homing_enabled_ = true;
-    if (info_.hardware_parameters.find("servo/calibration") != info_.hardware_parameters.end())
-    {
-      homing_enabled_ = info_.hardware_parameters["servo/calibration"] == "true";
-    }
+
+    auto calibration_params = servo_controller_.getCalibrationParameters();
+    homing_enabled_ = calibration_params.enable_calibration;
+    homing_position_ = calibration_params.calibration_position;
     if (homing_enabled_)
     {
       while (rclcpp::ok())

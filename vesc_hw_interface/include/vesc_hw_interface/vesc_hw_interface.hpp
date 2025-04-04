@@ -73,7 +73,7 @@ private:
   double position_steps_;
   bool sensor_initialize_;
 
-  double command_;
+  double command_, prev_command_;
   double position_, velocity_, effort_;  // joint states
 
   int num_rotor_poles_;               // the number of rotor poles

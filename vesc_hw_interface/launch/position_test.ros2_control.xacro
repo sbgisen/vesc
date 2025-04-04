@@ -14,6 +14,16 @@
       <plugin>vesc_hw_interface/VescHwInterface</plugin>
       <param name="port">/dev/ttyACM0</param>
       <param name="servo/calibration">false</param>
+      <param name="servo/calibration_current">1.0</param>
+      <param name="servo/calibration_strict_current">-0.08</param>
+      <param name="servo/calibration_duty">0.01</param>
+      <param name="servo/calibration_strict_duty">-0.08</param>
+      <param name="servo/calibration_mode">duty</param>
+      <param name="servo/calibration_position">0.0</param>
+      <param name="servo/use_endstop">false</param>
+      <param name="servo/endstop_window">1</param>
+      <param name="servo/endstop_threshold">0.8</param>
+      <param name="servo/endstop_margin">0.02</param>
       <param name="command_mode">position</param>
     </hardware>
     <joint name="vesc_joint">

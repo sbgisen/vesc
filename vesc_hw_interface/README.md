@@ -25,7 +25,7 @@ This hardware interface supports multiple command modes, each has its own behavi
 - **position**/**velocity** modes rely on **VESC internal PID**. Configure gains using VESC Tool.
 - **position_duty**/**velocity_duty** modes use **external PID control**, and PID gains must be set via URDF parameters.
 - URDF joint types must match the command mode or the motor will produce unexpected behaviors.
-> ⚠️ **Important:** When using `position` mode, the joint range must map to a 0°–90° VESC range using the "Position Angle Division" setting. [More info.](#⚠️-notes-on-vesc-pid-position-control)
+> ⚠️ **Important:** When using `position` mode, the joint range must map to a 0°–90° VESC range using the "Position Angle Division" setting. [More info.](#%EF%B8%8F-notes-on-vesc-pid-position-control)
 
 ## Parameters
 Parameters should be set under the `<ros2_control>` tag in your URDF or `xacro` file.
@@ -66,7 +66,7 @@ Check the `vesc_hw_interface/launch` directory for examples.
 | num_rotor_poles | int | optional | 2 | Number of rotor poles |
 | gear_ratio | double | optional | 1.0 | Gear reduction ratio |
 | torque_const | double | optional | 1.0| Torque constant of the motor |
-| screw_lead | double | optional | 1.0 | Screw lead, only used in `position_duty` command mode|
+| screw_lead | double | optional | 1.0 | Screw lead, only used in when joint is `prismatic`|
 
 #### Notes
 `position` and `velocity` command mode will use the gear ratio, num rotor poles, and torque constants from VESC.

@@ -16,7 +16,6 @@
       <param name="gear_ratio">0.230769</param>
       <param name="torque_const">1.0</param>
       <param name="num_hall_sensors">3</param>
-      <param name="screw_lead">1.0</param>
       <param name="num_rotor_poles">20</param>
       <param name="motor/Kp">0.1</param>
       <param name="motor/Ki">0.01</param>

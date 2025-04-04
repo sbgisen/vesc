@@ -30,6 +30,10 @@
 #include "vesc_hw_interface/vesc_servo_controller.hpp"
 #include "vesc_hw_interface/vesc_wheel_controller.hpp"
 
+constexpr double VESC_POS_RANGE = 360.0;  // Full angular range of the VESC PID position control
+constexpr double VESC_POS_MAPPING_RANGE = 90.0;  // Range for mapping the position to the VESC
+constexpr double VESC_POS_WRAP_THRESHOLD = (VESC_POS_RANGE - VESC_POS_MAPPING_RANGE) / 2.0 + VESC_POS_MAPPING_RANGE;  // Angle at which to wrap the position (overflow/underflow)
+
 namespace vesc_hw_interface
 {
 using vesc_driver::VescInterface;

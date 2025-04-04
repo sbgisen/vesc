@@ -370,8 +370,8 @@ hardware_interface::return_type VescHwInterface::write(const rclcpp::Time& /*tim
   }
   else if (command_mode_ == "position")
   {
-    command = 90.0 * (command - homing_position_) / (upper_limit_ - lower_limit_);
-    command = std::fmod(command + homing_offset_ + 360.0, 360.0);
+    command = VESC_POS_MAPPING_RANGE * (command - homing_position_) / (upper_limit_ - lower_limit_);
+    command = std::fmod(command + homing_offset_ + VESC_POS_RANGE, VESC_POS_RANGE);
     vesc_interface_->setPosition(command);
   }
   else if (command_mode_ == "velocity")
@@ -495,12 +495,12 @@ void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& pa
     if (joint_type_ == "revolute" || joint_type_ == "prismatic")
     {
       // `position` is [deg] but here we mapped the position to the joint limits hence unit is irrelevant
-      position_ = std::fmod(position - homing_offset_ + 360.0, 360.0);
-      if (position_ > 225.0)
+      position_ = std::fmod(position - homing_offset_ + VESC_POS_RANGE, VESC_POS_RANGE);
+      if (position_ > VESC_POS_WRAP_THRESHOLD)
       {
-        position_ -= 360.0;
+        position_ -= VESC_POS_RANGE;
       }
-      position_ = homing_position_ + position_ * (upper_limit_ - lower_limit_) / 90.0;
+      position_ = homing_position_ + position_ * (upper_limit_ - lower_limit_) / VESC_POS_MAPPING_RANGE;
     }
     else if (joint_type_ == "continuous")
     {

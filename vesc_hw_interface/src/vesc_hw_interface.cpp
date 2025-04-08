@@ -362,6 +362,23 @@ hardware_interface::return_type VescHwInterface::write(const rclcpp::Time& /*tim
     servo_controller_.setTargetPosition(command);
     servo_controller_.control(1.0 / period.seconds());
   }
+  else if (command_mode_ == "position")
+  {
+    command = VESC_POS_MAPPING_RANGE * (command - homing_position_) / (upper_limit_ - lower_limit_);
+    command = std::fmod(command + homing_offset_ + VESC_POS_RANGE, VESC_POS_RANGE);
+    vesc_interface_->setPosition(command);
+  }
+  else if (command_mode_ == "velocity")
+  {
+    // limit_velocity_interface_.enforceLimits(period);
+
+    // converts the velocity unit: rad/s or m/s -> rpm -> erpm
+    const double command_rpm = command * 60.0 / 2.0 / M_PI / gear_ratio_;
+    const double command_erpm = command_rpm * static_cast<double>(num_rotor_poles_) / 2;
+
+    // sends a reference velocity command
+    vesc_interface_->setSpeed(command_erpm);
+  }
   else if (command_mode_ == "velocity_duty")
   {
     // limit_velocity_interface_.enforceLimits(period);
@@ -370,46 +387,24 @@ hardware_interface::return_type VescHwInterface::write(const rclcpp::Time& /*tim
     wheel_controller_.setTargetVelocity(command);
     wheel_controller_.control(1.0 / period.seconds());
   }
-
-  if (std::fabs(command - prev_command_) > std::numeric_limits<double>::epsilon())
+  else if (command_mode_ == "effort")
   {
-    if (command_mode_ == "position")
-    {
-      command = VESC_POS_MAPPING_RANGE * (command - homing_position_) / (upper_limit_ - lower_limit_);
-      command = std::fmod(command + homing_offset_ + VESC_POS_RANGE, VESC_POS_RANGE);
-      vesc_interface_->setPosition(command);
-    }
-    else if (command_mode_ == "velocity")
-    {
-      // limit_velocity_interface_.enforceLimits(period);
+    // limit_effort_interface_.enforceLimits(period);
 
-      // converts the velocity unit: rad/s or m/s -> rpm -> erpm
-      const double command_rpm = command * 60.0 / 2.0 / M_PI / gear_ratio_;
-      const double command_erpm = command_rpm * static_cast<double>(num_rotor_poles_) / 2;
+    // converts the command unit: Nm or N -> A
+    const double command_current = command * gear_ratio_ / torque_const_;
 
-      // sends a reference velocity command
-      vesc_interface_->setSpeed(command_erpm);
-    }
-    else if (command_mode_ == "effort")
-    {
-      // limit_effort_interface_.enforceLimits(period);
-
-      // converts the command unit: Nm or N -> A
-      const double command_current = command * gear_ratio_ / torque_const_;
-
-      // sends a reference current command
-      vesc_interface_->setCurrent(command_current);
-    }
-    else if (command_mode_ == "effort_duty")
-    {
-      command = std::max(-1.0, command);
-      command = std::min(1.0, command);
-
-      // sends a  duty command
-      vesc_interface_->setDutyCycle(command);
-    }
+    // sends a reference current command
+    vesc_interface_->setCurrent(command_current);
   }
-  prev_command_ = command;
+  else if (command_mode_ == "effort_duty")
+  {
+    command = std::max(-1.0, command);
+    command = std::min(1.0, command);
+
+    // sends a  duty command
+    vesc_interface_->setDutyCycle(command);
+  }
   return hardware_interface::return_type::OK;
 }
 

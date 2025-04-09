@@ -53,7 +53,12 @@ def launch_setup(context: LaunchContext, *args, **kwargs) -> list:
              arguments=['--controller-manager', 'controller_manager', 'joint_position_controller'])
     ])
 
-    return [control_node, controllers]
+    robot_state = Node(package='robot_state_publisher',
+                       executable='robot_state_publisher',
+                       parameters=[robot_description],
+                       output='both')
+
+    return [control_node, controllers, robot_state]
 
 
 def generate_launch_description() -> LaunchDescription:

@@ -30,11 +30,13 @@
 #include "vesc_hw_interface/vesc_servo_controller.hpp"
 #include "vesc_hw_interface/vesc_wheel_controller.hpp"
 
+
 namespace vesc_hw_interface
 {
 using vesc_driver::VescInterface;
 using vesc_driver::VescPacket;
 using vesc_driver::VescPacketValues;
+using vesc_driver::VescPacketMCConf;
 using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 
 class VescHwInterface : public hardware_interface::ActuatorInterface
@@ -62,6 +64,14 @@ private:
 
   std::string joint_name_, command_mode_, port_;
   std::string joint_type_;
+  double upper_limit_, lower_limit_;
+  bool homing_enabled_;
+  bool homing_done_;
+  double homing_offset_;
+  double homing_position_;
+  int32_t prev_steps_;
+  double position_steps_;
+  bool sensor_initialize_;
 
   double command_;
   double position_, velocity_, effort_;  // joint states
@@ -77,6 +87,10 @@ private:
 
   void packetCallback(const std::shared_ptr<VescPacket const>&);
   void errorCallback(const std::string&);
+
+  static constexpr double VESC_POS_RANGE = 360.0;  // Full angular range of the VESC PID position control
+  static constexpr double VESC_POS_MAPPING_RANGE = 90.0;  // Range for mapping the position to the VESC
+  static constexpr double VESC_POS_WRAP_THRESHOLD = (VESC_POS_RANGE - VESC_POS_MAPPING_RANGE) / 2.0 + VESC_POS_MAPPING_RANGE;  // Angle at which to wrap the position (overflow/underflow)
 };
 
 }  // namespace vesc_hw_interface

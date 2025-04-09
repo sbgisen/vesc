@@ -136,6 +136,8 @@ public:
 protected:
   VescPacket(const std::string& name, const int16_t payload_size, const int16_t payload_id);
   VescPacket(const std::string& name, std::shared_ptr<VescFrame> raw);
+  double readBuffer(const uint8_t, const uint8_t) const;
+  double readAutoBuffer(const int) const;
 
 private:
   std::string name_;
@@ -147,7 +149,7 @@ typedef std::shared_ptr<VescPacket const> VescPacketConstPtr;
 /*------------------------------------------------------------------*/
 
 /**
- * @brief Farmware version
+ * @brief Firmware version
  **/
 class VescPacketFWVersion : public VescPacket
 {
@@ -161,7 +163,7 @@ public:
 /*------------------------------------------------------------------*/
 
 /**
- * @brief Requests farmware version
+ * @brief Requests firmware version
  **/
 class VescPacketRequestFWVersion : public VescPacket
 {
@@ -172,7 +174,7 @@ public:
 /*------------------------------------------------------------------*/
 
 /**
- * @brief Gets values in return packets
+ * @brief Gets values in COMM_GET_VALUES return packets
  **/
 class VescPacketValues : public VescPacket
 {
@@ -190,23 +192,49 @@ public:
   double getInputCharge() const;
   double getConsumedPower() const;
   double getInputPower() const;
-  double getPosition() const;
+  double getTachometer() const;
   double getDisplacement() const;
   int getFaultCode() const;
-
-private:
-  double readBuffer(const uint8_t, const uint8_t) const;
+  double getPosition() const;
+  int getControllerID() const;
 };
 
 /*------------------------------------------------------------------*/
 
 /**
- * @brief Packet for requesting retrun packets
+ * @brief Packet for requesting COMM_GET_VALUES return packets
  **/
 class VescPacketRequestValues : public VescPacket
 {
 public:
   VescPacketRequestValues();
+};
+
+/*------------------------------------------------------------------*/
+
+/**
+ * @brief Gets values in COMM_GET_MCCONF return packets
+ **/
+class VescPacketMCConf : public VescPacket
+{
+public:
+  explicit VescPacketMCConf(std::shared_ptr<VescFrame> raw);
+
+  MCConfiguration getConfig() const;
+
+private:
+  MCConfiguration config_;
+};
+
+/*------------------------------------------------------------------*/
+
+/**
+ * @brief Packet for requesting COMM_GET_MCCONF return packets
+ **/
+class VescPacketRequestMCConf : public VescPacket
+{
+public:
+  VescPacketRequestMCConf();
 };
 
 /*------------------------------------------------------------------*/

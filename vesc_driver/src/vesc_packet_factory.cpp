@@ -145,7 +145,7 @@ VescPacketPtr VescPacketFactory::createPacket(
     return createFailed(num_bytes_needed, what, "Invalid checksum");
 
   // constructs the raw frame
-  std::shared_ptr<VescPayload> raw_frame(new VescPayload(view_payload));
+  std::shared_ptr<VescFrame> raw_frame(new VescFrame(view_payload));
 
   // constructs the corresponding subclass if the packet has a payload
   if (boost::distance(view_payload) > 0)
@@ -197,7 +197,7 @@ VescPacketPtr VescPacketFactory::createCanPacket(
   }
 
   // constructs the raw frame
-  std::shared_ptr<VescPayload> raw_frame(new VescPayload(view_payload));
+  std::shared_ptr<VescFrame> raw_frame(new VescFrame(view_payload));
 
   // constructs the corresponding subclass if the packet has a payload
   if (boost::distance(view_payload) > 0)

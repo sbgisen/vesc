@@ -67,7 +67,7 @@ public:
                                       const Buffer::const_iterator&,
                                       int*, std::string*);
 
- typedef std::function<VescPacketPtr(std::shared_ptr<VescPayload>)> CreateFn;
+ typedef std::function<VescPacketPtr(std::shared_ptr<VescFrame>)> CreateFn;
 
  /** Register a packet type with the factory. */
  static void registerPacketType(COMM_PACKET_ID, CreateFn);
@@ -89,7 +89,7 @@ private:
     {                                                                                                                  \
       VescPacketFactory::registerPacketType((id), &klass##Factory::create);                                            \
     }                                                                                                                  \
-    static VescPacketPtr create(std::shared_ptr<VescPayload> frame)                                                      \
+    static VescPacketPtr create(std::shared_ptr<VescFrame> frame)                                                      \
     {                                                                                                                  \
       return VescPacketPtr(new klass(frame));                                                                          \
     }                                                                                                                  \

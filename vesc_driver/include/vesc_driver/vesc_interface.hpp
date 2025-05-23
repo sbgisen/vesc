@@ -80,9 +80,11 @@ public:
    *
    * @throw SerialException
    */
-  VescInterface(const std::string& port = std::string(),const std::string& controller_id = std::string(), const std::string& vesct_id = std::string(),
-                const PacketHandlerFunction& packet_handler = PacketHandlerFunction(),
-                const ErrorHandlerFunction& error_handler = ErrorHandlerFunction());
+  VescInterface(
+      const std::string& port = std::string(), const int& controller_id = int(),
+      const int& vesc_id = int(),
+      const PacketHandlerFunction& packet_handler = PacketHandlerFunction(),
+      const ErrorHandlerFunction& error_handler = ErrorHandlerFunction());
 
   /**
    * VescInterface destructor.
@@ -105,7 +107,8 @@ public:
    *
    * @throw SerialException
    */
-  void connect(const std::string& port,const std::string& controller_id, const std::string& vesct_id);
+  void connect(const std::string& port, const int& controller_id,
+               const int& vesc_id);
 
   /**
    * Closes the serial port interface to the VESC.
@@ -128,7 +131,8 @@ public:
   /**
    * Send a VESC packet.
    */
-  void send(const VescPacket& packet);
+  void send(const VescPacket& data);
+  void canSend(const VescCanPacket& data);
 
   void requestFWVersion();
   void requestState();
@@ -144,6 +148,7 @@ private:
   // Pimpl - hide serial port members from class users
   class Impl;
   std::unique_ptr<Impl> impl_;
+  std::string port_;
 };
 
 // todo: review

@@ -36,6 +36,10 @@
 #ifndef VESC_DRIVER_VESC_PACKET_FACTORY_HPP_
 #define VESC_DRIVER_VESC_PACKET_FACTORY_HPP_
 
+#include <boost/noncopyable.hpp>
+#include <boost/range/begin.hpp>
+#include <boost/range/distance.hpp>
+#include <boost/range/end.hpp>
 #include <cassert>
 #include <cstdint>
 #include <functional>
@@ -45,28 +49,28 @@
 #include <string>
 #include <vector>
 
-#include <boost/noncopyable.hpp>
-#include <boost/range/begin.hpp>
-#include <boost/range/distance.hpp>
-#include <boost/range/end.hpp>
-
 #include "vesc_driver/data_map.hpp"
 #include "vesc_driver/vesc_packet.hpp"
 
-namespace vesc_driver
-{
+namespace vesc_driver {
 /**
  * @brief Creates VESC packets from raw data.
  **/
 class VescPacketFactory : private boost::noncopyable
 {
 public:
-  static VescPacketPtr createPacket(const Buffer::const_iterator&, const Buffer::const_iterator&, int*, std::string*);
+ static VescPacketPtr createPacket(const Buffer::const_iterator&,
+                                   const Buffer::const_iterator&, int*, int*,
+                                   std::string*);
 
-  typedef std::function<VescPacketPtr(std::shared_ptr<VescFrame>)> CreateFn;
+ static VescPacketPtr createCanPacket(const Buffer::const_iterator&,
+                                      const Buffer::const_iterator&,
+                                      int*, std::string*);
 
-  /** Register a packet type with the factory. */
-  static void registerPacketType(COMM_PACKET_ID, CreateFn);
+ typedef std::function<VescPacketPtr(std::shared_ptr<VescPayload>)> CreateFn;
+
+ /** Register a packet type with the factory. */
+ static void registerPacketType(COMM_PACKET_ID, CreateFn);
 
 private:
   typedef std::map<COMM_PACKET_ID, CreateFn> FactoryMap;
@@ -85,7 +89,7 @@ private:
     {                                                                                                                  \
       VescPacketFactory::registerPacketType((id), &klass##Factory::create);                                            \
     }                                                                                                                  \
-    static VescPacketPtr create(std::shared_ptr<VescFrame> frame)                                                      \
+    static VescPacketPtr create(std::shared_ptr<VescPayload> frame)                                                      \
     {                                                                                                                  \
       return VescPacketPtr(new klass(frame));                                                                          \
     }                                                                                                                  \

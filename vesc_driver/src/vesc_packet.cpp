@@ -96,9 +96,10 @@ VescFrame::VescFrame(const BufferRangeConst& frame, const BufferRangeConst& payl
  * @param payload_size Specified payload size
  * @param payload_id ID of payload
  **/
-VescPacket::VescPacket(const std::string& name, const int16_t payload_size, const int16_t payload_id)
+VescPacket::VescPacket(const std::string& name, const int16_t payload_size, const COMM_PACKET_ID payload)
   : VescFrame(payload_size), name_(name)
 {
+  int16_t payload_id = static_cast<int16_t>(payload);
   assert(payload_id >= 0 && payload_id < 256);
   assert(boost::distance(payload_end_) > 0);
   *payload_end_.first = payload_id;
@@ -194,7 +195,7 @@ int16_t VescPacketFWVersion::fwMinor() const
 /**
  * @brief Constructor
  **/
-VescPacketRequestFWVersion::VescPacketRequestFWVersion() : VescPacket("RequestFWVersion", 1, COMM_FW_VERSION)
+VescPacketRequestFWVersion::VescPacketRequestFWVersion() : VescPacket("RequestFWVersion", 1, COMM_PACKET_ID::COMM_FW_VERSION)
 {
   VescFrame::CRC crc_calc;
   crc_calc.process_bytes(&(*payload_end_.first), boost::distance(payload_end_));
@@ -218,7 +219,7 @@ VescPacketValues::VescPacketValues(std::shared_ptr<VescFrame> raw) : VescPacket(
  **/
 double VescPacketValues::getMosTemp() const
 {
-  return readBuffer(TEMP_MOS, 2) / 10.0;
+  return readBuffer(static_cast<uint8_t>(PACKET_MAP::TEMP_MOS), 2) / 10.0;
 }
 
 /**
@@ -227,7 +228,7 @@ double VescPacketValues::getMosTemp() const
  **/
 double VescPacketValues::getMotorTemp() const
 {
-  return readBuffer(TEMP_MOTOR, 2) / 10.0;
+  return readBuffer(static_cast<uint8_t>(PACKET_MAP::TEMP_MOTOR), 2) / 10.0;
 }
 
 /**
@@ -236,7 +237,7 @@ double VescPacketValues::getMotorTemp() const
  **/
 double VescPacketValues::getMotorCurrent() const
 {
-  return readBuffer(CURRENT_MOTOR, 4) / 100.0;
+  return readBuffer(static_cast<uint8_t>(PACKET_MAP::CURRENT_MOTOR), 4) / 100.0;
 }
 
 /**
@@ -245,7 +246,7 @@ double VescPacketValues::getMotorCurrent() const
  **/
 double VescPacketValues::getInputCurrent() const
 {
-  return readBuffer(CURRENT_IN, 4) / 100.0;
+  return readBuffer(static_cast<uint8_t>(PACKET_MAP::CURRENT_IN), 4) / 100.0;
 }
 
 /**
@@ -254,7 +255,7 @@ double VescPacketValues::getInputCurrent() const
  **/
 double VescPacketValues::getDuty() const
 {
-  int16_t duty_raw = static_cast<int32_t>(readBuffer(DUTY_NOW, 2));
+  int16_t duty_raw = static_cast<int32_t>(readBuffer(static_cast<uint8_t>(PACKET_MAP::DUTY_NOW), 2));
 
   // inverts to derive a negative value
   if (duty_raw > 1000)
@@ -271,7 +272,7 @@ double VescPacketValues::getDuty() const
  **/
 double VescPacketValues::getVelocityERPM() const
 {
-  return readBuffer(ERPM, 4);
+  return readBuffer(static_cast<uint8_t>(PACKET_MAP::ERPM), 4);
 }
 
 /**
@@ -280,7 +281,7 @@ double VescPacketValues::getVelocityERPM() const
  **/
 double VescPacketValues::getInputVoltage() const
 {
-  return readBuffer(VOLTAGE_IN, 2) / 10.0;
+  return readBuffer(static_cast<uint8_t>(PACKET_MAP::VOLTAGE_IN), 2) / 10.0;
 }
 
 /**
@@ -289,7 +290,7 @@ double VescPacketValues::getInputVoltage() const
  **/
 double VescPacketValues::getConsumedCharge() const
 {
-  return readBuffer(AMP_HOURS, 4) / 10000.0;
+  return readBuffer(static_cast<uint8_t>(PACKET_MAP::AMP_HOURS), 4) / 10000.0;
 }
 
 /**
@@ -298,7 +299,7 @@ double VescPacketValues::getConsumedCharge() const
  **/
 double VescPacketValues::getInputCharge() const
 {
-  return readBuffer(AMP_HOURS_CHARGED, 4) / 10000.0;
+  return readBuffer(static_cast<uint8_t>(PACKET_MAP::AMP_HOURS_CHARGED), 4) / 10000.0;
 }
 
 /**
@@ -307,7 +308,7 @@ double VescPacketValues::getInputCharge() const
  **/
 double VescPacketValues::getConsumedPower() const
 {
-  return readBuffer(WATT_HOURS, 4) / 10000.0;
+  return readBuffer(static_cast<uint8_t>(PACKET_MAP::TACHOMETER), 4) / 10000.0;
 }
 
 /**
@@ -316,7 +317,7 @@ double VescPacketValues::getConsumedPower() const
  **/
 double VescPacketValues::getInputPower() const
 {
-  return readBuffer(WATT_HOURS_CHARGED, 4) / 10000.0;
+  return readBuffer(static_cast<uint8_t>(PACKET_MAP::WATT_HOURS_CHARGED), 4) / 10000.0;
 }
 
 /**
@@ -325,7 +326,7 @@ double VescPacketValues::getInputPower() const
  **/
 double VescPacketValues::getTachometer() const
 {
-  return readBuffer(TACHOMETER, 4);
+  return readBuffer(static_cast<uint8_t>(PACKET_MAP::TACHOMETER), 4);
 }
 
 /**
@@ -334,7 +335,7 @@ double VescPacketValues::getTachometer() const
  **/
 double VescPacketValues::getDisplacement() const
 {
-  return readBuffer(TACHOMETER_ABS, 4);
+  return readBuffer(static_cast<uint8_t>(PACKET_MAP::FAULT_CODE), 4);
 }
 
 /**
@@ -343,7 +344,7 @@ double VescPacketValues::getDisplacement() const
  **/
 int VescPacketValues::getFaultCode() const
 {
-  return static_cast<int32_t>(*(payload_end_.first + FAULT_CODE));
+  return static_cast<int32_t>(*(payload_end_.first + static_cast<uint8_t>(PACKET_MAP::FAULT_CODE)));
 }
 
 /**
@@ -352,7 +353,7 @@ int VescPacketValues::getFaultCode() const
  **/
  double VescPacketValues::getPosition() const
  {
-   return readBuffer(PID_POS, 4) / 1000000.0;
+   return readBuffer(static_cast<uint8_t>(PACKET_MAP::PID_POS), 4) / 1000000.0;
  }
 
  /**
@@ -361,7 +362,7 @@ int VescPacketValues::getFaultCode() const
  **/
 int VescPacketValues::getControllerID() const
 {
-  return static_cast<int32_t>(*(payload_end_.first + CONTROLLER_ID));
+  return static_cast<int32_t>(*(payload_end_.first + static_cast<uint8_t>(PACKET_MAP::CONTROLLER_ID)));
 }
 
 /*------------------------------------------------------------------*/
@@ -369,7 +370,7 @@ int VescPacketValues::getControllerID() const
 /**
  * @brief Constructor
  **/
-VescPacketRequestValues::VescPacketRequestValues() : VescPacket("RequestValues", 1, COMM_GET_VALUES)
+VescPacketRequestValues::VescPacketRequestValues() : VescPacket("RequestValues", 1, COMM_PACKET_ID::COMM_GET_VALUES)
 {
   VescFrame::CRC crc_calc;
   crc_calc.process_bytes(&(*payload_end_.first), boost::distance(payload_end_));
@@ -578,7 +579,7 @@ MCConfiguration VescPacketMCConf::getConfig() const
 /**
  * @brief Constructor
  **/
-VescPacketRequestMCConf::VescPacketRequestMCConf() : VescPacket("RequestMCConf", 1, COMM_GET_MCCONF)
+VescPacketRequestMCConf::VescPacketRequestMCConf() : VescPacket("RequestMCConf", 1, COMM_PACKET_ID::COMM_GET_MCCONF)
 {
   VescFrame::CRC crc_calc;
   crc_calc.process_bytes(&(*payload_end_.first), boost::distance(payload_end_));
@@ -592,7 +593,7 @@ VescPacketRequestMCConf::VescPacketRequestMCConf() : VescPacket("RequestMCConf",
 /**
  * @brief Constructor
  **/
-VescPacketSetDuty::VescPacketSetDuty(double duty) : VescPacket("SetDuty", 5, COMM_SET_DUTY)
+VescPacketSetDuty::VescPacketSetDuty(double duty) : VescPacket("SetDuty", 5, COMM_PACKET_ID::COMM_SET_DUTY)
 {
   // checks the range of duty
   if (duty > 1.0)
@@ -623,7 +624,7 @@ VescPacketSetDuty::VescPacketSetDuty(double duty) : VescPacket("SetDuty", 5, COM
 /**
  * @brief Constructor
  **/
-VescPacketSetCurrent::VescPacketSetCurrent(double current) : VescPacket("SetCurrent", 5, COMM_SET_CURRENT)
+VescPacketSetCurrent::VescPacketSetCurrent(double current) : VescPacket("SetCurrent", 5, COMM_PACKET_ID::COMM_SET_CURRENT)
 {
   const int32_t v = static_cast<int32_t>(current * 1000.0);
 
@@ -645,7 +646,7 @@ VescPacketSetCurrent::VescPacketSetCurrent(double current) : VescPacket("SetCurr
  * @brief Constructor
  **/
 VescPacketSetCurrentBrake::VescPacketSetCurrentBrake(double current_brake)
-  : VescPacket("SetCurrentBrake", 5, COMM_SET_CURRENT_BRAKE)
+  : VescPacket("SetCurrentBrake", 5, COMM_PACKET_ID::COMM_SET_CURRENT_BRAKE)
 {
   const int32_t v = static_cast<int32_t>(current_brake * 1000.0);
 
@@ -666,7 +667,7 @@ VescPacketSetCurrentBrake::VescPacketSetCurrentBrake(double current_brake)
 /**
  * @brief Constructor
  **/
-VescPacketSetVelocityERPM::VescPacketSetVelocityERPM(double vel_erpm) : VescPacket("SetERPM", 5, COMM_SET_ERPM)
+VescPacketSetVelocityERPM::VescPacketSetVelocityERPM(double vel_erpm) : VescPacket("SetERPM", 5, COMM_PACKET_ID::COMM_SET_ERPM)
 {
   const int32_t v = static_cast<int32_t>(vel_erpm);
 
@@ -687,7 +688,7 @@ VescPacketSetVelocityERPM::VescPacketSetVelocityERPM(double vel_erpm) : VescPack
 /**
  * @brief Constructor
  **/
-VescPacketSetPos::VescPacketSetPos(double pos) : VescPacket("SetPos", 5, COMM_SET_POS)
+VescPacketSetPos::VescPacketSetPos(double pos) : VescPacket("SetPos", 5, COMM_PACKET_ID::COMM_SET_POS)
 {
   /** @todo range check pos */
 
@@ -710,7 +711,7 @@ VescPacketSetPos::VescPacketSetPos(double pos) : VescPacket("SetPos", 5, COMM_SE
 /**
  * @brief Constructor
  **/
-VescPacketSetServoPos::VescPacketSetServoPos(double servo_pos) : VescPacket("SetServoPos", 3, COMM_SET_SERVO_POS)
+VescPacketSetServoPos::VescPacketSetServoPos(double servo_pos) : VescPacket("SetServoPos", 3, COMM_PACKET_ID::COMM_SET_SERVO_POS)
 {
   /** @todo range check pos */
 

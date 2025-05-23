@@ -66,10 +66,10 @@ public:
   typedef std::function<VescPacketPtr(std::shared_ptr<VescFrame>)> CreateFn;
 
   /** Register a packet type with the factory. */
-  static void registerPacketType(int, CreateFn);
+  static void registerPacketType(COMM_PACKET_ID, CreateFn);
 
 private:
-  typedef std::map<int, CreateFn> FactoryMap;
+  typedef std::map<COMM_PACKET_ID, CreateFn> FactoryMap;
   static FactoryMap* getMap();
 };
 

@@ -27,7 +27,7 @@ namespace vesc_hw_interface
 VescHwInterface::VescHwInterface()
 {
   vesc_interface_ = std::make_shared<VescInterface>(
-      std::string(), std::bind(&VescHwInterface::packetCallback, this, std::placeholders::_1),
+      std::string(), std::string(),std::string(),std::bind(&VescHwInterface::packetCallback, this, std::placeholders::_1),
       std::bind(&VescHwInterface::errorCallback, this, std::placeholders::_1));
 }
 
@@ -179,7 +179,7 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
   try
   {
     RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "connect to %s", port_.c_str());
-    vesc_interface_->connect(port_);
+    vesc_interface_->connect(port_, controller_id_, vesct_id_);
     RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "connected");
   }
   catch (const vesc_driver::SerialException& exception)
@@ -439,7 +439,7 @@ void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& pa
     auto config = mc_conf->getConfig();
     num_rotor_poles_ = config.si_motor_poles;
     gear_ratio_ = config.si_gear_ratio;
-    if (config.motor_type == MOTOR_TYPE_FOC) {
+    if (config.motor_type == vesc_driver::MOTOR_TYPE_FOC) {
       auto pole_pairs = num_rotor_poles_ / 2.0;
       auto flux_linkage = config.foc_motor_flux_linkage;
       torque_const_ = (60.0 / (2.0 * M_PI * pole_pairs)) * flux_linkage;

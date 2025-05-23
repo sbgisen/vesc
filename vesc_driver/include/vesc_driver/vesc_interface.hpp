@@ -44,8 +44,16 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <algorithm>
 
 #include <pthread.h>
+
+#include <linux/can.h>
+#include <linux/can/raw.h>
+#include <sys/ioctl.h>
+#include <net/if.h>
+#include <sys/socket.h>
+#include <cstring>  
 
 #include "vesc_driver/vesc_packet.hpp"
 #include "vesc_driver/vesc_packet_factory.hpp"
@@ -72,7 +80,7 @@ public:
    *
    * @throw SerialException
    */
-  VescInterface(const std::string& port = std::string(),
+  VescInterface(const std::string& port = std::string(),const std::string& controller_id = std::string(), const std::string& vesct_id = std::string(),
                 const PacketHandlerFunction& packet_handler = PacketHandlerFunction(),
                 const ErrorHandlerFunction& error_handler = ErrorHandlerFunction());
 
@@ -97,7 +105,7 @@ public:
    *
    * @throw SerialException
    */
-  void connect(const std::string& port);
+  void connect(const std::string& port,const std::string& controller_id, const std::string& vesct_id);
 
   /**
    * Closes the serial port interface to the VESC.

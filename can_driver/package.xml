@@ -1,21 +1,17 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>vesc_driver</name>
+  <name>can_driver</name>
   <version>1.0.0</version>
   <description> ROS device driver for VESC open source motor driver. </description>
   <maintainer email="SBGRP-git@g.softbank.co.jp">SoftBank Corp.</maintainer>
   <license>Apache 2.0</license>
 
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
-  <buildtool_depend>asio_cmake_module</buildtool_depend> 
 
   <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>
   <depend>std_msgs</depend>
-  <depend>vesc_msgs</depend>
-  <depend>serial_driver</depend>
-  <depend>can_driver</depend>
 
   <export>
     <build_type>ament_cmake</build_type>

@@ -118,14 +118,14 @@ double VescPacket::readBuffer(const uint8_t map_id, const uint8_t size) const
   switch (size)
   {
     case 2:
-      value += static_cast<int32_t>(*(payload_end_.first + map_id) << 8);
-      value += static_cast<int32_t>(*(payload_end_.first + map_id + 1));
+      value += static_cast<int32_t>(*(payload_.begin() + map_id) << 8);
+      value += static_cast<int32_t>(*(payload_.begin()  + map_id + 1));
       break;
     case 4:
-      value += static_cast<int32_t>(*(payload_end_.first + map_id) << 24);
-      value += static_cast<int32_t>(*(payload_end_.first + map_id + 1) << 16);
-      value += static_cast<int32_t>(*(payload_end_.first + map_id + 2) << 8);
-      value += static_cast<int32_t>(*(payload_end_.first + map_id + 3));
+      value += static_cast<int32_t>(*(payload_.begin()  + map_id) << 24);
+      value += static_cast<int32_t>(*(payload_.begin()  + map_id + 1) << 16);
+      value += static_cast<int32_t>(*(payload_.begin()  + map_id + 2) << 8);
+      value += static_cast<int32_t>(*(payload_.begin()  + map_id + 3));
       break;
   }
 
@@ -141,10 +141,10 @@ double VescPacket::readBuffer(const uint8_t map_id, const uint8_t size) const
 double VescPacket::readAutoBuffer(const int map_id) const
 {
   uint32_t bits = 0;
-  bits |= static_cast<uint32_t>(*(payload_end_.first + map_id)) << 24;
-  bits |= static_cast<uint32_t>(*(payload_end_.first + map_id + 1)) << 16;
-  bits |= static_cast<uint32_t>(*(payload_end_.first + map_id + 2)) << 8;
-  bits |= static_cast<uint32_t>(*(payload_end_.first + map_id + 3));
+  bits |= static_cast<uint32_t>(*(payload_.begin()  + map_id)) << 24;
+  bits |= static_cast<uint32_t>(*(payload_.begin()  + map_id + 1)) << 16;
+  bits |= static_cast<uint32_t>(*(payload_.begin()  + map_id + 2)) << 8;
+  bits |= static_cast<uint32_t>(*(payload_.begin()  + map_id + 3));
 
   float value;
   std::memcpy(&value, &bits, sizeof(value));
@@ -365,7 +365,7 @@ int VescPacketValues::getFaultCode() const
  **/
 int VescPacketValues::getControllerID() const
 {
-  return static_cast<int32_t>(*(payload_end_.first + static_cast<uint8_t>(PACKET_MAP::CONTROLLER_ID)));
+  return static_cast<int32_t>(*(payload_.begin() + static_cast<uint8_t>(PACKET_MAP::CONTROLLER_ID)));
 }
 
 /*------------------------------------------------------------------*/
@@ -375,11 +375,6 @@ int VescPacketValues::getControllerID() const
  **/
 VescPacketRequestValues::VescPacketRequestValues() : VescPacket("RequestValues", 1, COMM_PACKET_ID::COMM_GET_VALUES)
 {
-  VescFrame::CRC crc_calc;
-  crc_calc.process_bytes(&(*payload_end_.first), boost::distance(payload_end_));
-  uint16_t crc = crc_calc.checksum();
-  *(frame_.end() - 3) = static_cast<uint8_t>(crc >> 8);
-  *(frame_.end() - 2) = static_cast<uint8_t>(crc & 0xFF);
 }
 
 /*------------------------------------------------------------------*/
@@ -391,10 +386,10 @@ VescPacketMCConf::VescPacketMCConf(std::shared_ptr<VescFrame> raw) : VescPacket(
 {
   int map_id = 2;
   config_.signature = static_cast<uint32_t>(readAutoBuffer(map_id)); map_id += 4;
-  config_.pwm_mode = static_cast<PWM_MODE>(*(payload_end_.first + map_id)); map_id += 1;
-  config_.comm_mode = static_cast<COMM_MODE>(*(payload_end_.first + map_id)); map_id += 1;
-  config_.motor_type = static_cast<MOTOR_TYPE>(*(payload_end_.first + map_id)); map_id += 1;
-  config_.sensor_mode = static_cast<SENSOR_MODE>(*(payload_end_.first + map_id)); map_id += 1;
+  config_.pwm_mode = static_cast<PWM_MODE>(*(payload_.begin() + map_id)); map_id += 1;
+  config_.comm_mode = static_cast<COMM_MODE>(*(payload_.begin() + map_id)); map_id += 1;
+  config_.motor_type = static_cast<MOTOR_TYPE>(*(payload_.begin() + map_id)); map_id += 1;
+  config_.sensor_mode = static_cast<SENSOR_MODE>(*(payload_.begin() + map_id)); map_id += 1;
   config_.l_current_max = readAutoBuffer(map_id); map_id += 4;
   config_.l_current_min = readAutoBuffer(map_id); map_id += 4;
   config_.l_in_current_max = readAutoBuffer(map_id); map_id += 4;
@@ -409,7 +404,7 @@ VescPacketMCConf::VescPacketMCConf(std::shared_ptr<VescFrame> raw) : VescPacket(
   config_.l_max_vin = readAutoBuffer(map_id); map_id += 4;
   config_.l_battery_cut_start = readAutoBuffer(map_id); map_id += 4;
   config_.l_battery_cut_end = readAutoBuffer(map_id); map_id += 4;
-  config_.l_slow_abs_current = static_cast<bool>(*(payload_end_.first + map_id)); map_id += 1;
+  config_.l_slow_abs_current = static_cast<bool>(*(payload_.begin() + map_id)); map_id += 1;
   config_.l_temp_fet_start = readBuffer(map_id, 2) / 10.0; map_id += 2;
   config_.l_temp_fet_end = readBuffer(map_id, 2) / 10.0; map_id += 2;
   config_.l_temp_motor_start = readBuffer(map_id, 2) / 10.0; map_id += 2;
@@ -429,20 +424,20 @@ VescPacketMCConf::VescPacketMCConf(std::shared_ptr<VescFrame> raw) : VescPacket(
   config_.sl_phase_advance_at_br = readBuffer(map_id, 2) / 10000.0; map_id += 2;
   config_.sl_cycle_int_rpm_br = readAutoBuffer(map_id); map_id += 4;
   config_.sl_bemf_coupling_k = readAutoBuffer(map_id); map_id += 4;
-  config_.hall_table[0] = static_cast<int>(*(payload_end_.first + map_id)); map_id += 1;
-  config_.hall_table[1] = static_cast<int>(*(payload_end_.first + map_id)); map_id += 1;
-  config_.hall_table[2] = static_cast<int>(*(payload_end_.first + map_id)); map_id += 1;
-  config_.hall_table[3] = static_cast<int>(*(payload_end_.first + map_id)); map_id += 1;
-  config_.hall_table[4] = static_cast<int>(*(payload_end_.first + map_id)); map_id += 1;
-  config_.hall_table[5] = static_cast<int>(*(payload_end_.first + map_id)); map_id += 1;
-  config_.hall_table[6] = static_cast<int>(*(payload_end_.first + map_id)); map_id += 1;
-  config_.hall_table[7] = static_cast<int>(*(payload_end_.first + map_id)); map_id += 1;
+  config_.hall_table[0] = static_cast<int>(*(payload_.begin() + map_id)); map_id += 1;
+  config_.hall_table[1] = static_cast<int>(*(payload_.begin() + map_id)); map_id += 1;
+  config_.hall_table[2] = static_cast<int>(*(payload_.begin() + map_id)); map_id += 1;
+  config_.hall_table[3] = static_cast<int>(*(payload_.begin() + map_id)); map_id += 1;
+  config_.hall_table[4] = static_cast<int>(*(payload_.begin() + map_id)); map_id += 1;
+  config_.hall_table[5] = static_cast<int>(*(payload_.begin() + map_id)); map_id += 1;
+  config_.hall_table[6] = static_cast<int>(*(payload_.begin() + map_id)); map_id += 1;
+  config_.hall_table[7] = static_cast<int>(*(payload_.begin() + map_id)); map_id += 1;
   config_.hall_sl_erpm = readAutoBuffer(map_id); map_id += 4;
   config_.foc_current_kp = readAutoBuffer(map_id); map_id += 4;
   config_.foc_current_ki = readAutoBuffer(map_id); map_id += 4;
   config_.foc_f_zv = readAutoBuffer(map_id); map_id += 4;
   config_.foc_dt_us = readAutoBuffer(map_id); map_id += 4;
-  config_.foc_encoder_inverted = static_cast<bool>(*(payload_end_.first + map_id)); map_id += 1;
+  config_.foc_encoder_inverted = static_cast<bool>(*(payload_.begin() + map_id)); map_id += 1;
   config_.foc_encoder_offset = readAutoBuffer(map_id); map_id += 4;
   config_.foc_encoder_ratio = readAutoBuffer(map_id); map_id += 4;
   config_.foc_encoder_sin_gain = readAutoBuffer(map_id); map_id += 4;
@@ -450,7 +445,7 @@ VescPacketMCConf::VescPacketMCConf(std::shared_ptr<VescFrame> raw) : VescPacket(
   config_.foc_encoder_sin_offset = readAutoBuffer(map_id); map_id += 4;
   config_.foc_encoder_cos_offset = readAutoBuffer(map_id); map_id += 4;
   config_.foc_encoder_sincos_filter_constant = readAutoBuffer(map_id); map_id += 4;
-  config_.foc_sensor_mode = static_cast<FOC_SENSOR_MODE>(*(payload_end_.first + map_id)); map_id += 1;
+  config_.foc_sensor_mode = static_cast<FOC_SENSOR_MODE>(*(payload_.begin() + map_id)); map_id += 1;
   config_.foc_pll_kp = readAutoBuffer(map_id); map_id += 4;
   config_.foc_pll_ki = readAutoBuffer(map_id); map_id += 4;
   config_.foc_motor_l = readAutoBuffer(map_id); map_id += 4;
@@ -470,32 +465,32 @@ VescPacketMCConf::VescPacketMCConf(std::shared_ptr<VescFrame> raw) : VescPacket(
   config_.foc_sl_openloop_time_lock = readBuffer(map_id, 2) / 100.0; map_id += 2;
   config_.foc_sl_openloop_time_ramp = readBuffer(map_id, 2) / 100.0; map_id += 2;
   config_.foc_sl_openloop_time = readBuffer(map_id, 2) / 100.0; map_id += 2;
-  config_.foc_hall_table[0] = static_cast<int>(*(payload_end_.first + map_id)); map_id += 1;
-  config_.foc_hall_table[1] = static_cast<int>(*(payload_end_.first + map_id)); map_id += 1;
-  config_.foc_hall_table[2] = static_cast<int>(*(payload_end_.first + map_id)); map_id += 1;
-  config_.foc_hall_table[3] = static_cast<int>(*(payload_end_.first + map_id)); map_id += 1;
-  config_.foc_hall_table[4] = static_cast<int>(*(payload_end_.first + map_id)); map_id += 1;
-  config_.foc_hall_table[5] = static_cast<int>(*(payload_end_.first + map_id)); map_id += 1;
-  config_.foc_hall_table[6] = static_cast<int>(*(payload_end_.first + map_id)); map_id += 1;
-  config_.foc_hall_table[7] = static_cast<int>(*(payload_end_.first + map_id)); map_id += 1;
+  config_.foc_hall_table[0] = static_cast<int>(*(payload_.begin() + map_id)); map_id += 1;
+  config_.foc_hall_table[1] = static_cast<int>(*(payload_.begin() + map_id)); map_id += 1;
+  config_.foc_hall_table[2] = static_cast<int>(*(payload_.begin() + map_id)); map_id += 1;
+  config_.foc_hall_table[3] = static_cast<int>(*(payload_.begin() + map_id)); map_id += 1;
+  config_.foc_hall_table[4] = static_cast<int>(*(payload_.begin() + map_id)); map_id += 1;
+  config_.foc_hall_table[5] = static_cast<int>(*(payload_.begin() + map_id)); map_id += 1;
+  config_.foc_hall_table[6] = static_cast<int>(*(payload_.begin() + map_id)); map_id += 1;
+  config_.foc_hall_table[7] = static_cast<int>(*(payload_.begin() + map_id)); map_id += 1;
   config_.foc_hall_interp_erpm = readAutoBuffer(map_id); map_id += 4;
   config_.foc_sl_erpm = readAutoBuffer(map_id); map_id += 4;
-  config_.foc_sample_v0_v7 = static_cast<bool>(*(payload_end_.first + map_id)); map_id += 1;
-  config_.foc_sample_high_current = static_cast<bool>(*(payload_end_.first + map_id)); map_id += 1;
+  config_.foc_sample_v0_v7 = static_cast<bool>(*(payload_.begin() + map_id)); map_id += 1;
+  config_.foc_sample_high_current = static_cast<bool>(*(payload_.begin() + map_id)); map_id += 1;
   config_.foc_sat_comp = readBuffer(map_id, 2) / 1000.0; map_id += 2;
-  config_.foc_temp_comp = static_cast<bool>(*(payload_end_.first + map_id)); map_id += 1;
+  config_.foc_temp_comp = static_cast<bool>(*(payload_.begin() + map_id)); map_id += 1;
   config_.foc_temp_comp_base_temp = readBuffer(map_id, 2) / 100.0; map_id += 2;
   config_.foc_current_filter_const = readBuffer(map_id, 2) / 10000.0; map_id += 2;
-  config_.foc_cc_decoupling = static_cast<FOC_CC_DECOUPLING_MODE>(*(payload_end_.first + map_id)); map_id += 1;
-  config_.foc_observer_type = static_cast<FOC_OBSERVER_TYPE>(*(payload_end_.first + map_id)); map_id += 1;
+  config_.foc_cc_decoupling = static_cast<FOC_CC_DECOUPLING_MODE>(*(payload_.begin() + map_id)); map_id += 1;
+  config_.foc_observer_type = static_cast<FOC_OBSERVER_TYPE>(*(payload_.begin() + map_id)); map_id += 1;
   config_.foc_hfi_voltage_start = readAutoBuffer(map_id); map_id += 4;
   config_.foc_hfi_voltage_run = readAutoBuffer(map_id); map_id += 4;
   config_.foc_hfi_voltage_max = readAutoBuffer(map_id); map_id += 4;
   config_.foc_sl_erpm_hfi = readAutoBuffer(map_id); map_id += 4;
   config_.foc_hfi_start_samples = readBuffer(map_id, 2); map_id += 2;
   config_.foc_hfi_obs_ovr_sec = readAutoBuffer(map_id); map_id += 4;
-  config_.foc_hfi_samples = static_cast<FOC_HFI_SAMPLES>(*(payload_end_.first + map_id)); map_id += 1;
-  config_.foc_offsets_cal_on_boot = static_cast<bool>(*(payload_end_.first + map_id)); map_id += 1;
+  config_.foc_hfi_samples = static_cast<FOC_HFI_SAMPLES>(*(payload_.begin() + map_id)); map_id += 1;
+  config_.foc_offsets_cal_on_boot = static_cast<bool>(*(payload_.begin() + map_id)); map_id += 1;
   config_.foc_offsets_current[0] = readAutoBuffer(map_id); map_id += 4;
   config_.foc_offsets_current[1] = readAutoBuffer(map_id); map_id += 4;
   config_.foc_offsets_current[2] = readAutoBuffer(map_id); map_id += 4;
@@ -505,9 +500,9 @@ VescPacketMCConf::VescPacketMCConf(std::shared_ptr<VescFrame> raw) : VescPacket(
   config_.foc_offsets_voltage_undriven[0] = readBuffer(map_id, 2) / 10000.0; map_id += 2;
   config_.foc_offsets_voltage_undriven[1] = readBuffer(map_id, 2) / 10000.0; map_id += 2;
   config_.foc_offsets_voltage_undriven[2] = readBuffer(map_id, 2) / 10000.0; map_id += 2;
-  config_.foc_phase_filter_enable = static_cast<bool>(*(payload_end_.first + map_id)); map_id += 1;
+  config_.foc_phase_filter_enable = static_cast<bool>(*(payload_.begin() + map_id)); map_id += 1;
   config_.foc_phase_filter_max_erpm = readAutoBuffer(map_id); map_id += 4;
-  config_.foc_mtpa_mode = static_cast<MTPA_MODE>(*(payload_end_.first + map_id)); map_id += 1;
+  config_.foc_mtpa_mode = static_cast<MTPA_MODE>(*(payload_.begin() + map_id)); map_id += 1;
   config_.foc_fw_current_max = readAutoBuffer(map_id); map_id += 4;
   config_.foc_fw_duty_start = readBuffer(map_id, 2) / 10000.0; map_id += 2;
   config_.foc_fw_ramp_time  = readBuffer(map_id, 2) / 1000.0; map_id += 2;
@@ -517,13 +512,13 @@ VescPacketMCConf::VescPacketMCConf(std::shared_ptr<VescFrame> raw) : VescPacket(
   config_.gpd_current_filter_const = readBuffer(map_id, 2) / 10000.0; map_id += 2;
   config_.gpd_current_kp = readAutoBuffer(map_id); map_id += 4;
   config_.gpd_current_ki = readAutoBuffer(map_id); map_id += 4;
-  config_.sp_pid_loop_rate = static_cast<PID_RATE>(*(payload_end_.first + map_id)); map_id += 1;
+  config_.sp_pid_loop_rate = static_cast<PID_RATE>(*(payload_.begin() + map_id)); map_id += 1;
   config_.s_pid_kp = readAutoBuffer(map_id); map_id += 4;
   config_.s_pid_ki = readAutoBuffer(map_id); map_id += 4;
   config_.s_pid_kd = readAutoBuffer(map_id); map_id += 4;
   config_.s_pid_kd_filter = readBuffer(map_id, 2) / 10000.0; map_id += 2;
   config_.s_pid_min_erpm = readAutoBuffer(map_id); map_id += 4;
-  config_.s_pid_allow_braking = static_cast<bool>(*(payload_end_.first + map_id)); map_id += 1;
+  config_.s_pid_allow_braking = static_cast<bool>(*(payload_.begin() + map_id)); map_id += 1;
   config_.s_pid_ramp_erpms_s = readAutoBuffer(map_id); map_id += 4;
   config_.p_pid_kp = readAutoBuffer(map_id); map_id += 4;
   config_.p_pid_ki = readAutoBuffer(map_id); map_id += 4;
@@ -541,31 +536,31 @@ VescPacketMCConf::VescPacketMCConf(std::shared_ptr<VescFrame> raw) : VescPacket(
   config_.m_duty_ramp_step = readAutoBuffer(map_id); map_id += 4;
   config_.m_current_backoff_gain = readAutoBuffer(map_id); map_id += 4;
   config_.m_encoder_counts = readAutoBuffer(map_id); map_id += 4;
-  config_.m_sensor_port_mode = static_cast<SENSOR_PORT_MODE>(*(payload_end_.first + map_id)); map_id += 1;
-  config_.m_invert_direction = static_cast<bool>(*(payload_end_.first + map_id)); map_id += 1;
-  config_.m_drv8301_oc_mode = static_cast<DRV8301_OC_MODE>(*(payload_end_.first + map_id)); map_id += 1;
-  config_.m_drv8301_oc_adj = static_cast<int>(*(payload_end_.first + map_id)); map_id += 1;
+  config_.m_sensor_port_mode = static_cast<SENSOR_PORT_MODE>(*(payload_.begin() + map_id)); map_id += 1;
+  config_.m_invert_direction = static_cast<bool>(*(payload_.begin() + map_id)); map_id += 1;
+  config_.m_drv8301_oc_mode = static_cast<DRV8301_OC_MODE>(*(payload_.begin() + map_id)); map_id += 1;
+  config_.m_drv8301_oc_adj = static_cast<int>(*(payload_.begin() + map_id)); map_id += 1;
   config_.m_bldc_f_sw_min = readAutoBuffer(map_id); map_id += 4;
   config_.m_bldc_f_sw_max = readAutoBuffer(map_id); map_id += 4;
   config_.m_dc_f_sw = readAutoBuffer(map_id); map_id += 4;
   config_.m_ntc_motor_beta = readAutoBuffer(map_id); map_id += 4;
-  config_.m_out_aux_mode = static_cast<OUT_AUX_MODE>(*(payload_end_.first + map_id)); map_id += 1;
-  config_.m_motor_temp_sens_type = static_cast<TEMP_SENSOR_TYPE>(*(payload_end_.first + map_id)); map_id += 1;
+  config_.m_out_aux_mode = static_cast<OUT_AUX_MODE>(*(payload_.begin() + map_id)); map_id += 1;
+  config_.m_motor_temp_sens_type = static_cast<TEMP_SENSOR_TYPE>(*(payload_.begin() + map_id)); map_id += 1;
   config_.m_ptc_motor_coeff = readAutoBuffer(map_id); map_id += 4;
-  config_.m_hall_extra_samples = static_cast<int>(*(payload_end_.first + map_id)); map_id += 1;
-  config_.si_motor_poles = static_cast<int>(*(payload_end_.first + map_id)); map_id += 1;
+  config_.m_hall_extra_samples = static_cast<int>(*(payload_.begin() + map_id)); map_id += 1;
+  config_.si_motor_poles = static_cast<int>(*(payload_.begin() + map_id)); map_id += 1;
   config_.si_gear_ratio = readAutoBuffer(map_id); map_id += 4;
   config_.si_wheel_diameter = readAutoBuffer(map_id); map_id += 4;
-  config_.si_battery_type = static_cast<BATTERY_TYPE>(*(payload_end_.first + map_id)); map_id += 1;
-  config_.si_battery_cells = static_cast<int>(*(payload_end_.first + map_id)); map_id += 1;
+  config_.si_battery_type = static_cast<BATTERY_TYPE>(*(payload_.begin() + map_id)); map_id += 1;
+  config_.si_battery_cells = static_cast<int>(*(payload_.begin() + map_id)); map_id += 1;
   config_.si_battery_ah = readAutoBuffer(map_id); map_id += 4;
   config_.si_motor_nl_current = readAutoBuffer(map_id); map_id += 4;
-  config_.bms.type = static_cast<BMS_TYPE>(*(payload_end_.first + map_id)); map_id += 1;
+  config_.bms.type = static_cast<BMS_TYPE>(*(payload_.begin() + map_id)); map_id += 1;
   config_.bms.t_limit_start = readBuffer(map_id, 2) / 100.0; map_id += 2;
   config_.bms.t_limit_end   = readBuffer(map_id, 2) / 100.0; map_id += 2;
   config_.bms.soc_limit_start = readBuffer(map_id, 2) / 1000.0; map_id += 2;
   config_.bms.soc_limit_end   = readBuffer(map_id, 2) / 1000.0; map_id += 2;
-  config_.bms.fwd_can_mode = static_cast<BMS_FWD_CAN_MODE>(*(payload_end_.first + map_id)); map_id += 1;
+  config_.bms.fwd_can_mode = static_cast<BMS_FWD_CAN_MODE>(*(payload_.begin() + map_id)); map_id += 1;
 }
 
 /**
@@ -651,14 +646,14 @@ VescPacketSetCurrentBrake::VescPacketSetCurrentBrake(double current_brake)
 /**
  * @brief Constructor
  **/
-VescPacketSetVelocityERPM::VescPacketSetVelocityERPM(double vel_erpm) : VescPacket("SetERPM", 5, COMM_PACKET_ID::COMM_SET_ERPM)
+VescPacketSetVelocityERPM::VescPacketSetVelocityERPM(int32_t vel_erpm) : VescPacket("SetRPM", 5, COMM_PACKET_ID::COMM_SET_ERPM)
 {
-  const int32_t v = static_cast<int32_t>(vel_erpm);
+  const int32_t v = vel_erpm;
 
-  setPayloadValue(static_cast<uint8_t>((v >> 24) & 0xFF),0);
-  setPayloadValue(static_cast<uint8_t>((v >> 16) & 0xFF),1);
-  setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),2);
-  setPayloadValue(static_cast<uint8_t>(v & 0xFF),3);
+  setPayloadValue(static_cast<uint8_t>((v >> 24) & 0xFF),1);
+  setPayloadValue(static_cast<uint8_t>((v >> 16) & 0xFF),2);
+  setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),3);
+  setPayloadValue(static_cast<uint8_t>(v & 0xFF),4);
 
 
 }

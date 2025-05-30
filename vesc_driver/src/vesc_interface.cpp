@@ -553,7 +553,7 @@ void VescInterface::setBrake(double brake) {
   }
 }
 
-void VescInterface::setSpeed(double speed) {
+void VescInterface::setSpeed(int32_t speed) {
   const std::string can_port = "can";
   if (std::equal(can_port.begin(), can_port.end(), port_.begin())) {
     canSend(VescCanPacketSetVelocityERPM(speed));

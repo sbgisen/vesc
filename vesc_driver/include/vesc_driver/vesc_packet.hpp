@@ -258,7 +258,7 @@ public:
 class VescPacketSetVelocityERPM : public VescPacket
 {
 public:
-  explicit VescPacketSetVelocityERPM(double vel_erpm);
+  explicit VescPacketSetVelocityERPM(int32_t vel_erpm);
 };
 
 /*------------------------------------------------------------------*/

@@ -140,7 +140,7 @@ public:
   void setDutyCycle(double duty_cycle);
   void setCurrent(double current);
   void setBrake(double brake);
-  void setSpeed(double speed);
+  void setSpeed(int32_t speed);
   void setPosition(double position);
   void setServo(double servo);
 

@@ -372,12 +372,11 @@ hardware_interface::return_type VescHwInterface::write(const rclcpp::Time& /*tim
   {
     // limit_velocity_interface_.enforceLimits(period);
 
-    // converts the velocity unit: rad/s or m/s -> rpm -> erpm
-    const double command_rpm = command * 60.0 / 2.0 / M_PI / gear_ratio_;
-    const double command_erpm = command_rpm * static_cast<double>(num_rotor_poles_) / 2;
-
-    // sends a reference velocity command
-    vesc_interface_->setSpeed(command_erpm);
+    const double control_rate = 1.0 / period.seconds();
+    double target_steps =
+      position_steps_ + command * (num_rotor_poles_ * num_hall_sensors_) / (2 * M_PI) / control_rate / gear_ratio_;
+    double position = (target_steps * 2.0 * M_PI) / (num_rotor_poles_ * 3.0) * gear_ratio_;  // unit: rad
+    vesc_interface_->setPosition(position);
   }
   else if (command_mode_ == "velocity_duty")
   {

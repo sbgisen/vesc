@@ -110,6 +110,14 @@ public:
    * @return Returns true if the serial port is open, false otherwise.
    */
   bool isConnected() const;
+
+  /**
+   * Attempts to reconnect to the VESC if the connection is lost.
+   *
+   * @return Returns true if the reconnection was successful, false otherwise.
+   */
+  bool reconnectIfDisconnected() const;
+
   /**
    * Returns whether the data has been updated or not.
    *

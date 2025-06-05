@@ -243,6 +243,48 @@ bool VescInterface::isConnected() const
   }
 }
 
+bool VescInterface::reconnectIfDisconnected() const
+{
+  const rclcpp::Logger logger = rclcpp::get_logger("VescDriver");
+
+  // If already connected, nothing to do
+  if (isConnected())
+    return true;
+
+  const int reconnect_interval_ms = 100;       // Interval between attempts
+  const int reconnect_timeout_ms = 5000;       // Total timeout duration
+  const int max_attempts = reconnect_timeout_ms / reconnect_interval_ms;
+  const int max_warnings = 10;
+  const int warn_interval = std::max(1, max_attempts / max_warnings);  // e.g. 5sec/100ms=50 → every 5 attempts
+
+  int attempt = 0;
+
+  while (rclcpp::ok() && attempt < max_attempts)
+  {
+    try
+    {
+      connect(last_known_port_);
+      RCLCPP_WARN(logger, "VESC reconnected.");
+      rclcpp::sleep_for(std::chrono::milliseconds(100));
+      return true;
+    }
+    catch (const std::exception& e)
+    {
+      if (attempt % warn_interval == 0)
+      {
+        RCLCPP_WARN(logger, "Retrying to connect to VESC (%d/%d): %s",
+                    attempt + 1, max_attempts, e.what());
+      }
+
+      rclcpp::sleep_for(std::chrono::milliseconds(reconnect_interval_ms));
+      ++attempt;
+    }
+  }
+
+  RCLCPP_ERROR(logger, "Reconnect failed after %d attempts (~%d ms).", attempt, reconnect_timeout_ms);
+  return false;
+}
+
 bool VescInterface::isRxDataUpdated() const
 {
   bool output = impl_->data_updated_;

@@ -522,6 +522,12 @@ void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& pa
 void VescHwInterface::errorCallback(const std::string& error)
 {
   RCLCPP_ERROR(rclcpp::get_logger("VescHwInterface"), "%s", error.c_str());
+  bool recconected = vesc_interface_->reconnectIfDisconnected();
+  if (!recconected)
+  {
+    RCLCPP_ERROR(rclcpp::get_logger("VescHwInterface"), "Failed to reconnect to the VESC.");
+    rclcpp::shutdown();
+  }
   return;
 }
 

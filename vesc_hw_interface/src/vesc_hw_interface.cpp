@@ -440,24 +440,7 @@ void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& pa
     return;
   }
 
-  if (packet->getName() == "MCConfiguration")
-  {
-    std::shared_ptr<VescPacketMCConf const> mc_conf = std::dynamic_pointer_cast<VescPacketMCConf const>(packet);
-
-    auto config = mc_conf->getConfig();
-    num_rotor_poles_ = config.si_motor_poles;
-    gear_ratio_ = config.si_gear_ratio;
-    if (config.motor_type == vesc_driver::MOTOR_TYPE_FOC) {
-      auto pole_pairs = num_rotor_poles_ / 2.0;
-      auto flux_linkage = config.foc_motor_flux_linkage;
-      torque_const_ = (60.0 / (2.0 * M_PI * pole_pairs)) * flux_linkage;
-    }
-    RCLCPP_INFO_STREAM(rclcpp::get_logger("VescHwInterface"), "Extracted configuration from VESC:");
-    RCLCPP_INFO_STREAM(rclcpp::get_logger("VescHwInterface"), "  - Number of rotor poles: " << num_rotor_poles_);
-    RCLCPP_INFO_STREAM(rclcpp::get_logger("VescHwInterface"), "  - Gear ratio: " << gear_ratio_);
-    RCLCPP_INFO_STREAM(rclcpp::get_logger("VescHwInterface"), "  - Torque constant: " << torque_const_);
-  }
-  else if (packet->getName() == "Values")
+  if (packet->getName() == "Values")
   {
     std::shared_ptr<VescPacketValues const> values = std::dynamic_pointer_cast<VescPacketValues const>(packet);
 

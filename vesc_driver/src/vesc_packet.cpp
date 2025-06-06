@@ -669,10 +669,10 @@ VescPacketSetPos::VescPacketSetPos(double pos) : VescPacket("SetPos", 5, COMM_PA
 
   const int32_t v = static_cast<int32_t>(pos * 1000000.0);
 
-  setPayloadValue(static_cast<uint8_t>((v >> 24) & 0xFF),0);
-  setPayloadValue(static_cast<uint8_t>((v >> 16) & 0xFF),1);
-  setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),2);
-  setPayloadValue(static_cast<uint8_t>(v & 0xFF),3);
+  setPayloadValue(static_cast<uint8_t>((v >> 24) & 0xFF),1);
+  setPayloadValue(static_cast<uint8_t>((v >> 16) & 0xFF),2);
+  setPayloadValue(static_cast<uint8_t>((v >> 8) & 0xFF),3);
+  setPayloadValue(static_cast<uint8_t>(v & 0xFF),4);
 
 
 }

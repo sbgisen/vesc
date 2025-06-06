@@ -52,25 +52,24 @@
 #include "vesc_driver/data_map.hpp"
 #include "vesc_driver/vesc_packet.hpp"
 
-namespace vesc_driver {
+namespace vesc_driver
+{
 /**
  * @brief Creates VESC packets from raw data.
  **/
 class VescPacketFactory : private boost::noncopyable
 {
 public:
- static VescPacketPtr createPacket(const Buffer::const_iterator&,
-                                   const Buffer::const_iterator&, int*, int*,
-                                   std::string*);
+  static VescPacketPtr createPacket(const Buffer::const_iterator&, const Buffer::const_iterator&, int*, int*,
+                                    std::string*);
 
- static VescPacketPtr createCanPacket(const Buffer::const_iterator&,
-                                      const Buffer::const_iterator&,
-                                      int*, std::string*);
+  static VescPacketPtr createCanPacket(const Buffer::const_iterator&, const Buffer::const_iterator&, int*,
+                                       std::string*);
 
- typedef std::function<VescPacketPtr(std::shared_ptr<VescFrame>)> CreateFn;
+  typedef std::function<VescPacketPtr(std::shared_ptr<VescFrame>)> CreateFn;
 
- /** Register a packet type with the factory. */
- static void registerPacketType(COMM_PACKET_ID, CreateFn);
+  /** Register a packet type with the factory. */
+  static void registerPacketType(COMM_PACKET_ID, CreateFn);
 
 private:
   typedef std::map<COMM_PACKET_ID, CreateFn> FactoryMap;

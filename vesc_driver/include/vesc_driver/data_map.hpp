@@ -21,11 +21,13 @@
 #include <cstdint>
 #include <boost/crc.hpp>
 
-namespace vesc_driver {
+namespace vesc_driver
+{
 /**
  * @brief ID of communication commands
  **/
-enum class COMM_PACKET_ID : int16_t {
+enum class COMM_PACKET_ID : int16_t
+{
   COMM_FW_VERSION = 0,
   COMM_JUMP_TO_BOOTLOADER,
   COMM_ERASE_NEW_APP,
@@ -204,7 +206,8 @@ enum class COMM_PACKET_ID : int16_t {
 /**
  * @brief Map of return packets of COMM_GET_VALUES
  **/
-enum class PACKET_MAP : uint8_t {
+enum class PACKET_MAP : uint8_t
+{
   TEMP_MOS = 1,
   TEMP_MOTOR = 3,
   CURRENT_MOTOR = 5,
@@ -578,7 +581,8 @@ struct MCConfiguration
   uint16_t crc;
 };
 
-enum class CAN_PACKET_ID : std::uint32_t {
+enum class CAN_PACKET_ID : std::uint32_t
+{
   CAN_PACKET_SET_DUTY = 0,
   CAN_PACKET_SET_CURRENT = 1,
   CAN_PACKET_SET_CURRENT_BRAKE = 2,
@@ -652,8 +656,8 @@ constexpr int16_t VESC_MAX_FRAME_SIZE = 6 + VESC_MAX_PAYLOAD_SIZE;  //  frame si
 constexpr int16_t VESC_SOF_VAL_SMALL_FRAME = 2;                     // f "small" frame value
 constexpr int16_t VESC_SOF_VAL_LARGE_FRAME = 3;                     // f "large" frame value
 constexpr int16_t VESC_EOF_VAL = 3;                                 // frame
-constexpr int16_t VESC_MIN_HEADER_SIZE = 2;  // Minimum header size (bytes)
-constexpr int16_t VESC_FOOTER_SIZE = 3;      // Footer size (bytes)
+constexpr int16_t VESC_MIN_HEADER_SIZE = 2;                         // Minimum header size (bytes)
+constexpr int16_t VESC_FOOTER_SIZE = 3;                             // Footer size (bytes)
 
 using CRC = boost::crc_optimal<16, 0x1021, 0, 0, false, false>;
 

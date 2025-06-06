@@ -27,7 +27,7 @@ namespace vesc_hw_interface
 VescHwInterface::VescHwInterface()
 {
   vesc_interface_ = std::make_shared<VescInterface>(
-      std::string(), int(),int(),std::bind(&VescHwInterface::packetCallback, this, std::placeholders::_1),
+      std::string(), int(), int(), std::bind(&VescHwInterface::packetCallback, this, std::placeholders::_1),
       std::bind(&VescHwInterface::errorCallback, this, std::placeholders::_1));
 }
 
@@ -109,20 +109,25 @@ CallbackReturn VescHwInterface::on_init(const hardware_interface::HardwareInfo& 
 
   // parse URDF for joint type
   auto urdf = info_.original_xml;
-  if (!urdf.empty()) {
+  if (!urdf.empty())
+  {
     tinyxml2::XMLDocument doc;
-    if (doc.Parse(urdf.c_str()) != tinyxml2::XML_SUCCESS) {
+    if (doc.Parse(urdf.c_str()) != tinyxml2::XML_SUCCESS)
+    {
       RCLCPP_ERROR_STREAM(get_logger(), "Failed to parse URDF XML");
       return hardware_interface::CallbackReturn::ERROR;
     }
-    const tinyxml2::XMLElement * joint_it = doc.RootElement()->FirstChildElement("joint");
-    while (joint_it) {
-      const tinyxml2::XMLAttribute * name_attr = joint_it->FindAttribute("name");
-      const tinyxml2::XMLAttribute * type_attr = joint_it->FindAttribute("type");
-      if (name_attr && type_attr) {
+    const tinyxml2::XMLElement* joint_it = doc.RootElement()->FirstChildElement("joint");
+    while (joint_it)
+    {
+      const tinyxml2::XMLAttribute* name_attr = joint_it->FindAttribute("name");
+      const tinyxml2::XMLAttribute* type_attr = joint_it->FindAttribute("type");
+      if (name_attr && type_attr)
+      {
         std::string name = joint_it->Attribute("name");
         std::string type = joint_it->Attribute("type");
-        if (name == joint_name_) {
+        if (name == joint_name_)
+        {
           joint_type_ = type;
           break;
         }
@@ -196,7 +201,8 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
     return CallbackReturn::FAILURE;
   }
 
-  if ((command_mode_ == hardware_interface::HW_IF_POSITION) || (command_mode_ == hardware_interface::HW_IF_VELOCITY) || (command_mode_ == hardware_interface::HW_IF_EFFORT))
+  if ((command_mode_ == hardware_interface::HW_IF_POSITION) || (command_mode_ == hardware_interface::HW_IF_VELOCITY) ||
+      (command_mode_ == hardware_interface::HW_IF_EFFORT))
   {
     vesc_interface_->requestMCConfiguration();
     rclcpp::sleep_for(std::chrono::milliseconds(100));
@@ -215,8 +221,11 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
     {
       upper_limit_ = joint_limit_itr->second.max_position;
       lower_limit_ = joint_limit_itr->second.min_position;
-    } else {
-      RCLCPP_WARN(rclcpp::get_logger("VescHwInterface"), "No joint position limits found in URDF, using default limits");
+    }
+    else
+    {
+      RCLCPP_WARN(rclcpp::get_logger("VescHwInterface"), "No joint position limits found in URDF, using default "
+                                                         "limits");
     }
 
     // initializes the servo controller
@@ -357,7 +366,8 @@ hardware_interface::return_type VescHwInterface::write(const rclcpp::Time& /*tim
   // sends commands
 
   auto command = command_;
-  if (std::isnan(command) && command_mode_ != "position_duty") {
+  if (std::isnan(command) && command_mode_ != "position_duty")
+  {
     command = 0.0;
   }
   if (command_mode_ == "position_duty")
@@ -464,7 +474,8 @@ void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& pa
           sensor_initialize_ = true;
           return;
         }
-        sensor_initialize_ = (std::fabs(homing_offset_ - position) < std::numeric_limits<double>::epsilon()) ? true : false;
+        sensor_initialize_ =
+            (std::fabs(homing_offset_ - position) < std::numeric_limits<double>::epsilon()) ? true : false;
         homing_offset_ = position;
       }
       else if (joint_type_ == "continuous")

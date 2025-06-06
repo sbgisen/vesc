@@ -74,9 +74,9 @@ VescPacketPtr createFailed(int* p_num_bytes_needed, std::string* p_what, const s
  * @return Pointer to a valid VescPacket if successful; otherwise, an empty
  * pointer.
  **/
-VescPacketPtr VescPacketFactory::createPacket(
-    const Buffer::const_iterator& begin, const Buffer::const_iterator& end,
-    int* num_bytes_needed, int* frame_size, std::string* what) {
+VescPacketPtr VescPacketFactory::createPacket(const Buffer::const_iterator& begin, const Buffer::const_iterator& end,
+                                              int* num_bytes_needed, int* frame_size, std::string* what)
+{
   // initializes output variables
   if (num_bytes_needed != NULL)
   {
@@ -171,9 +171,9 @@ VescPacketPtr VescPacketFactory::createPacket(
   }
 }
 
-VescPacketPtr VescPacketFactory::createCanPacket(
-    const Buffer::const_iterator& begin, const Buffer::const_iterator& end,
-    int* num_bytes_needed, std::string* what) {
+VescPacketPtr VescPacketFactory::createCanPacket(const Buffer::const_iterator& begin, const Buffer::const_iterator& end,
+                                                 int* num_bytes_needed, std::string* what)
+{
   // initializes output variables
   if (num_bytes_needed != NULL)
   {
@@ -183,7 +183,6 @@ VescPacketPtr VescPacketFactory::createCanPacket(
   {
     what->clear();
   }
-
 
   // gets a view of the payload
   BufferRangeConst view_payload;

@@ -56,72 +56,93 @@ typedef std::vector<uint8_t> Buffer;
 typedef std::pair<Buffer::iterator, Buffer::iterator> BufferRange;
 typedef std::pair<Buffer::const_iterator, Buffer::const_iterator> BufferRangeConst;
 
-class VescFrame {
- public:
-  virtual ~VescFrame() {}  // segmenation fault
+class VescFrame
+{
+public:
+  virtual ~VescFrame()
+  {
+  }  // segmenation fault
 
-  virtual const Buffer& getPayload() const final { return payload_; }
+  virtual const Buffer& getPayload() const final
+  {
+    return payload_;
+  }
   explicit VescFrame(const int16_t payload_size);
   explicit VescFrame(const BufferRangeConst& payload);
-  virtual void setPayloadId(const int16_t payload_id) final {
+  virtual void setPayloadId(const int16_t payload_id) final
+  {
     *payload_.begin() = payload_id;
   }
-  virtual void setPayloadValue(const int16_t payload_value,
-                               const uint8_t position) final {
+  virtual void setPayloadValue(const int16_t payload_value, const uint8_t position) final
+  {
     *(payload_.begin() + position) = payload_value;
   }
 
- protected:
+protected:
   Buffer payload_;
 
- private:
+private:
   friend class VescPacketFactory;  // gives VescPacketFactory access to private
                                    // constructor
 };
 
-class VescPacket : public VescFrame {
- public:
+class VescPacket : public VescFrame
+{
+public:
   /**
    * @brief Destructor
    **/
-  virtual ~VescPacket() {}
+  virtual ~VescPacket()
+  {
+  }
 
   /**
    * @brief Gets the packet name
    * @return The packet name
    **/
-  virtual const std::string& getName() const final { return name_; }
+  virtual const std::string& getName() const final
+  {
+    return name_;
+  }
 
- protected:
-  VescPacket(const std::string& name, const int16_t payload_size,
-           const COMM_PACKET_ID cmd);
+protected:
+  VescPacket(const std::string& name, const int16_t payload_size, const COMM_PACKET_ID cmd);
   VescPacket(const std::string& name, std::shared_ptr<VescFrame> raw);
   double readBuffer(const uint8_t, const uint8_t) const;
   double readAutoBuffer(const int) const;
 
- private:
+private:
   std::string name_;
 };
 
+class VescCanPacket : public VescFrame
+{
+public:
+  virtual ~VescCanPacket()
+  {
+  }
+  virtual const std::string& getName() const final
+  {
+    return name_;
+  }
+  virtual const CAN_PACKET_ID& getCanPacketId() const final
+  {
+    return can_packet_id_;
+  }
 
-class VescCanPacket : public VescFrame{
-  public:
-    virtual ~VescCanPacket() {}
-    virtual const std::string& getName() const final { return name_; }
-    virtual const CAN_PACKET_ID& getCanPacketId() const final { return can_packet_id_; }
-  protected:
-    VescCanPacket(const std::string& name, const int16_t payload_size, const CAN_PACKET_ID cmd);
-    VescCanPacket(const std::string& name, std::shared_ptr<VescFrame> raw);
-  private:
-    std::string name_;  
-    CAN_PACKET_ID can_packet_id_;
+protected:
+  VescCanPacket(const std::string& name, const int16_t payload_size, const CAN_PACKET_ID cmd);
+  VescCanPacket(const std::string& name, std::shared_ptr<VescFrame> raw);
+
+private:
+  std::string name_;
+  CAN_PACKET_ID can_packet_id_;
 };
 /*------------------------------------------------------------------*/
 
 /**
  * @brief VescFrame with a non-zero length payload
  **/
-
 
 typedef std::shared_ptr<VescPacket> VescPacketPtr;
 typedef std::shared_ptr<VescPacket const> VescPacketConstPtr;
@@ -283,8 +304,6 @@ public:
   explicit VescPacketSetServoPos(double servo_pos);
 };
 
-
-
 /**
  * @brief Packet for setting duty
  **/
@@ -339,7 +358,6 @@ public:
 };
 
 /*------------------------------------------------------------------*/
-
 
 }  // namespace vesc_driver
 

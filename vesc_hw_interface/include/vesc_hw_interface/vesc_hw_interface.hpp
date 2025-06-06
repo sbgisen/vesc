@@ -30,13 +30,12 @@
 #include "vesc_hw_interface/vesc_servo_controller.hpp"
 #include "vesc_hw_interface/vesc_wheel_controller.hpp"
 
-
 namespace vesc_hw_interface
 {
 using vesc_driver::VescInterface;
 using vesc_driver::VescPacket;
-using vesc_driver::VescPacketValues;
 using vesc_driver::VescPacketMCConf;
+using vesc_driver::VescPacketValues;
 using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 
 class VescHwInterface : public hardware_interface::ActuatorInterface
@@ -76,8 +75,8 @@ private:
   double command_;
   double position_, velocity_, effort_;  // joint states
 
-  int num_rotor_poles_;               // the number of rotor poles
-  int num_hall_sensors_;              // the number of hall sensors
+  int num_rotor_poles_;   // the number of rotor poles
+  int num_hall_sensors_;  // the number of hall sensors
   int controller_id_, vesct_id_;
   double gear_ratio_, torque_const_;  // physical params
   double screw_lead_;                 // linear distance (m) of 1 revolution
@@ -89,9 +88,11 @@ private:
   void packetCallback(const std::shared_ptr<VescPacket const>&);
   void errorCallback(const std::string&);
 
-  static constexpr double VESC_POS_RANGE = 360.0;  // Full angular range of the VESC PID position control
+  static constexpr double VESC_POS_RANGE = 360.0;         // Full angular range of the VESC PID position control
   static constexpr double VESC_POS_MAPPING_RANGE = 90.0;  // Range for mapping the position to the VESC
-  static constexpr double VESC_POS_WRAP_THRESHOLD = (VESC_POS_RANGE - VESC_POS_MAPPING_RANGE) / 2.0 + VESC_POS_MAPPING_RANGE;  // Angle at which to wrap the position (overflow/underflow)
+  static constexpr double VESC_POS_WRAP_THRESHOLD =
+      (VESC_POS_RANGE - VESC_POS_MAPPING_RANGE) / 2.0 +
+      VESC_POS_MAPPING_RANGE;  // Angle at which to wrap the position (overflow/underflow)
 };
 
 }  // namespace vesc_hw_interface

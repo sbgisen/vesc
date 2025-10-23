@@ -15,6 +15,7 @@
  ********************************************************************/
 
 #include "vesc_hw_interface/vesc_hw_interface.hpp"
+#include <exception>
 #include <hardware_interface/actuator_interface.hpp>
 #include <hardware_interface/types/hardware_interface_type_values.hpp>
 #include <rclcpp/clock.hpp>
@@ -298,6 +299,17 @@ std::vector<hardware_interface::CommandInterface> VescHwInterface::export_comman
 
 CallbackReturn VescHwInterface::on_activate(const rclcpp_lifecycle::State& /*previous_state*/)
 {
+  if (!vesc_interface_->isConnected())
+  {
+    try {
+      vesc_interface_->connect(port_);
+    }
+    catch (const std::exception& exception)
+    {
+      RCLCPP_FATAL(rclcpp::get_logger("VescHwInterface"), "Failed to connect to the VESC, %s.", exception.what());
+      return CallbackReturn::FAILURE;
+    }
+  }
   // Set some default values
   if (std::isnan(position_))
     position_ = 0;
@@ -312,6 +324,7 @@ CallbackReturn VescHwInterface::on_activate(const rclcpp_lifecycle::State& /*pre
 
 CallbackReturn VescHwInterface::on_deactivate(const rclcpp_lifecycle::State& /*previous_state*/)
 {
+  vesc_interface_->disconnect();
   return CallbackReturn::SUCCESS;
 }
 
@@ -385,7 +398,10 @@ hardware_interface::return_type VescHwInterface::write(const rclcpp::Time& /*tim
 
     // executes PID control
     wheel_controller_.setTargetVelocity(command);
-    wheel_controller_.control(1.0 / period.seconds());
+    if (!wheel_controller_.control(1.0 / period.seconds()))
+    {
+      return hardware_interface::return_type::DEACTIVATE;
+    }
   }
   else if (command_mode_ == "effort")
   {

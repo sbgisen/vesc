@@ -120,17 +120,17 @@ public:
   /**
    * Send a VESC packet.
    */
-  void send(const VescPacket& packet);
+  bool send(const VescPacket& packet);
 
-  void requestFWVersion();
-  void requestState();
-  void requestMCConfiguration();
-  void setDutyCycle(double duty_cycle);
-  void setCurrent(double current);
-  void setBrake(double brake);
-  void setSpeed(double speed);
-  void setPosition(double position);
-  void setServo(double servo);
+  bool requestFWVersion();
+  bool requestState();
+  bool requestMCConfiguration();
+  bool setDutyCycle(double duty_cycle);
+  bool setCurrent(double current);
+  bool setBrake(double brake);
+  bool setSpeed(double speed);
+  bool setPosition(double position);
+  bool setServo(double servo);
 
 private:
   // Pimpl - hide serial port members from class users

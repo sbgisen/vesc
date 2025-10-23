@@ -112,7 +112,7 @@ void VescWheelController::init(hardware_interface::HardwareInfo& info,
   // this);
 }
 
-void VescWheelController::control(const double control_rate)
+bool VescWheelController::control(const double control_rate)
 {
   if (pid_initialize_)
   {
@@ -127,8 +127,8 @@ void VescWheelController::control(const double control_rate)
     error_dt_ = 0.0;
     error_integ_ = 0.0;
     vesc_step_difference_.getStepDifference(position_steps_);
-    interface_ptr_->setDutyCycle(0.0);
-    return;
+    auto ret = interface_ptr_->setDutyCycle(0.0);
+    return ret;
   }
 
   // convert rad/s to steps
@@ -175,9 +175,10 @@ void VescWheelController::control(const double control_rate)
   // limit duty value
   u = std::clamp(u, -duty_limiter_, duty_limiter_);
 
-  interface_ptr_->setDutyCycle(u);
+  auto ret = interface_ptr_->setDutyCycle(u);
 
   pid_initialize_ = std::fabs(target_velocity_) < 0.0001;  // disable PID control when command is 0
+  return ret;
 }
 
 void VescWheelController::setTargetVelocity(const double velocity)

@@ -475,6 +475,14 @@ bool VescServoController::calibrate()
       target_position_ = calibration_position_;
       vesc_step_difference_.resetStepDifference(position_steps_);
       RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "Calibration Finished");
+      if (calibration_mode_ == CURRENT_)
+      {
+        interface_ptr_->setCurrent(0.0);
+      }
+      else if (calibration_mode_ == DUTY_)
+      {
+        interface_ptr_->setDutyCycle(0.0);
+      }
       calibration_flag_ = false;
       return true;
     }
@@ -498,6 +506,14 @@ bool VescServoController::calibrate()
       target_position_ = calibration_position_;
       vesc_step_difference_.resetStepDifference(position_steps_);
       RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "Calibration Finished");
+      if (calibration_mode_ == CURRENT_)
+      {
+        interface_ptr_->setCurrent(0.0);
+      }
+      else if (calibration_mode_ == DUTY_)
+      {
+        interface_ptr_->setDutyCycle(0.0);
+      }
       calibration_flag_ = false;
       return true;
     }

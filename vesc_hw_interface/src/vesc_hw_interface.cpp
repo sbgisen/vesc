@@ -27,7 +27,7 @@ namespace vesc_hw_interface
 VescHwInterface::VescHwInterface()
 {
   vesc_interface_ = std::make_shared<VescInterface>(
-      std::string(), std::bind(&VescHwInterface::packetCallback, this, std::placeholders::_1),
+      std::string(), int(), int(), std::bind(&VescHwInterface::packetCallback, this, std::placeholders::_1),
       std::bind(&VescHwInterface::errorCallback, this, std::placeholders::_1));
 }
 
@@ -72,6 +72,14 @@ CallbackReturn VescHwInterface::on_init(const hardware_interface::HardwareInfo& 
   {
     screw_lead_ = std::stod(info_.hardware_parameters["screw_lead"]);
   }
+  if (info_.hardware_parameters.find("controller_id") != info_.hardware_parameters.end())
+  {
+    controller_id_ = std::stoi(info_.hardware_parameters["controller_id"]);
+  }
+  if (info_.hardware_parameters.find("vesc_id") != info_.hardware_parameters.end())
+  {
+    vesct_id_ = std::stoi(info_.hardware_parameters["vesc_id"]);
+  }
 
   RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "Gear ratio is set to %f", gear_ratio_);
   RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "Torque constant is set to %f", torque_const_);
@@ -101,20 +109,25 @@ CallbackReturn VescHwInterface::on_init(const hardware_interface::HardwareInfo& 
 
   // parse URDF for joint type
   auto urdf = info_.original_xml;
-  if (!urdf.empty()) {
+  if (!urdf.empty())
+  {
     tinyxml2::XMLDocument doc;
-    if (doc.Parse(urdf.c_str()) != tinyxml2::XML_SUCCESS) {
+    if (doc.Parse(urdf.c_str()) != tinyxml2::XML_SUCCESS)
+    {
       RCLCPP_ERROR_STREAM(get_logger(), "Failed to parse URDF XML");
       return hardware_interface::CallbackReturn::ERROR;
     }
-    const tinyxml2::XMLElement * joint_it = doc.RootElement()->FirstChildElement("joint");
-    while (joint_it) {
-      const tinyxml2::XMLAttribute * name_attr = joint_it->FindAttribute("name");
-      const tinyxml2::XMLAttribute * type_attr = joint_it->FindAttribute("type");
-      if (name_attr && type_attr) {
+    const tinyxml2::XMLElement* joint_it = doc.RootElement()->FirstChildElement("joint");
+    while (joint_it)
+    {
+      const tinyxml2::XMLAttribute* name_attr = joint_it->FindAttribute("name");
+      const tinyxml2::XMLAttribute* type_attr = joint_it->FindAttribute("type");
+      if (name_attr && type_attr)
+      {
         std::string name = joint_it->Attribute("name");
         std::string type = joint_it->Attribute("type");
-        if (name == joint_name_) {
+        if (name == joint_name_)
+        {
           joint_type_ = type;
           break;
         }
@@ -179,7 +192,7 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
   try
   {
     RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "connect to %s", port_.c_str());
-    vesc_interface_->connect(port_);
+    vesc_interface_->connect(port_, controller_id_, vesct_id_);
     RCLCPP_INFO(rclcpp::get_logger("VescHwInterface"), "connected");
   }
   catch (const vesc_driver::SerialException& exception)
@@ -188,7 +201,8 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
     return CallbackReturn::FAILURE;
   }
 
-  if ((command_mode_ == hardware_interface::HW_IF_POSITION) || (command_mode_ == hardware_interface::HW_IF_VELOCITY) || (command_mode_ == hardware_interface::HW_IF_EFFORT))
+  if ((command_mode_ == hardware_interface::HW_IF_POSITION) || (command_mode_ == hardware_interface::HW_IF_VELOCITY) ||
+      (command_mode_ == hardware_interface::HW_IF_EFFORT))
   {
     vesc_interface_->requestMCConfiguration();
     rclcpp::sleep_for(std::chrono::milliseconds(100));
@@ -207,8 +221,11 @@ CallbackReturn VescHwInterface::on_configure(const rclcpp_lifecycle::State& /*pr
     {
       upper_limit_ = joint_limit_itr->second.max_position;
       lower_limit_ = joint_limit_itr->second.min_position;
-    } else {
-      RCLCPP_WARN(rclcpp::get_logger("VescHwInterface"), "No joint position limits found in URDF, using default limits");
+    }
+    else
+    {
+      RCLCPP_WARN(rclcpp::get_logger("VescHwInterface"), "No joint position limits found in URDF, using default "
+                                                         "limits");
     }
 
     // initializes the servo controller
@@ -349,7 +366,8 @@ hardware_interface::return_type VescHwInterface::write(const rclcpp::Time& /*tim
   // sends commands
 
   auto command = command_;
-  if (std::isnan(command) && command_mode_ != "position_duty") {
+  if (std::isnan(command) && command_mode_ != "position_duty")
+  {
     command = 0.0;
   }
   if (command_mode_ == "position_duty")
@@ -432,24 +450,7 @@ void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& pa
     return;
   }
 
-  if (packet->getName() == "MCConfiguration")
-  {
-    std::shared_ptr<VescPacketMCConf const> mc_conf = std::dynamic_pointer_cast<VescPacketMCConf const>(packet);
-
-    auto config = mc_conf->getConfig();
-    num_rotor_poles_ = config.si_motor_poles;
-    gear_ratio_ = config.si_gear_ratio;
-    if (config.motor_type == MOTOR_TYPE_FOC) {
-      auto pole_pairs = num_rotor_poles_ / 2.0;
-      auto flux_linkage = config.foc_motor_flux_linkage;
-      torque_const_ = (60.0 / (2.0 * M_PI * pole_pairs)) * flux_linkage;
-    }
-    RCLCPP_INFO_STREAM(rclcpp::get_logger("VescHwInterface"), "Extracted configuration from VESC:");
-    RCLCPP_INFO_STREAM(rclcpp::get_logger("VescHwInterface"), "  - Number of rotor poles: " << num_rotor_poles_);
-    RCLCPP_INFO_STREAM(rclcpp::get_logger("VescHwInterface"), "  - Gear ratio: " << gear_ratio_);
-    RCLCPP_INFO_STREAM(rclcpp::get_logger("VescHwInterface"), "  - Torque constant: " << torque_const_);
-  }
-  else if (packet->getName() == "Values")
+  if (packet->getName() == "Values")
   {
     std::shared_ptr<VescPacketValues const> values = std::dynamic_pointer_cast<VescPacketValues const>(packet);
 
@@ -473,7 +474,8 @@ void VescHwInterface::packetCallback(const std::shared_ptr<VescPacket const>& pa
           sensor_initialize_ = true;
           return;
         }
-        sensor_initialize_ = (std::fabs(homing_offset_ - position) < std::numeric_limits<double>::epsilon()) ? true : false;
+        sensor_initialize_ =
+            (std::fabs(homing_offset_ - position) < std::numeric_limits<double>::epsilon()) ? true : false;
         homing_offset_ = position;
       }
       else if (joint_type_ == "continuous")

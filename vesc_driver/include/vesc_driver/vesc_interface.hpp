@@ -44,8 +44,16 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <algorithm>
 
 #include <pthread.h>
+
+#include <linux/can.h>
+#include <linux/can/raw.h>
+#include <sys/ioctl.h>
+#include <net/if.h>
+#include <sys/socket.h>
+#include <cstring>
 
 #include "vesc_driver/vesc_packet.hpp"
 #include "vesc_driver/vesc_packet_factory.hpp"
@@ -72,7 +80,7 @@ public:
    *
    * @throw SerialException
    */
-  VescInterface(const std::string& port = std::string(),
+  VescInterface(const std::string& port = std::string(), const int& controller_id = int(), const int& vesc_id = int(),
                 const PacketHandlerFunction& packet_handler = PacketHandlerFunction(),
                 const ErrorHandlerFunction& error_handler = ErrorHandlerFunction());
 
@@ -97,7 +105,7 @@ public:
    *
    * @throw SerialException
    */
-  void connect(const std::string& port);
+  void connect(const std::string& port, const int& controller_id, const int& vesc_id);
 
   /**
    * Closes the serial port interface to the VESC.
@@ -120,7 +128,8 @@ public:
   /**
    * Send a VESC packet.
    */
-  void send(const VescPacket& packet);
+  void send(const VescPacket& data);
+  void canSend(const VescCanPacket& data);
 
   void requestFWVersion();
   void requestState();
@@ -128,7 +137,7 @@ public:
   void setDutyCycle(double duty_cycle);
   void setCurrent(double current);
   void setBrake(double brake);
-  void setSpeed(double speed);
+  void setSpeed(int32_t speed);
   void setPosition(double position);
   void setServo(double servo);
 
@@ -136,6 +145,7 @@ private:
   // Pimpl - hide serial port members from class users
   class Impl;
   std::unique_ptr<Impl> impl_;
+  std::string port_;
 };
 
 // todo: review

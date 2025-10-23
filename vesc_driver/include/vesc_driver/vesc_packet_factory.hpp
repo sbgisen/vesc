@@ -36,6 +36,10 @@
 #ifndef VESC_DRIVER_VESC_PACKET_FACTORY_HPP_
 #define VESC_DRIVER_VESC_PACKET_FACTORY_HPP_
 
+#include <boost/noncopyable.hpp>
+#include <boost/range/begin.hpp>
+#include <boost/range/distance.hpp>
+#include <boost/range/end.hpp>
 #include <cassert>
 #include <cstdint>
 #include <functional>
@@ -44,11 +48,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-
-#include <boost/noncopyable.hpp>
-#include <boost/range/begin.hpp>
-#include <boost/range/distance.hpp>
-#include <boost/range/end.hpp>
 
 #include "vesc_driver/data_map.hpp"
 #include "vesc_driver/vesc_packet.hpp"
@@ -61,15 +60,19 @@ namespace vesc_driver
 class VescPacketFactory : private boost::noncopyable
 {
 public:
-  static VescPacketPtr createPacket(const Buffer::const_iterator&, const Buffer::const_iterator&, int*, std::string*);
+  static VescPacketPtr createPacket(const Buffer::const_iterator&, const Buffer::const_iterator&, int*, int*,
+                                    std::string*);
+
+  static VescPacketPtr createCanPacket(const Buffer::const_iterator&, const Buffer::const_iterator&, int*,
+                                       std::string*);
 
   typedef std::function<VescPacketPtr(std::shared_ptr<VescFrame>)> CreateFn;
 
   /** Register a packet type with the factory. */
-  static void registerPacketType(int, CreateFn);
+  static void registerPacketType(COMM_PACKET_ID, CreateFn);
 
 private:
-  typedef std::map<int, CreateFn> FactoryMap;
+  typedef std::map<COMM_PACKET_ID, CreateFn> FactoryMap;
   static FactoryMap* getMap();
 };
 

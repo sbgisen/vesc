@@ -14,6 +14,8 @@
       <plugin>vesc_hw_interface/VescHwInterface</plugin>
       <param name="port">/dev/ttyACM0</param>
       <param name="servo/calibration">false</param>
+      <param name="controller_id">6</param>
+      <param name="vesc_id">4</param>
       <param name="servo/calibration_current">1.0</param>
       <param name="servo/calibration_strict_current">-0.08</param>
       <param name="servo/calibration_duty">0.01</param>

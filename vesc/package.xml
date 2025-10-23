@@ -12,6 +12,7 @@
   <exec_depend>vesc_driver</exec_depend>
   <exec_depend>vesc_msgs</exec_depend>
   <exec_depend>vesc_hw_interface</exec_depend>
+  <exec_depend>can_driver</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

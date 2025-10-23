@@ -36,6 +36,10 @@
 #ifndef VESC_DRIVER_VESC_PACKET_HPP_
 #define VESC_DRIVER_VESC_PACKET_HPP_
 
+#include <boost/crc.hpp>
+#include <boost/range/begin.hpp>
+#include <boost/range/distance.hpp>
+#include <boost/range/end.hpp>
 #include <cassert>
 #include <cstdint>
 #include <iterator>
@@ -43,11 +47,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <boost/crc.hpp>
-#include <boost/range/begin.hpp>
-#include <boost/range/distance.hpp>
-#include <boost/range/end.hpp>
 
 #include "vesc_driver/data_map.hpp"
 
@@ -57,63 +56,36 @@ typedef std::vector<uint8_t> Buffer;
 typedef std::pair<Buffer::iterator, Buffer::iterator> BufferRange;
 typedef std::pair<Buffer::const_iterator, Buffer::const_iterator> BufferRangeConst;
 
-/**
- * @brief The raw frame for communicating with the VESC
- **/
 class VescFrame
 {
 public:
-  /**
-   * @brief Destructor
-   **/
   virtual ~VescFrame()
   {
-  }
+  }  // segmenation fault
 
-  /**
-   * @brief Gets a reference of the frame
-   * @return Reference of the frame
-   **/
-  virtual const Buffer& getFrame() const
+  virtual const Buffer& getPayload() const final
   {
-    return frame_;
+    return payload_;
   }
-
-  /* packet properties */
-  static const int16_t VESC_MAX_PAYLOAD_SIZE = 1024;                     // Maximum payload size (bytes)
-  static const int16_t VESC_MIN_FRAME_SIZE = 5;                          // Smallest frame size (bytes)
-  static const int16_t VESC_MAX_FRAME_SIZE = 6 + VESC_MAX_PAYLOAD_SIZE;  // Largest frame size (bytes)
-  static const int16_t VESC_SOF_VAL_SMALL_FRAME = 2;                     // Start of "small" frame value
-  static const int16_t VESC_SOF_VAL_LARGE_FRAME = 3;                     // Start of "large" frame value
-  static const int16_t VESC_EOF_VAL = 3;                                 // End-of-frame value
-
-  /**
-   * @brief CRC parameters for the VESC
-   **/
-  typedef boost::crc_optimal<16, 0x1021, 0, 0, false, false> CRC;
+  explicit VescFrame(const int16_t payload_size);
+  explicit VescFrame(const BufferRangeConst& payload);
+  virtual void setPayloadId(const int16_t payload_id) final
+  {
+    *payload_.begin() = payload_id;
+  }
+  virtual void setPayloadValue(const int16_t payload_value, const uint8_t position) final
+  {
+    *(payload_.begin() + position) = payload_value;
+  }
 
 protected:
-  explicit VescFrame(const int16_t payload_size);
-
-  Buffer frame_;
-  // Stores frame data
-
-  BufferRange payload_end_;
-  // View into frame's payload section
-  // .first:  iterator which points the front of payload (in `frame_`/)
-  // .second: iterator which points the tail of payload (in `frame_`)
+  Buffer payload_;
 
 private:
-  VescFrame(const BufferRangeConst& frame, const BufferRangeConst& payload);
-
-  friend class VescPacketFactory;  // gives VescPacketFactory access to private constructor
+  friend class VescPacketFactory;  // gives VescPacketFactory access to private
+                                   // constructor
 };
 
-/*------------------------------------------------------------------*/
-
-/**
- * @brief VescFrame with a non-zero length payload
- **/
 class VescPacket : public VescFrame
 {
 public:
@@ -128,13 +100,13 @@ public:
    * @brief Gets the packet name
    * @return The packet name
    **/
-  virtual const std::string& getName() const
+  virtual const std::string& getName() const final
   {
     return name_;
   }
 
 protected:
-  VescPacket(const std::string& name, const int16_t payload_size, const int16_t payload_id);
+  VescPacket(const std::string& name, const int16_t payload_size, const COMM_PACKET_ID cmd);
   VescPacket(const std::string& name, std::shared_ptr<VescFrame> raw);
   double readBuffer(const uint8_t, const uint8_t) const;
   double readAutoBuffer(const int) const;
@@ -142,6 +114,35 @@ protected:
 private:
   std::string name_;
 };
+
+class VescCanPacket : public VescFrame
+{
+public:
+  virtual ~VescCanPacket()
+  {
+  }
+  virtual const std::string& getName() const final
+  {
+    return name_;
+  }
+  virtual const CAN_PACKET_ID& getCanPacketId() const final
+  {
+    return can_packet_id_;
+  }
+
+protected:
+  VescCanPacket(const std::string& name, const int16_t payload_size, const CAN_PACKET_ID cmd);
+  VescCanPacket(const std::string& name, std::shared_ptr<VescFrame> raw);
+
+private:
+  std::string name_;
+  CAN_PACKET_ID can_packet_id_;
+};
+/*------------------------------------------------------------------*/
+
+/**
+ * @brief VescFrame with a non-zero length payload
+ **/
 
 typedef std::shared_ptr<VescPacket> VescPacketPtr;
 typedef std::shared_ptr<VescPacket const> VescPacketConstPtr;
@@ -278,7 +279,7 @@ public:
 class VescPacketSetVelocityERPM : public VescPacket
 {
 public:
-  explicit VescPacketSetVelocityERPM(double vel_erpm);
+  explicit VescPacketSetVelocityERPM(int32_t vel_erpm);
 };
 
 /*------------------------------------------------------------------*/
@@ -302,6 +303,61 @@ class VescPacketSetServoPos : public VescPacket
 public:
   explicit VescPacketSetServoPos(double servo_pos);
 };
+
+/**
+ * @brief Packet for setting duty
+ **/
+class VescCanPacketSetDuty : public VescCanPacket
+{
+public:
+  explicit VescCanPacketSetDuty(double duty);
+};
+
+/*------------------------------------------------------------------*/
+
+/**
+ * @brief Packet for setting reference current
+ **/
+class VescCanPacketSetCurrent : public VescCanPacket
+{
+public:
+  explicit VescCanPacketSetCurrent(double current);
+};
+
+/*------------------------------------------------------------------*/
+
+/**
+ * @brief Packet for setting current brake
+ **/
+class VescCanPacketSetCurrentBrake : public VescCanPacket
+{
+public:
+  explicit VescCanPacketSetCurrentBrake(double current_brake);
+};
+
+/*------------------------------------------------------------------*/
+
+/**
+ * @brief Packet for setting reference angular velocity
+ **/
+class VescCanPacketSetVelocityERPM : public VescCanPacket
+{
+public:
+  explicit VescCanPacketSetVelocityERPM(double vel_erpm);
+};
+
+/*------------------------------------------------------------------*/
+
+/**
+ * @brief Packet for setting a reference position
+ **/
+class VescCanPacketSetPos : public VescCanPacket
+{
+public:
+  explicit VescCanPacketSetPos(double pos);
+};
+
+/*------------------------------------------------------------------*/
 
 }  // namespace vesc_driver
 
